@@ -1,0 +1,18 @@
+package com.yatrix.social.google.api.impl.json;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties
+abstract class GoogleEventAttendeesMixin {
+	
+	@JsonCreator
+	GoogleEventAttendeesMixin(){
+		
+	}
+	@SuppressWarnings("unused")
+	@JsonProperty("email")
+	private String email;
+
+}
