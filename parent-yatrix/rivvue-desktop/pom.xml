@@ -146,6 +146,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>rivvue-desktop</finalName>
+		<finalName>wannabethere</finalName>
 	</build>
 </project>

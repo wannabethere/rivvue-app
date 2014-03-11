@@ -22,6 +22,16 @@
    </nav>
 
 	</header>
+	<header th:fragment="signedHeader">
+   		<div id="logo">
+   			<img src="images/logo.png" th:src="@{/resources/images/logo.png}" width="150" height="36" /> 
+   		</div>
+   		<nav>
+      		<ul>
+         		<li><a href="#">What's New</a>| </li>
+      		</ul>
+   		</nav>
+	</header>
 	
 	<div th:fragment="banner">
 		<div class="menu">

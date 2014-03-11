@@ -1,28 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RIVVUE</title>
-<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
-<link href="css/stylesheet.css" rel="stylesheet" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title th:text="#{app.name}" >RIVVUE</title>
+	<link href="http://fonts.googleapis.com/css?family=Oswald"  rel="stylesheet" type="text/css"  />
+	<link href="./../../../resources/css/stylesheet.css"  rel="stylesheet" type="text/css"  th:href="@{/resources/css/stylesheet.css}"/>
 </head>
 
 <body>
-<header>
-   <div id="logo">
-   <img src="images/logo.png" width="150" height="36" /> </div>
-   <nav>
-      <ul>
-         <li><a href="#">What's New</a>
-|         
-</li>
-         <li><a href="#">Sign In</a> 
-|
-         </li>
-         <li><a href="#">Sign Up</a>
-      </li></ul>
-   </nav>
+<header th:include="include :: signedHeader">
 </header>
 <div id="content1">
 
@@ -36,7 +24,7 @@
    <li>|</li>
    <li><a href="#">Calendar</a> </li>
    <li>|</li>
-   <li><a href="#">Contacts</a></li>
+   <li><a href="#" th:href="@{'/friends/'+${authname}}">Contacts</a></li>
    
    </ul>
    
@@ -45,26 +33,26 @@
    <!--topmenu end-->
    
    <div class="event1">
-   <div class="createevent"><a href="#"><img src="images/createevent.png" alt="" /></a></div>
+   <div class="createevent"><a href="#"><img src="./../../resources/images/createevent.png" th:src="@{/resources/images/createevent.png}"  alt="" /></a></div>
      <div class="myevent"><a href="#">My Events</a></div>
-   <div class="allevent"><img src="images/allevent.png" alt="" /></div>
+   <div class="allevent"><img src="./../../resources/images/allevent.png" th:src="@{/resources/images/allevent.png}"  alt="" /></div>
  
    </div>
    <div class=" clear"></div>
    <div id="searchbar"><input name="Search " type="text" class="searchbox1" id="Search "  value="Search Event"/> </div> 
     <div class=" clear"></div>
    <div id="box">
-     <div id="image"><img src="images/flag.png" width="39" height="39" /></div>
+     <div id="image"><img src="./../../resources/images/flag.png" th:src="@{/resources/images/flag.png}" width="39" height="39" /></div>
      <!--start inner box -->
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
           <h1>PLAY VOLLEYBALL</h1>
-          <div id="rightbox"><img src="images/redstar.png" width="17" height="17" />
-           <img src="images/redstar.png" width="17" height="17" />
-           <img src="images/redstar.png" width="17" height="17" />
-           <img src="images/redstar.png" width="17" height="17" />
-           <img src="images/greystar.png" width="17" height="17" /> 8 yorum
+          <div id="rightbox"><img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
+           <img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
+           <img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
+           <img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
+           <img src="./../../resources/images/greystar.png" th:src="@{/resources/images/greystar.png}"  width="17" height="17" /> 8 yorum
            </div>
           </div>
            <!--end heading -->
@@ -85,18 +73,18 @@
     </div>
     <!--end box-->
     <div id="box">
-     <div id="image"><img src="images/run.png" width="36" height="40" /></div>
+     <div id="image"><img src="./../../resources/images/run.png" th:src="@{/resources/images/run.png}" width="36" height="40" /></div>
      <!--start inner box -->
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
           <h1>RUNNING</h1>
           <div id="rightbox"><span class="imdb">IMDB RATING 8.6</span>
-          <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/halfyellowstar.png" width="14" height="14" /> 
+          <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./../../resources/images/halfyellowstar.png" th:src="@{/resources/images/halfyellowstar.png}"  width="14" height="14" /> 
            </div>
           </div>
            <!--end heading -->
@@ -113,7 +101,7 @@
     </div>
     <!--end innerbox -->
     </div><div id="box">
-     <div id="image"><img src="images/sports.png" width="37" height="48" /></div>
+     <div id="image"><img src="./../../resources/images/sports.png"  th:src="@{/resources/images/sports.png}" width="37" height="48" /></div>
      <!--start inner box -->
      <div id="innerbox">
           <!--start heading -->
@@ -122,7 +110,7 @@
           <div id="rightbox">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td><img src="images/greenbar.png" width="150" height="17" /></td>
+                <td><img src="./../../resources/images/greenbar.png" th:src="@{/resources/images/greenbar.png}" width="150" height="17" /></td>
                 <td><span class="imdb">90/100</span></td>
               </tr>
             </table>
@@ -137,12 +125,12 @@
           </div>
                <!--end subheading -->
     
-    <div class="style3"><img src="images/participants.png" width="25" height="21" /> 21 Participants Joined this Event
+    <div class="style3"><img src="./../../resources/images/participants.png" th:src="@{/resources/images/participants.png}" width="25" height="21" /> 21 Participants Joined this Event
     </div>
     </div>
     <!--end innerbox -->
     </div><div id="box">
-     <div id="image"><img src="images/flag.jpg" width="39" height="39" /></div>
+     <div id="image"><img src="./../../resources/images/flag.jpg" th:src="@{/resources/images/greenbar.jpg}" width="39" height="39" /></div>
      <!--start inner box -->
      <div id="innerbox">
           <!--start heading -->
@@ -151,7 +139,7 @@
           <div id="rightbox">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td><img src="images/greenbar.png" width="150" height="17" /></td>
+                <td><img src="./../../resources/images/greenbar.png" th:src="@{/resources/images/greenbar.png}"  width="150" height="17" /></td>
                 <td><span class="imdb">90/100</span></td>
               </tr>
             </table>
@@ -188,50 +176,50 @@
       <div class="calenderbutton">
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td><img src="images/calender.jpg" width="110" height="36" /></td>
-    <td><img src="images/group.jpg" width="110" height="36" /></td>
+    <td><img src="./../../resources/images/calender.jpg" th:src="@{/resources/images/calender.jpg}" width="110" height="36" /></td>
+    <td><img src="./../../resources/images/group.jpg" th:src="@{/resources/images/group.jpg}" width="110" height="36" /></td>
   </tr>
 </table>
 
     </div>
     <div class="calender">
-       <img src="images/date.jpg" width="232" height="207" /> 
+       <img src="./../../resources/images/date.jpg"  th:src="@{/resources/images/date.jpg}" width="232" height="207" /> 
        </div>
     <div class= "topparti">Top Participats </div>
        <div id = "topparticipats">
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}"  width="40" height="40" />
        </div>
        <div class="topparticipatsname">Barbara Tisiot
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}"  width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}"  width="40" height="40" />
        </div>
        <div class="topparticipatsname">Katie Milburn
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}"  width="40" height="40" />
        </div>
        <div class="topparticipatsname">Josh Kripura
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}"  width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">David
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
@@ -240,38 +228,38 @@
       <div class= "topparti">People You May Know</div>
       <div id = "topparticipats">
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}"  width="40" height="40" />
        </div>
        <div class="topparticipatsname">Barbara Tisiot
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}"  width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}"  width="40" height="40" />
        </div>
        <div class="topparticipatsname">Katie Milburn
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Josh Kripura
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}"  width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./../../resources/images/topparticipant.jpg" th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">David
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./../../resources/images/connect.png" th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
@@ -280,10 +268,8 @@
   </aside>
   <!--aside close-->
   <!--footer start-->
-   <footer><a href="#">Terms</a> <a href="#">| </a> <a href="#">Privacy Policy</a><a href="#">| </a><a href="#"> About Us</a> <a href="#">| </a> <a href="#">Contact Us</a>
-   <div class="copyright">&copy; 2014 RIVVUE. All Right Reserved
-   </div>
-</footer>
+   <footer th:include="include :: footer">
+   </footer>
 <!--footer close-->
 </div>
 <!--content close-->

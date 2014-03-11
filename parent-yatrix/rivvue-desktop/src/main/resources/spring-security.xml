@@ -22,6 +22,7 @@
 		<intercept-url pattern="/error" access="permitAll"/>
 		<intercept-url pattern="/denied" access="hasRole('ROLE_USER')"/>
 		<intercept-url pattern="/welcome" access="hasAnyRole('ROLE_USER','ROLE_ADMIN','ROLE_AUTHOR')"/>
+		<intercept-url pattern="/events/postlogin" access="hasAnyRole('ROLE_USER','ROLE_ADMIN','ROLE_AUTHOR')"/>
 		<intercept-url pattern="/users" access="hasRole('ROLE_USER')"/>
 		<intercept-url pattern="/supc" access="hasRole('ROLE_USER')"/>
 		<intercept-url pattern="/fb/profile" access="hasRole('ROLE_USER')"/>

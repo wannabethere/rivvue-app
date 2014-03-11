@@ -474,6 +474,7 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>${tomcat7.maven.plugin.version}</version>
 				<configuration>
+					<path>/${project.build.finalName}</path>
 					<port>8080</port>
 				</configuration>
 			</plugin>

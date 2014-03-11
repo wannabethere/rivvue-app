@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+	
+<head>
+    <meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title th:text="#{app.name}" >RIVVUE</title>
+	<link href="http://fonts.googleapis.com/css?family=Oswald"  rel="stylesheet" type="text/css"  />
+	<link href="./../../../resources/css/stylesheet.css"  rel="stylesheet" type="text/css"  th:href="@{/resources/css/stylesheet.css}"/>
+	<script type="text/javascript"  th:src ="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
+	 <script type="text/javascript">
+	    function addFriendFn(friendId, srcProfileType){
+	    	var username = $('#loggedInUser').val();
+	    	alert(friendId + " : " + srcProfileType + " : " + username);
+	    	var url = "../" +username + "/addFriend";
+	    	var param = {"profileType":srcProfileType,"id":friendId};
+	    	
+	    	 $.ajax({
+	    		  url: url,
+	    		  dataType: "json",
+	    		  type: 'POST',
+	    		  data: param,
+	    		  success: function(data) {
+	    			alert('Added successfully' + data);  
+
+	    		  }
+	    	 });
+	    }
+	 </script>
+</head>
+
+<body>
+	<header th:include="include :: signedHeader">
+	</header>
+	<div class="content1">
+		<article>
+		<section> 
+
+  <!--topmenu start-->
+    		<div class="topmenu">
+  			 <ul>
+   				<li><a href="#">Events</a> </li>
+   				<li>|</li>
+   				<li><a href="#">Calendar</a> </li>
+   				<li>|</li>
+   				<li><a href="#">Contacts</a></li>
+   
+   			</ul>
+   			</div>
+   			 <!--topmenu end-->
+   			 <div class=" clear"></div>
+		
+			
+			<div id="searchbar">
+				<form action="#" th:action="@{'/profile/search/' + ${authname}}" method="get">
+				<input type="hidden" name="loggedInUser" id="loggedInUser"  th:value="${authname}"  />
+				<table class="box-table-a">
+					<tbody>
+						<tr>
+							<td>	<input name="Search " type="text" class="searchbox" id="Search "  value="Search Events"/>
+									&nbsp;&nbsp;&nbsp;
+									<button class="add-button" type="submit">Search</button>
+							</td>
+							<td>&nbsp;<a href="#" th:href="@{'/profile/create/' + ${authname}}"><b>+ Create Contact</b></a></td>
+						</tr>
+					</tbody>
+				</table>				
+				</form>
+			 </div>	
+			  <div class=" clear"></div>
+				<div id="box">
+				<table class="box-table-a">
+					<caption th:text="#{profileusers.table.caption}">Your Contacts</caption>
+					<div id="innerbox">
+					<thead>
+						
+						<tr>
+							<th scope="col" th:text="#{profileuser.userId.label}">UserId</th>
+							<th scope="col" th:text="#{profileuser.username.label}">Username</th>
+							<th scope="col" th:text="#{profileuser.firstName.label}">First Name</th>
+							<th scope="col" th:text="#{profileuser.lastName.label}">Last Name</th>
+							<!--  <th scope="col" th:text="#{profileuser.gender.label}">Gender</th>-->
+							<th scope="col" th:text="#{profileuser.email.label}">Email</th>
+							<th scope="col" th:text="#{profileuser.add.friend.label}">Add Friend</th>
+						</tr>
+						
+					</thead>
+					</div>
+					<div class=" clear"></div>
+					<div id="innerbox">
+					<tbody>
+						<tr th:each="u : ${users.profiles}">
+							<td th:text="${u.id}">1</td>
+							<td th:text="${u.username}">gwash</td>
+							<td th:text="${u.firstName}">George</td>
+							<td th:text="${u.lastName}">Washington</td>
+							<!--<td th:text="${u.gender}">Male</td> -->
+						    <td th:text="${u.email}">Email</td>
+						    <td ><a href="#" th:onclick="'javascript:addFriendFn(\'' + ${u.id} + '\' , \'' + ${u.srcProfileType} + '\');'">Add Friend</a></td> 
+						</tr>
+					</tbody>
+					</div>
+				</table>	
+			</div>
+		</section>
+    
+   </article> 
+   <aside>
+   </aside>
+    <footer th:include="include :: footer">
+   </footer>
+	</div>
+		
+	
+</body>
+</html>
