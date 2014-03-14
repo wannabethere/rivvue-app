@@ -1,5 +1,6 @@
 package com.yatrix.activity.service.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ public class MediatorController {
 	@RequestMapping
 	public String getHomePage(ModelMap model) {
 
-		//TODO: Remove the hard coded string.
-		List<UserActivity> publicActivities = userActivityCatalogService.findAllPublicUserEventsByState("Andhra Pradesh");
+		//TODO: Place correct type of events.
+		List<UserActivity> publicActivities = new ArrayList<UserActivity>();//userActivityCatalogService.findAllPublicUserEventsByState("CA");
 		
 		model.put("events", publicActivities);
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
