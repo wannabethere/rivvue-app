@@ -30,7 +30,7 @@
    
    </div>
    
-   <!--topmenu end-->
+<!--topmenu end-->
    
    <div class="event1">
    <div class="createevent"><a href="#"><img src="./../../resources/images/createevent.png" th:src="@{/resources/images/createevent.png}"  alt="" /></a></div>
@@ -41,127 +41,36 @@
    <div class=" clear"></div>
    <div id="searchbar"><input name="Search " type="text" class="searchbox1" id="Search "  value="Search Event"/> </div> 
     <div class=" clear"></div>
-   <div id="box">
-     <div id="image"><img src="./../../resources/images/flag.png" th:src="@{/resources/images/flag.png}" width="39" height="39" /></div>
+	     <!-- start box-->
+    <div id="box" th:each="event : ${events}">
+     <div id="image"><img src="./resources/images/run.png" th:src="@{/resources/images/run.png}"  width="36" height="40" /></div>
      <!--start inner box -->
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <h1>PLAY VOLLEYBALL</h1>
-          <div id="rightbox"><img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
-           <img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
-           <img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
-           <img src="./../../resources/images/redstar.png" th:src="@{/resources/images/redstar.png}" width="17" height="17" />
-           <img src="./../../resources/images/greystar.png" th:src="@{/resources/images/greystar.png}"  width="17" height="17" /> 8 yorum
-           </div>
-          </div>
-           <!--end heading -->
-           <!--start subheading -->
-           <div id="subheading">
-             <h2>Ponderosa Park, Sunnyvale,CA  <a href="#">(View Map)</a></h2>
-             <div class="daytemp">17*
-             </div>
-          </div>
-               <!--end subheading -->
-    
-    <p>In product Help provides access to all documentation and instructional content available at the time the software ships. It is available through the Help menu in your Adobe software.
-
-
-    </p>
-    </div>
-    <!--end innerbox -->
-    </div>
-    <!--end box-->
-    <div id="box">
-     <div id="image"><img src="./../../resources/images/run.png" th:src="@{/resources/images/run.png}" width="36" height="40" /></div>
-     <!--start inner box -->
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <h1>RUNNING</h1>
+          <h1 th:text="${event.messageposted.message}">RUNNING</h1>
           <div id="rightbox"><span class="imdb">IMDB RATING 8.6</span>
-          <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
-           <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
-           <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
-           <img src="./../../resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
-           <img src="./../../resources/images/halfyellowstar.png" th:src="@{/resources/images/halfyellowstar.png}"  width="14" height="14" /> 
+          <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img src="./resources/images/halfyellowstar.png" th:src="@{/resources/images/halfyellowstar.png}" width="14" height="14" /> 
            </div>
           </div>
            <!--end heading -->
            <!--start subheading -->
            <div id="subheading">
-             <h2>Ponderosa Park, Sunnyvale,CA <a href="#">(View Map)</a></h2>
+             <h2 th:text="${event.formattedAddress}">Ponderosa Park, Sunnyvale,CA <a href="#">(View Map)</a></h2>
              <div class="nighttemp">17*
              </div>
           </div>
                <!--end subheading -->
-          <div class="style1">Friday, 20 Decomber 2013   </div>
-      <div class="style2">8:30am &nbsp;&nbsp; &rarr;&nbsp;&nbsp; 9:30am <span class="imdb">(1hour)</span></div>
-      <div class="style1">7:00pm &nbsp;&nbsp; &rarr;&nbsp;&nbsp; 8:00pm (PST) </div>
+		<div class="style3"><img src="./resources/images/participants.png" width="25" height="21" /> <span th:text="${#lists.size(event.facebookAccepted)}">21 </span> Participants accepted this Event</div>
+          <div class="style1" th:text="${#dates.format(event.startTime, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
+      <div class="style2" ><span th:text="${#dates.format(event.startTime, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endTime, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
     </div>
     <!--end innerbox -->
-    </div><div id="box">
-     <div id="image"><img src="./../../resources/images/sports.png"  th:src="@{/resources/images/sports.png}" width="37" height="48" /></div>
-     <!--start inner box -->
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <h1>SPORTS EVENTS</h1>
-          <div id="rightbox">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td><img src="./../../resources/images/greenbar.png" th:src="@{/resources/images/greenbar.png}" width="150" height="17" /></td>
-                <td><span class="imdb">90/100</span></td>
-              </tr>
-            </table>
-          </div>
-          </div>
-           <!--end heading -->
-           <!--start subheading -->
-           <div id="subheading">
-             <h2>Ponderosa Park, Sunnyvale,CA</h2>
-             <div class="daytemp">17*
-             </div>
-          </div>
-               <!--end subheading -->
-    
-    <div class="style3"><img src="./../../resources/images/participants.png" th:src="@{/resources/images/participants.png}" width="25" height="21" /> 21 Participants Joined this Event
-    </div>
-    </div>
-    <!--end innerbox -->
-    </div><div id="box">
-     <div id="image"><img src="./../../resources/images/flag.jpg" th:src="@{/resources/images/greenbar.jpg}" width="39" height="39" /></div>
-     <!--start inner box -->
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <h1>PLAY VOLLEYBALL</h1>
-          <div id="rightbox">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td><img src="./../../resources/images/greenbar.png" th:src="@{/resources/images/greenbar.png}"  width="150" height="17" /></td>
-                <td><span class="imdb">90/100</span></td>
-              </tr>
-            </table>
-          </div>
-           </div>
-           <!--end heading -->
-           <!--start subheading -->
-           <div id="subheading">
-             <h2>PLAY VOLLEYBALL</h2>
-             <div class="daytemp">17*
-             </div>
-           </div>
-               <!--end subheading -->
-    
-    <p>In product Help provides access to all documentation and instructional content available at the time the software ships. It is available through the Help menu in your Adobe software.
-
-
-    </p>
-    </div>
-    <!--end innerbox -->
-    </div>
-    <!--end box-->
+    </div>     <!-- end box-->
     <div class="moreevents">more events
     </div>
    </section>

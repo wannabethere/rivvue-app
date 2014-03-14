@@ -245,6 +245,11 @@ public String getFacebookFeedId() {
 	return facebookFeedId;
 }
 
+public Long getDuration(){
+	
+	return ((endTime.getTime() -  startTime.getTime())/(1000 * 60 * 60));
+}
+
 @Override
   public int hashCode() {
     final int prime = 31;
