@@ -5,12 +5,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RIVVUE</title>
-<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="./../../../resources/css/style.css" th:href="@{/resources/css/style.css}" />
+<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
+<link rel="stylesheet" href="./../resources/css/stylesheet.css" th:href="@{/resources/css/stylesheet.css}" />
 <link href="./../../../css/colorbox.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/colorbox.css}"/>
 <script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}" th:href="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}"></script>
-<script src="./../../../js/jquery.colorbox.js" language="javascript1.5"></script>
-<script>
+<script src="./resources/js/jquery.colorbox.js" language="javascript1.5" th:href="@{/resources/js/jquery.colorbox.js}"></script>
+ <script type="text/javascript" th:inline="javascript" >
+//<![CDATA[
 $(document).ready(function(){
 				//Examples of how to assign the Colorbox event to elements
 								$(".inline").colorbox({inline:true, width:"50%"});
@@ -52,25 +53,13 @@ function MM_swapImage() { //v3.0
   var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
    if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
 }
+//]]>
 </script>
 </head>
 
 <body onload="MM_preloadImages('images/correctred.png','images/normalfacebook.png','images/overtwitter.png','images/overgoogleplus.png','images/overphone.png','images/searchover.png')">
 
-<header>
-   <div id="logo">
-   <img src="images/logo.png" width="150" height="36" /> </div>
-   <nav>
-      <ul>
-         <li><a href="#">What's New</a>
-|         
-</li>
-         <li><a href="#">Sign In</a> 
-|
-         </li>
-         <li><a href="#">Sign Up</a>
-      </li></ul>
-   </nav>
+<header th:include="include :: signedHeader">
 </header>
 <div id="content1">
 
@@ -105,7 +94,7 @@ function MM_swapImage() { //v3.0
  <form action="" method="get">
  <div class="inner_form1">
 					<label>Title :</label>
-					<div class="text_field"><input type="text" name="mtitle"></div>
+					<div class="text_field"><input type="text" name="mtitle" /></div>
 				
 </div>
  <div class="inner_form1">
@@ -116,45 +105,34 @@ function MM_swapImage() { //v3.0
  
  <div class="inner_form1">
 					<label>Tags :</label>
-					<div class="text_field"><input type="title" name="mtitle" > <div class="add"><img src="images/add.png" alt="" /></div></div>
+					<div class="text_field"><input type="title" name="mtitle" /> <div class="add"><img src="images/add.png" alt="" /></div></div>
 				
 </div>
 <div class="inner_form_button">
-				<input type="submit" value="" class="sport_button" name="button">
-                <input type="submit" value="" class="fun_button" name="button">
-                <input type="submit" value="" class="pleasure_button" name="button">
+				<input type="submit" value="" class="sport_button" name="button" />
+                <input type="submit" value="" class="fun_button" name="button" />
+                <input type="submit" value="" class="pleasure_button" name="button" />
 				</div>
   <div class="inner_form1"></div>
   <div class="inner_form1">
 					<label>Location :</label>
-					<div class="text_field"><input type="text" name="mtitle" class="locationbox"></div>
+					<div class="text_field"><input type="text" name="mtitle" class="locationbox" /></div>
 				
 </div>
    <div class="inner_form1">
 					<label>Start Time :</label>
-					<div class="text_field"><input type="starttime" name="mtitle" class="timeinput watchbox"><label>End Time :</label><input type="starttime" name="mtitle" class="timeinput watchbox"></div>
+					<div class="text_field"><input type="starttime" name="mtitle" class="timeinput watchbox" /><label>End Time :</label>
+					<input type="starttime" name="mtitle" class="timeinput watchbox" /></div>
 				
 </div>
-<div class="inner_form1">
-					<label>Repeat Event: </label>
-					<div class="text_field">
-						<select>
-							<option>Never....</option>
-							<option>Never....</option>
-							<option>Never....</option>
-						</select>
-					
-					</div>
-				
-				</div>
   <div class="inner_form_button1">
-				<a class='inline' href="#inline_content"><input type="submit" value="" class="invitefriend_button" name="button"></a>
-                <a class='inline' href="#inline_content1"><input type="submit" value="" class="looking_button" name="button"></a>
+				<a class='inline' href="#inline_content"><input type="submit" value="" class="invitefriend_button" name="button" /></a>
+                <a class='inline' href="#inline_content1"><input type="submit" value="" class="looking_button" name="button" /></a>
              
 				</div>
                 
            <div class="inner_form_button2">
-				<input type="submit" value="SUBMIT" class="submit_button" name="button">
+				<input type="submit" value="SUBMIT" class="submit_button" name="button" />
              	 <div class="myevent"><a href="#">Cancel</a></div>
              
 				</div>
@@ -328,32 +306,32 @@ function MM_swapImage() { //v3.0
         <div style='display:none'>
 			<div id='inline_content1' style='padding:10px; background:#fff;'>
            
-            <div class="headingpop">Looking For & Viewable</div>
+            <div class="headingpop">Looking For &amp; Viewable</div>
             <div  class="mheading"><ul><li>Viewable By</li> <li>Open To</li> </ul></div>
         <table width="100%" cellpadding="0" border="0" cellspacing="0"  class="tab1">
   <tbody><tr>
-    <td width="50" class="tab1"><img alt="" src="images/gloabe.png"></td>
+    <td width="50" class="tab1"><img alt="" src="images/gloabe.png"/></td>
     <td width="448" class="publictxt tab1">Public</td>
-    <td class="borderrig tab1" width="50" class=""><input type="checkbox" value="" name=""></td>
-    <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name=""></td>
+    <td class="borderrig tab1" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
 <tr>
     <td width="50" class="tab2"><img src="images/friends.png" alt="" /></td>
     <td width="448" class="publictxt tab2">Friends</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name=""></td>
-    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name=""></td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
   <tr>
     <td width="50" class="tab2"><img src="images/invites.png" alt="" /></td>
     <td width="448" class="publictxt tab2">Invitees</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name=""></td>
-    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name=""></td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
    <tr>
     <td width="50" class="tab2"><img src="images/notonly.png" alt="" /></td>
     <td width="448" class="publictxt tab2">Only Me</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name=""></td>
-    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name=""></td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
 </tbody></table>
 <div class="contenttxtpop">Using the audience selector right where you post events. This Control 
