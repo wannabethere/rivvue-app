@@ -4,6 +4,7 @@ body  {
 	font-family: 'Oswald', sans-serif;
 	font-weight: normal;
 	color: #666;
+	overflow-x: hidden;
 }
 p{
 	clear: both;
@@ -142,7 +143,7 @@ section h2 {
 	padding-top: 10px;
 	padding-bottom: 10px;
 	padding-left: 10px;
-	height:180px;
+	height:160px;
 }
 #box a {
 	font-size: 15px;
@@ -427,12 +428,16 @@ width:108px;  cursor:pointer; color:#FFFFFF;}
 #signin{ width: 434px; background-color:#edece8; margin: 0 auto; height:534px; }
 #signin h1{ text-align:center; font-family:"District Pro", Arial; font-size:44px; color:#58595b; text-transform:capitalize; padding-top: 15px;}
 #signin .text_fieldlogin { margin: 0 auto; width:79%;}
-.text_fieldlogin input[type="textlogin"] {border: 1px solid #bbb;color: #000000;float: left; font-family:"District Pro", Arial ; height: 30px; 
+.text_fieldlogin input[type="text"] {border: 1px solid #bbb;color: #000000;float: left; font-family:"District Pro", Arial ; height: 30px; 
 padding: 5px; width: 294px; height:58px; background-color:#FFFFFF; font-size: 18px; } 
+
+.text_fieldlogin input[type="password"] {border: 1px solid #bbb;color: #000000;float: left; font-family:"District Pro", Arial ; height: 30px; 
+padding: 5px; width: 294px; height:58px; background-color:#FFFFFF; font-size: 18px; } 
+
 .userna{background:url(../images/user.png) no-repeat scroll right center rgba(0, 0, 0, 0); color: #999999; margin-left: 2px;  margin-right: 20px;
     padding: 5px 54px 5px 15px !important;}
 .passwo{background:url(../images/password.png) no-repeat scroll right center rgba(0, 0, 0, 0); color: #999999; margin-left: 2px;  margin-right: 20px;  padding: 5px 54px 5px 15px !important; }
-.submitlogin { background:url(../images/submit.png) no-repeat center center; width:375px;  color:#FFFFFF; padding:20px;  border:none; cursor:pointer; text-indent:-9999px`SD;}
+.submitlogin { background:url(../images/submit.png) no-repeat center center; width:365px;  color:#FFFFFF; padding:20px;  border:none; cursor:pointer; text-indent:-99999px; margin-left:26px; }
 .forgetpass{ margin-top:12px;}
 .forgetpass ul{ list-style:none; margin-left:-15px;}
 .forgetpass ul li{display :inline;  margin-right: 30px;}
@@ -597,7 +602,7 @@ aside {width:100%;}
     float: left;
 	margin-top:10px;
 }
-.submitlogin {width: 90%; float: left;background:url(../images/submit_small.png) no-repeat center center; }
+	.submitlogin {width: 90%; float: left;background:url(../images/submit_small.png) no-repeat center center; margin-left:2px; width:368px}
 .forgetpass { width:100%;}
 .forgetpass ul {margin-left: -15px;}
 #signin { width:100%;}
@@ -636,8 +641,8 @@ nav{float:left; padding-left:10px; width:100%}
     width: 100%;
 }
 #signin .text_fieldlogin { width:100%;}
-.text_fieldlogin input[type="textlogin"] {
-    width: 80%;
+.text_fieldlogin input[type="text"] {
+/*    width: 80%;*/
 }
 .text_field input[type="title"] {width: 94%;}
 .inner_form_button {
@@ -650,6 +655,7 @@ nav{float:left; padding-left:10px; width:100%}
     float: left;
    
 }
+.publictxt {width: 110px!important;}
 }
 @media screen and (min-width: 481px) and (max-width:580px) {
 header { width: 100%;}
@@ -694,6 +700,7 @@ footer {
     width: 94%;
 }
 .submitlogin { float: left;background:url(../images/submit_small.png) no-repeat center center; }
+.publictxt {width: 110px!important;}
 }
 @media screen and (min-width: 581px) and (max-width:768px) {
 header { width: 100%;}
@@ -788,3 +795,41 @@ aside {width:100%;}
 }
 
 }
+.headingpop{ font-size: 28px; 	font-family:"District Pro", Arial; color:#757575; text-align:center;}
+	.mheading{ width:100%;}
+	.mheading ul{ list-style:none;}
+	.mheading ul li{font-size: 18px; font-family:"District Pro", Arial; color:#757575; display:inline; float:right;  margin-left: 25px;}
+	
+	.tab1{ border-bottom: 1px solid #f2f2f2; border-top: 1px solid #f2f2f2; height:30px;}
+	.tab2{ border-bottom: 1px solid #f2f2f2; height:30px;}
+	.publictxt{font-size: 18px; 	font-family:"District Pro", Arial; color:#757575; width:750px;}
+	.borderrig{ border-right:1px solid #f2f2f2;}
+	.contenttxtpop{ font-family:Arial; font-size:18px; color:#84848a; width:95%; margin-top:20px;}
+	#invitefriend{
+	overflow: hidden;
+	border-top-width: thin;
+	border-top-style: solid;
+	border-top-color: #CCC;
+	padding-top: 20px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	height:50px;
+}
+#invitefriend a {
+	font-size: 15px;
+	font-weight: normal;
+	color: #666;
+	margin-left: 10px;
+}
+#invitefriend a:hover {
+	font-size: 15px;
+	font-weight: normal;
+	color: #1061B0;
+	margin-left: 10px;
+}
+.correctround{ float:right;}
+.socialiconpopup { margin: 0 auto;text-align: center; width: 100%;}
+.socialiconpopup ul{ list-style:none; margin-left:-40px;}
+.socialiconpopup ul li{ display:inline;  }
+.socialiconpopup ul li .img12{border: 2px solid #e2e2e2;}
+.lookingview{ width:95%; margin-left:10px;}

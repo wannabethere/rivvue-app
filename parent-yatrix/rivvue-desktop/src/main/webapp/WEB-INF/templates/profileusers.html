@@ -1,118 +1,104 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org">
-	
-<head>
-    <meta charset="utf-8" />
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<title th:text="#{app.name}" >RIVVUE</title>
-	<link href="http://fonts.googleapis.com/css?family=Oswald"  rel="stylesheet" type="text/css"  />
-	<link href="./../../../resources/css/stylesheet.css"  rel="stylesheet" type="text/css"  th:href="@{/resources/css/stylesheet.css}"/>
-	<script type="text/javascript"  th:src ="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
-	 <script type="text/javascript">
-	    function addFriendFn(friendId, srcProfileType){
-	    	var username = $('#loggedInUser').val();
-	    	alert(friendId + " : " + srcProfileType + " : " + username);
-	    	var url = "../" +username + "/addFriend";
-	    	var param = {"profileType":srcProfileType,"id":friendId};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title th:text="#{app.name}" >RIVVUE</title>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'/>
+		<link href="./../resources/css/stylesheet.css"  rel="stylesheet" type="text/css"  th:href="@{./../resources/css/stylesheet.css}"/>
+		<script type="text/javascript"  th:src ="@{./../resources/js/jQuery.js}" th:href="@{./../resources/js/jQuery.js}"></script>
+ 		<script type="text/javascript" th:inline="javascript" >
+			//<![CDATA[
+			function MM_swapImgRestore() { //v3.0
+			  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+			}
+			function MM_preloadImages() { //v3.0
+			  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+				var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+				if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+			}
+
+			function MM_findObj(n, d) { //v4.01
+			  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+				d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+			  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+			  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+			  if(!x && d.getElementById) x=d.getElementById(n); return x;
+			}
+
+			function MM_swapImage() { //v3.0
+			  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+			   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+			}
+			//]]>
+		</script>
+	 	<script type="text/javascript">
+	    	function addFriendFn(friendId, srcProfileType){
+	    		var username = $('#loggedInUser').val();
+	    		var url = "../profile/" +username + "/addFriend";
+	    		var param = {"profileType":srcProfileType,"id":friendId};
 	    	
-	    	 $.ajax({
+	    	 	$.ajax({
 	    		  url: url,
 	    		  dataType: "json",
 	    		  type: 'POST',
 	    		  data: param,
 	    		  success: function(data) {
 	    			alert('Added successfully' + data);  
-
 	    		  }
-	    	 });
-	    }
-	 </script>
-</head>
+	    	    });
+	    	}
+	 	</script>
+	</head>
 
-<body>
-	<header th:include="include :: signedHeader">
-	</header>
-	<div class="content1">
-		<article>
-		<section> 
-
-  <!--topmenu start-->
-    		<div class="topmenu">
-  			 <ul>
-   				<li><a href="#">Events</a> </li>
-   				<li>|</li>
-   				<li><a href="#">Calendar</a> </li>
-   				<li>|</li>
-   				<li><a href="#">Contacts</a></li>
-   
-   			</ul>
-   			</div>
-   			 <!--topmenu end-->
-   			 <div class=" clear"></div>
-		
-			
-			<div id="searchbar">
-				<form action="#" th:action="@{'/profile/search/' + ${authname}}" method="get">
-				<input type="hidden" name="loggedInUser" id="loggedInUser"  th:value="${authname}"  />
-				<table class="box-table-a">
-					<tbody>
-						<tr>
-							<td>	<input name="Search " type="text" class="searchbox" id="Search "  value="Search Events"/>
-									&nbsp;&nbsp;&nbsp;
-									<button class="add-button" type="submit">Search</button>
-							</td>
-							<td>&nbsp;<a href="#" th:href="@{'/profile/create/' + ${authname}}"><b>+ Create Contact</b></a></td>
-						</tr>
-					</tbody>
-				</table>				
-				</form>
-			 </div>	
-			  <div class=" clear"></div>
-				<div id="box">
-				<table class="box-table-a">
-					<caption th:text="#{profileusers.table.caption}">Your Contacts</caption>
+	<body>
+		<header>
+			<div id="logo"><img src="./../resources/images/logo.png" width="150" height="36" /> </div>
+			<nav>
+				<ul>
+					<li><a href="#">What's New</a>|</li>
+					<li><a href="#">Sign In</a>|</li>
+					<li><a href="#">Sign Up</a></li>
+				</ul>
+			</nav>
+		</header>
+		<form action="#" th:action="@{'/profile/search/' + ${authname}}" method="get">
+		<input type="hidden" name="loggedInUser" id="loggedInUser"  th:value="${authname}"  />
+		<div id="content1">
+			<div class="newarticle">
+				<div  class="headingpop">Friends</div>
+				<div class="socialiconpopup">
+					<ul>
+						<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image27','','./../resources/images/normalfacebook.png',1)"><img src="./../resources/images/overfacebook.png" name="Image27" width="107" height="110" border="0" id="Image27"  class="img12"/></a></li>
+						<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image28','','./../resources/images/overtwitter.png',1)"><img src="./../resources/images/normaltwitter.png" name="Image28" width="92" height="110" border="0" id="Image28" class="img12"/></a></li>
+						<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image29','','./../resources/images/overgoogleplus.png',1)"><img src="./../resources/images/normalgoogle.png" name="Image29" width="108" height="110" border="0" id="Image29" class="img12"/></a></li>
+						<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image30','','./../resources/images/overphone.png',1)"><img src="./../resources/images/phonecontact.png" name="Image30" width="103" height="110" border="0" id="Image30" class="img12"/></a></li>
+						<li><input type="text" class="searchbox" id="query" name="query"  value="Search Name"/><a href="#" onclick="document.forms[0].submit();return false;" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image31','','./../resources/images/searchover.png',1)"><img src="./../resources/images/searchnor.png" name="Image31" width="65" height="110" border="0" id="Image31" class="img12"/></a></li>
+					</ul>
+				</div>
+            
+				<div id="profileUsers" th:each="u : ${users.profiles}">
+				<div id="invitefriend">
+					<div id="image"><img src="./../resources/images/topparticipant.jpg" width="40" height="40" /></div>
+  
 					<div id="innerbox">
-					<thead>
-						
-						<tr>
-							<th scope="col" th:text="#{profileuser.userId.label}">UserId</th>
-							<th scope="col" th:text="#{profileuser.username.label}">Username</th>
-							<th scope="col" th:text="#{profileuser.firstName.label}">First Name</th>
-							<th scope="col" th:text="#{profileuser.lastName.label}">Last Name</th>
-							<!--  <th scope="col" th:text="#{profileuser.gender.label}">Gender</th>-->
-							<th scope="col" th:text="#{profileuser.email.label}">Email</th>
-							<th scope="col" th:text="#{profileuser.add.friend.label}">Add Friend</th>
-						</tr>
-						
-					</thead>
+						<!--start heading -->
+        
+						<div class="name"><span th:text="${u.firstName}"/> <div class="correctround"><a href="#" th:onclick="'javascript:addFriendFn(\'' + ${u.id} + '\' , \'' + ${u.srcProfileType} + '\');'" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./../resources/images/correctred.png',1)"><img src="./../resources/images/correctgray.png" name="Image19" width="55" height="54" border="0" id="Image19" /></a></div>
+						</div>
 					</div>
-					<div class=" clear"></div>
-					<div id="innerbox">
-					<tbody>
-						<tr th:each="u : ${users.profiles}">
-							<td th:text="${u.id}">1</td>
-							<td th:text="${u.username}">gwash</td>
-							<td th:text="${u.firstName}">George</td>
-							<td th:text="${u.lastName}">Washington</td>
-							<!--<td th:text="${u.gender}">Male</td> -->
-						    <td th:text="${u.email}">Email</td>
-						    <td ><a href="#" th:onclick="'javascript:addFriendFn(\'' + ${u.id} + '\' , \'' + ${u.srcProfileType} + '\');'">Add Friend</a></td> 
-						</tr>
-					</tbody>
-					</div>
-				</table>	
+				</div>
+				</div>
+				
 			</div>
-		</section>
-    
-   </article> 
-   <aside>
-   </aside>
-    <footer th:include="include :: footer">
-   </footer>
-	</div>
-		
-	
-</body>
+			<footer><a href="#">Terms</a> <a href="#">| </a> <a href="#">Privacy Policy</a><a href="#">| </a><a href="#"> About Us</a> <a href="#">| </a> <a href="#">Contact Us</a>
+				<div class="copyright">&copy; 2014 RIVVUE. All Right Reserved
+				</div>
+			</footer>
+		</div>
+		<!--footer start-->
+  
+		<!--footer close-->
+		</form>  
+	</body>
 </html>
