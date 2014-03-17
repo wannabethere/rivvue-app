@@ -72,8 +72,9 @@ public class AccessController {
       value = "status",
       required = false) String error, ModelMap model) {
 
+	  String authname = SecurityContextHolder.getContext().getAuthentication().getName();
     try {
-      String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+      
       EventDto eventDto = new EventDto();
 
       model.addAttribute("userid", authname);
@@ -88,6 +89,27 @@ public class AccessController {
     } catch (org.springframework.social.connect.NotConnectedException nce) {
       System.out.println("not connected");
     }
+    
+    ProfileListDto userListDto = new ProfileListDto();
+	List<UserDto> users = new ArrayList<UserDto>();
+	//userListDto.setProfiles(service.getAllByUserId(userId));
+	
+	UserAccount user = userRepository.findByUserId(authname);
+
+	if(user.getAppFriends() != null && user.getAppFriends().size() > 0){
+		List<UserAccount> appFriends = userRepository.findByUsernameIn(user.getAppFriends().toArray(new String[0]));
+		users = UserMapper.map(appFriends);
+		
+	}
+	
+	if(user.getFacebookFriends() != null && user.getFacebookFriends().size() > 0){
+		users.addAll(UserMapper.mapUserProfile(service.getUserProfilesIn(user.getFacebookFriends().toArray(new String[0]))));
+		
+	}
+	
+	userListDto.setProfiles(users);
+	
+	model.put("friends", userListDto);
 
     return "events/createEvent";
   }

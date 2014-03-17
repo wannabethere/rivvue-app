@@ -8,11 +8,43 @@
 <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
 <link rel="stylesheet" href="./../resources/css/stylesheet.css" th:href="@{/resources/css/stylesheet.css}" />
 <link href="./../../../css/colorbox.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/colorbox.css}"/>
+
 <script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}" th:href="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/js/jquery.autocomplete.min.js}" th:href="@{/resources/js/jquery.autocomplete.min.js}"></script>
 <script src="./resources/js/jquery.colorbox.js" language="javascript1.5" th:href="@{/resources/js/jquery.colorbox.js}"></script>
  <script type="text/javascript" th:inline="javascript" >
 //<![CDATA[
+           	var username;
+	var userId;
 $(document).ready(function(){
+	
+	username = document.getElementById("from").value;
+	userId = document.getElementById("user").value;
+	
+	$('#place').autocomplete({
+		serviceUrl: "app/"+username+"/citiAutocomplete",
+		paramName: "searchString",
+		delimiter: ",",
+	    transformResult: function(response) {
+	    	
+	    	var jsonStr = $.parseJSON(response).predictions;
+	    	//alert(jsonStr);
+	    	
+	        return {
+	        	
+	        	suggestions: $.map(jsonStr, function(item) {
+	            	
+	                return { value: item.description, data: item.description };
+	            })
+	            
+	        };
+	        
+	    }
+	    
+	});
+	
+
+
 				//Examples of how to assign the Colorbox event to elements
 								$(".inline").colorbox({inline:true, width:"50%"});
 				$(".callbacks").colorbox({
@@ -121,7 +153,7 @@ function changeSubmit(){
  
  <div class="inner_form1">
 					<label>Tags :</label>
-					<div class="text_field"><input type="title" name="mtitle" /> <div class="add"><img src="./resources/images/add.png" alt="" /></div></div>
+					<div class="text_field"><input type="text" id="categoryId" name="categoryId" th:field="*{categoryId}"/> <div class="add"><img src="./resources/images/add.png" alt="" /></div></div>
 				
 </div>
 <div class="inner_form_button">
@@ -132,13 +164,15 @@ function changeSubmit(){
   <div class="inner_form1"></div>
   <div class="inner_form1">
 					<label>Location :</label>
-					<div class="text_field"><input type="text" name="mtitle" class="locationbox" /></div>
-				
+					<div class="text_field"><input type="text" name="place" id="place" class="locationbox" /></div>
+						<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
+							<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
+							<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
 </div>
    <div class="inner_form1">
 					<label>Start Time :</label>
-					<div class="text_field"><input type="starttime" name="mtitle" class="timeinput watchbox" /><label>End Time :</label>
-					<input type="starttime" name="mtitle" class="timeinput watchbox" /></div>
+					<div class="text_field"><input id="start" name="start" th:field="*{start}" class="timeinput watchbox" /><label>End Time :</label>
+					<input type="text" id = "end" name="end" th:field="*{end}" class="timeinput watchbox" /></div>
 				
 </div>
   <div class="inner_form_button1">
@@ -249,73 +283,19 @@ function changeSubmit(){
 			<div id="invitefriend">
      <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
   
-     <div id="innerbox">
+     <div id="innerbox" th:each="friend : ${friends.profiles}">
           <!--start heading -->
         
-          <div class="name">Jack Mcleish <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image19" width="55" height="54" border="0" id="Image19" /></a></div>
-
-
+          <div class="name"><span th:text="${friend.lastName}" />Jack <span th:text="${friend.firstName}" />Mcleish 
+          	<div class="correctround">
+          		<a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)">
+          			<img src="./resources/images/correctgray.png" name="Image19" width="55" height="54" border="0" id="Image19" />
+          		</a>
+          	</div>
         </div>
-    
-    
-    
-
     </div>
+</div>	
 
-</div>
-			<div id="invitefriend">
-     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-        
-          <div class="name">Barbara Tisiot <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image21','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image21" width="53" height="54" border="0" id="Image21" /></a></div>
-
-
-        </div>
-    
-    
-    
-
-    </div>
-
-</div>
-
-		<div id="invitefriend">
-     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-        
-          <div class="name">Katie Milburn <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image20','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image20" width="53" height="54" border="0" id="Image20" /></a></div>
-
-
-        </div>
-    
-    
-    
-
-    </div>
-
-</div>
-		
-        <div id="invitefriend">
-     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-        
-          <div class="name">Josh Kripura <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image22','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image22" width="53" height="54" border="0" id="Image22" /></a></div>
-
-
-        </div>
-    
-    
-    
-
-    </div>
-
-</div>
   </div>
 		</div>
         
