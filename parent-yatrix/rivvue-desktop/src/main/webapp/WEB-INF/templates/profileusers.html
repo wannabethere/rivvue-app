@@ -62,10 +62,33 @@
 				</ul>
 			</nav>
 		</header>
+		
 		<form action="#" th:action="@{'/profile/search/' + ${authname}}" method="get">
 		<input type="hidden" name="loggedInUser" id="loggedInUser"  th:value="${authname}"  />
 		<div id="content1">
 			<div class="newarticle">
+   <!--topmenu start-->
+    <div class="topmenu">
+   <ul>
+   <li><a href="#">Events</a> </li>
+   <li>|</li>
+   <li><a href="#">Calendar</a> </li>
+   <li>|</li>
+   <li><a href="#">Contacts</a></li>
+   
+   </ul>
+   
+   </div>
+   
+   <!--topmenu end-->
+   <div id="breadcrumb1">
+<ul>
+<li><a href="#">home</a> ></li>
+<li>Events</li>
+
+</ul>
+</div>
+   <div class=" clear"></div>			
 				<div  class="headingpop">Friends</div>
 				<div class="socialiconpopup">
 					<ul>
