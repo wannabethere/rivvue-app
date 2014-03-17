@@ -280,13 +280,13 @@ function changeSubmit(){
             
             
             
-			<div id="invitefriend">
+			<div id="invitefriend"  th:each="friend : ${friends.profiles}">
      <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
   
-     <div id="innerbox" th:each="friend : ${friends.profiles}">
+     <div id="innerbox">
           <!--start heading -->
         
-          <div class="name"><span th:text="${friend.lastName}" />Jack <span th:text="${friend.firstName}" />Mcleish 
+          <div class="name"><span th:text="${friend.lastName}" >Jack</span>, <span th:text="${friend.firstName}" >Mcleish </span>
           	<div class="correctround">
           		<a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)">
           			<img src="./resources/images/correctgray.png" name="Image19" width="55" height="54" border="0" id="Image19" />
