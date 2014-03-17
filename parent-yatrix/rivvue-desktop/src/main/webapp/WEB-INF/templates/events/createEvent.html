@@ -53,11 +53,25 @@ function MM_swapImage() { //v3.0
   var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
    if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
 }
+
+function changeSubmit(){
+	
+	var locStr = $('#location').val();
+	$('#formattedAddress').val(addressObj[locStr]);
+	$('#locationLat').val(locationLat[locStr]);
+	$('#locationLng').val(locationLng[locStr]);
+	
+	var url = "app/"+username+"/userevent";
+	
+	$("#form").get(0).setAttribute("action", url);
+	
+		
+}
 //]]>
 </script>
 </head>
 
-<body onload="MM_preloadImages('images/correctred.png','images/normalfacebook.png','images/overtwitter.png','images/overgoogleplus.png','images/overphone.png','images/searchover.png')">
+<body onload="MM_preloadImages('./resources/images/correctred.png','./resources/images/normalfacebook.png','./resources/images/overtwitter.png','./resources/images/overgoogleplus.png','./resources/images/overphone.png','./resources/images/searchover.png')">
 
 <header th:include="include :: signedHeader">
 </header>
@@ -91,10 +105,12 @@ function MM_swapImage() { //v3.0
   
    
     <!--Form Start-->
- <form action="" method="get">
+ <form id="form" name="form" action="#" th:object="${event}" onsubmit="changeSubmit();" method="post">
+ 				<input type="hidden" name="from" id="from"  th:value="${authname}"  />
+				<input type="hidden" name="user" id="user" th:value="${userid}"  />
  <div class="inner_form1">
 					<label>Title :</label>
-					<div class="text_field"><input type="text" name="mtitle" /></div>
+					<div class="text_field"><input type="text" name="message" id="message" th:field="*{message}"/></div>
 				
 </div>
  <div class="inner_form1">
@@ -105,7 +121,7 @@ function MM_swapImage() { //v3.0
  
  <div class="inner_form1">
 					<label>Tags :</label>
-					<div class="text_field"><input type="title" name="mtitle" /> <div class="add"><img src="images/add.png" alt="" /></div></div>
+					<div class="text_field"><input type="title" name="mtitle" /> <div class="add"><img src="./resources/images/add.png" alt="" /></div></div>
 				
 </div>
 <div class="inner_form_button">
@@ -152,50 +168,50 @@ function MM_swapImage() { //v3.0
       <div class="calenderbutton">
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td><img src="images/calender.jpg" width="110" height="36" /></td>
-    <td><img src="images/group.jpg" width="110" height="36" /></td>
+    <td><img src="./resources/images/calender.jpg" width="110" height="36" /></td>
+    <td><img src="./resources/images/group.jpg" width="110" height="36" /></td>
   </tr>
 </table>
 
     </div>
     <div class="calender">
-       <img src="images/date.jpg" width="232" height="207" /> 
+       <img src="./resources/images/date.jpg" width="232" height="207" /> 
        </div>
     <div class= "topparti">Top Participats </div>
        <div id = "topparticipats">
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./resources/images/topparticipant.jpg" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Barbara Tisiot
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./resources/images/connect.png" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./resources/images/topparticipant.jpg" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Katie Milburn
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./resources/images/connect.png" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./resources/images/topparticipant.jpg" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Josh Kripura
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./resources/images/connect.png" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img src="./resources/images/topparticipant.jpg" width="40" height="40" />
        </div>
        <div class="topparticipatsname">David
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img src="./resources/images/connect.png" width="80" height="20" />
        </div>
        </div>
        
@@ -217,11 +233,11 @@ function MM_swapImage() { //v3.0
             <div  class="headingpop">Invite</div>
             <div class="socialiconpopup">
             <ul>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image27','','images/normalfacebook.png',1)"><img src="images/overfacebook.png" name="Image27" width="139" height="115" border="0" id="Image27" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image28','','images/overtwitter.png',1)"><img src="images/normaltwitter.png" name="Image28" width="139" height="115" border="0" id="Image28" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image29','','images/overgoogleplus.png',1)"><img src="images/normalgoogle.png" name="Image29" width="139" height="115" border="0" id="Image29" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image30','','images/overphone.png',1)"><img src="images/phonecontact.png" name="Image30" width="139" height="116" border="0" id="Image30" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image31','','images/searchover.png',1)"><img src="images/searchnor.png" name="Image31" width="139" height="115" border="0" id="Image31" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image27','','./resources/images/normalfacebook.png',1)"><img src="./resources/images/overfacebook.png" name="Image27" width="139" height="115" border="0" id="Image27" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image28','','./resources/images/overtwitter.png',1)"><img src="./resources/images/normaltwitter.png" name="Image28" width="139" height="115" border="0" id="Image28" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image29','','./resources/images/overgoogleplus.png',1)"><img src="./resources/images/normalgoogle.png" name="Image29" width="139" height="115" border="0" id="Image29" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image30','','./resources/images/overphone.png',1)"><img src="./resources/images/phonecontact.png" name="Image30" width="139" height="116" border="0" id="Image30" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image31','','./resources/images/searchover.png',1)"><img src="./resources/images/searchnor.png" name="Image31" width="139" height="115" border="0" id="Image31" /></a></li>
             </ul>
             
             
@@ -231,12 +247,12 @@ function MM_swapImage() { //v3.0
             
             
 			<div id="invitefriend">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
         
-          <div class="name">Jack Mcleish <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','images/correctred.png',1)"><img src="images/correctgray.png" name="Image19" width="55" height="54" border="0" id="Image19" /></a></div>
+          <div class="name">Jack Mcleish <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image19" width="55" height="54" border="0" id="Image19" /></a></div>
 
 
         </div>
@@ -248,12 +264,12 @@ function MM_swapImage() { //v3.0
 
 </div>
 			<div id="invitefriend">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
         
-          <div class="name">Barbara Tisiot <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image21','','images/correctred.png',1)"><img src="images/correctgray.png" name="Image21" width="53" height="54" border="0" id="Image21" /></a></div>
+          <div class="name">Barbara Tisiot <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image21','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image21" width="53" height="54" border="0" id="Image21" /></a></div>
 
 
         </div>
@@ -266,12 +282,12 @@ function MM_swapImage() { //v3.0
 </div>
 
 		<div id="invitefriend">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
         
-          <div class="name">Katie Milburn <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image20','','images/correctred.png',1)"><img src="images/correctgray.png" name="Image20" width="53" height="54" border="0" id="Image20" /></a></div>
+          <div class="name">Katie Milburn <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image20','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image20" width="53" height="54" border="0" id="Image20" /></a></div>
 
 
         </div>
@@ -284,12 +300,12 @@ function MM_swapImage() { //v3.0
 </div>
 		
         <div id="invitefriend">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
         
-          <div class="name">Josh Kripura <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image22','','images/correctred.png',1)"><img src="images/correctgray.png" name="Image22" width="53" height="54" border="0" id="Image22" /></a></div>
+          <div class="name">Josh Kripura <div class="correctround"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image22','','./resources/images/correctred.png',1)"><img src="./resources/images/correctgray.png" name="Image22" width="53" height="54" border="0" id="Image22" /></a></div>
 
 
         </div>
@@ -310,25 +326,25 @@ function MM_swapImage() { //v3.0
             <div  class="mheading"><ul><li>Viewable By</li> <li>Open To</li> </ul></div>
         <table width="100%" cellpadding="0" border="0" cellspacing="0"  class="tab1">
   <tbody><tr>
-    <td width="50" class="tab1"><img alt="" src="images/gloabe.png"/></td>
+    <td width="50" class="tab1"><img alt="" src="./resources/images/gloabe.png"/></td>
     <td width="448" class="publictxt tab1">Public</td>
     <td class="borderrig tab1" width="50" ><input type="checkbox" value="" name="" /></td>
     <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
 <tr>
-    <td width="50" class="tab2"><img src="images/friends.png" alt="" /></td>
+    <td width="50" class="tab2"><img src="./resources/images/friends.png" alt="" /></td>
     <td width="448" class="publictxt tab2">Friends</td>
     <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
     <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
   <tr>
-    <td width="50" class="tab2"><img src="images/invites.png" alt="" /></td>
+    <td width="50" class="tab2"><img src="./resources/images/invites.png" alt="" /></td>
     <td width="448" class="publictxt tab2">Invitees</td>
     <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
     <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
   </tr>
    <tr>
-    <td width="50" class="tab2"><img src="images/notonly.png" alt="" /></td>
+    <td width="50" class="tab2"><img src="./resources/images/notonly.png" alt="" /></td>
     <td width="448" class="publictxt tab2">Only Me</td>
     <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
     <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
