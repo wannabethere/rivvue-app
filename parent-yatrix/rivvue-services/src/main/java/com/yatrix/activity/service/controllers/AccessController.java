@@ -89,7 +89,7 @@ public class AccessController {
       System.out.println("not connected");
     }
 
-    return "calendarevent";
+    return "events/createEvent";
   }
   
 	@RequestMapping(value="/friends/{username}")

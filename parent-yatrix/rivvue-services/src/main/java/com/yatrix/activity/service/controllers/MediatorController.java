@@ -23,7 +23,7 @@ public class MediatorController {
 	public String getHomePage(ModelMap model) {
 
 		//TODO: Place correct type of events.
-		List<UserActivity> publicActivities = new ArrayList<UserActivity>();//userActivityCatalogService.findAllPublicUserEventsByState("CA");
+		  List<UserActivity> publicActivities = userActivityCatalogService.findAllPublicUserEventsByState("Tamil Nadu");
 		
 		model.put("events", publicActivities);
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
