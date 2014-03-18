@@ -1,5 +1,11 @@
 package com.yatrix.activity.service.mongo.dto;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.yatrix.activity.store.fb.domain.FacebookInvitee;
+
 public class EventDto {
 	private String id;
 	private String categoryId;
@@ -7,6 +13,8 @@ public class EventDto {
 	private String subCategoryId;
 	private String start;
 	private String end;
+	private Date startDate;
+	private Date endDate;
 	private String location;
 	private String from;
 	private String to;
@@ -17,6 +25,7 @@ public class EventDto {
 	private String formattedAddress;
 	private String locationLat;
 	private String locationLng;
+	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
 	
 	public String getAccess() {
 		return access;
@@ -113,5 +122,27 @@ public class EventDto {
 	}
 	public void setToAppUsers(String toAppUsers) {
 		this.toAppUsers = toAppUsers;
+	}
+	public List<FacebookInvitee> getFacebookAccepted() {
+		return facebookAccepted;
+	}
+	public void setFacebookAccepted(List<FacebookInvitee> facebookAccepted) {
+		this.facebookAccepted = facebookAccepted;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	public Long getDuration(){
+		
+		return ((endDate.getTime() -  startDate.getTime())/(1000 * 60 * 60));
 	}
 }

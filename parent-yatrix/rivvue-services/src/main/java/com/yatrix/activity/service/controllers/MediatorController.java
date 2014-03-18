@@ -9,7 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.yatrix.activity.service.mongo.dto.EventDto;
+import com.yatrix.activity.store.mongo.domain.Category;
+import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 
 @Controller
@@ -18,18 +22,41 @@ public class MediatorController {
 
 	@Autowired
 	IUserActivityCatalogService userActivityCatalogService;
-	
+
 	@RequestMapping
 	public String getHomePage(ModelMap model) {
 
 		String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-		
-		//TODO: Place correct type of events.
-		  List<UserActivity> publicActivities = userActivityCatalogService.findUserEventsByUser(userId);//findAllPublicUserEventsByState("CA");
-		
-		model.put("events", publicActivities);
+
+		List<UserActivity> myActivities = userActivityCatalogService.findUserEventsByUser(userId);//findAllPublicUserEventsByState("CA");
+
+		//TODO: Write a mapping method to transfer UserActivity to EventDto.
+		List<EventDto> eventList = new ArrayList<EventDto>();
+		EventDto dto = null;
+		for(UserActivity event : myActivities) {
+			dto = new EventDto();
+			dto.setId(event.getId());
+			//Category category = activityCatalogService.findCategory(event.getCategoryId());
+			//dto.setCategoryName(category.getDisplayName());
+			dto.setSubCategoryId(event.getSubCategory());
+			dto.setStartDate(event.getStartTime());
+			dto.setEndDate(event.getEndTime());
+			dto.setLocation(event.getLocation()); 
+			dto.setFormattedAddress(event.getFormattedAddress());
+			dto.setLocationLat(event.getLocationLat());
+			dto.setLocationLng(event.getLocationLng()); 
+			if(event.getMessageposted()!=null) {
+				PostMessage message = event.getMessageposted();
+				dto.setMessage(message.getMessage());
+
+			}
+			dto.setFacebookAccepted(event.getFacebookAccepted());
+			eventList.add(dto);
+		}
+		model.addAttribute("events", eventList);
+
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
-		
+
 		return "events/postlogin";
 	}
 }

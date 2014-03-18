@@ -34,8 +34,8 @@
    
    <div class="event1">
    <div class="createevent"><a href="#" th:href="@{/calendarevent}"><img src="./../../resources/images/createevent.png" th:src="@{/resources/images/createevent.png}"  alt="" /></a></div>
-     <div class="myevent"><a href="#">My Events</a></div>
-   <div class="allevent"><img src="./../../resources/images/allevent.png" th:src="@{/resources/images/allevent.png}"  alt="" /></div>
+     <div class="myevent"><a href="#" th:href="@{'/calendarevents/'+${authname} + '/invitedevents'}">Invited Events</a></div>
+   <div class="allevent"><a th:href="@{'/calendarevents/publicevents?state=CA'}"><img src="./../../resources/images/allevent.png" th:src="@{/resources/images/allevent.png}"  alt="" /></a></div>
  
    </div>
    <div class=" clear"></div>
@@ -48,7 +48,7 @@
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <h1 th:text="${event.messageposted.message}">RUNNING</h1>
+          <h1 th:text="${event.message}">RUNNING</h1>
           <div id="rightbox"><span class="imdb">IMDB RATING 8.6</span>
           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
@@ -66,8 +66,8 @@
           </div>
                <!--end subheading -->
 		<div class="style3"><img src="./resources/images/participants.png" width="25" height="21" /> <span th:text="${#lists.size(event.facebookAccepted)}">21 </span> Participants accepted this Event</div>
-          <div class="style1" th:text="${#dates.format(event.startTime, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
-      <div class="style2" ><span th:text="${#dates.format(event.startTime, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endTime, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
+          <div class="style1" th:text="${#dates.format(event.startDate, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
+      <div class="style2" ><span th:text="${#dates.format(event.startDate, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endDate, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
     </div>
     <!--end innerbox -->
     </div>     <!-- end box-->

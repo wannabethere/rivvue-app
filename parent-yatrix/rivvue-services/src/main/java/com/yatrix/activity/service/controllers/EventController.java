@@ -63,13 +63,14 @@ public class EventController {
 		List<EventDto> eventList = new ArrayList<EventDto>();
 		EventDto dto = null;
 		for(UserActivity event : list) {
+			//TODO: Write a mapping method to transfer UserActivity to EventDto.
 			dto = new EventDto();
 			dto.setId(event.getId());
 			Category category = activityCatalogService.findCategory(event.getCategoryId());
 			dto.setCategoryName(category.getDisplayName());
 			dto.setSubCategoryId(event.getSubCategory());
-			dto.setStart(event.getStartTime().toString());
-			dto.setEnd(event.getEndTime().toString());
+			dto.setStartDate(event.getStartTime());
+			dto.setEndDate(event.getEndTime());
 			dto.setLocation(event.getLocation()); 
 			dto.setFormattedAddress(event.getFormattedAddress());
 			dto.setLocationLat(event.getLocationLat());
@@ -92,12 +93,13 @@ public class EventController {
 				index++;
 			}
 			dto.setTo(temp.toString());
+			dto.setFacebookAccepted(event.getFacebookAccepted());
 			eventList.add(dto);
 		}
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
-		return "calendarevents";
+		return "events/postlogin";
 	}
 	
 	/**
@@ -118,13 +120,14 @@ public class EventController {
 		EventDto dto = null;
 		
 		for(UserActivity event : list) {
+			//TODO: Write a mapping method to transfer UserActivity to EventDto.
 			dto = new EventDto();
 			dto.setId(event.getId());
 			Category category = activityCatalogService.findCategory(event.getCategoryId());
 			dto.setCategoryName(category.getDisplayName());
 			dto.setSubCategoryId(event.getSubCategory());
-			dto.setStart(event.getStartTime().toString());
-			dto.setEnd(event.getEndTime().toString());
+			dto.setStartDate(event.getStartTime());
+			dto.setEndDate(event.getEndTime());
 			dto.setLocation(event.getLocation()); 
 			dto.setFormattedAddress(event.getFormattedAddress());
 			dto.setLocationLat(event.getLocationLat());
@@ -149,13 +152,14 @@ public class EventController {
 				}
 				index++;
 			}
+			dto.setFacebookAccepted(event.getFacebookAccepted());
 			dto.setTo(temp.toString());
 			eventList.add(dto);
 		}
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
-		return "calendarevents";
+		return "events/postlogin";
 	}
 
 	@RequestMapping(value="/{username}/invitedevents", produces="application/json" ,method=RequestMethod.GET)
@@ -175,8 +179,8 @@ public class EventController {
 			Category category = activityCatalogService.findCategory(event.getCategoryId());
 			dto.setCategoryName(category.getDisplayName());
 			dto.setSubCategoryId(event.getSubCategory());
-			dto.setStart(event.getStartTime().toString());
-			dto.setEnd(event.getEndTime().toString());
+			dto.setStartDate(event.getStartTime());
+			dto.setEndDate(event.getEndTime());
 			dto.setLocation(event.getLocation()); 
 			dto.setFormattedAddress(event.getFormattedAddress());
 			dto.setLocationLat(event.getLocationLat());
@@ -186,6 +190,8 @@ public class EventController {
 				dto.setMessage(message.getMessage());
 					
 			}
+			
+			dto.setFacebookAccepted(event.getFacebookAccepted());
 			List<String> participants = event.getParticipants();
 			
 			StringBuffer temp= new StringBuffer("");
@@ -207,7 +213,7 @@ public class EventController {
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", username);
-		return "calendarevents";
+		return "events/postlogin";
 	}
 	@RequestMapping(value="/{username}/{eventId}/postFBMessage", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody ActivityComment postFeedToFacebook(@PathVariable String username, @PathVariable String eventId, @RequestParam String message, ModelMap model) throws Exception {

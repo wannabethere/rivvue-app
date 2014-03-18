@@ -86,19 +86,54 @@ function MM_swapImage() { //v3.0
    if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
 }
 
+var selectedIds = new Array();
+var selectedAppUsers =  new Array();
+var selectedNames = new Array();
+
 function changeSubmit(){
 	
-	var locStr = $('#location').val();
+	/*var locStr = $('#location').val();
 	$('#formattedAddress').val(addressObj[locStr]);
 	$('#locationLat').val(locationLat[locStr]);
-	$('#locationLng').val(locationLng[locStr]);
+	$('#locationLng').val(locationLng[locStr]);*/
 	
 	var url = "app/"+username+"/userevent";
+	alert("URL: " + url);
 	
 	$("#form").get(0).setAttribute("action", url);
-	
+	$("#form").submit();
 		
 }
+
+function isChecked(obj, val, name, profileType) {
+	//alert("Profile Type: " + profileType);
+	
+	if ($(obj).is(':checked')) {
+		if (profileType == 'APP') {
+			selectedAppUsers.push($(obj).val());
+		} else {
+			selectedIds.push($(obj).val());
+		}
+		selectedNames.push(name);
+	} else {
+		var i = '';
+		if (profileType == 'APP') {
+			selectedAppUsers.indexOf($(obj).val());
+			selectedAppUsers.splice(i, 1);
+		} else {
+			selectedIds.indexOf($(obj).val());
+			selectedIds.splice(i, 1);				
+		}
+		i = selectedNames.indexOf($(obj).val());
+		selectedNames.splice(i, 1);
+	}
+	
+	$('#to').val(selectedIds);
+	//$(window.opener.document).find('#toNames').val(selectedNames);
+	$('#toAppUsers').val(selectedAppUsers);
+
+}
+
 //]]>
 </script>
 </head>
@@ -137,7 +172,7 @@ function changeSubmit(){
   
    
     <!--Form Start-->
- <form id="form" name="form" action="#" th:object="${event}" onsubmit="changeSubmit();" method="post">
+ <form id="form" name="form" th:object="${event}"  method="post">
  				<input type="hidden" name="from" id="from"  th:value="${authname}"  />
 				<input type="hidden" name="user" id="user" th:value="${userid}"  />
  <div class="inner_form1">
@@ -168,6 +203,9 @@ function changeSubmit(){
 						<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
 							<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
 							<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
+							<input type="hidden" name="access" id ="access" value = "PUBLIC" th:field="*{access}"  /> 
+							<input type="hidden" name="to" id ="to" th:field="*{to}" />
+							<input type="hidden" name="toAppUsers" id ="toAppUsers" th:field="*{toAppUsers}" /> 
 </div>
    <div class="inner_form1">
 					<label>Start Time :</label>
@@ -182,7 +220,7 @@ function changeSubmit(){
 				</div>
                 
            <div class="inner_form_button2">
-				<input type="submit" value="SUBMIT" class="submit_button" name="button" />
+				<input type="button" value="SUBMIT" class="submit_button" name="button" onclick="changeSubmit()"/>
              	 <div class="myevent"><a href="#">Cancel</a></div>
              
 				</div>
@@ -281,7 +319,7 @@ function changeSubmit(){
             
             
 			<div id="invitefriend"  th:each="friend : ${friends.profiles}">
-     <div id="image"><img src="./resources/images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><input type="checkbox" th:name="${friend.username == null ? '' : friend.username}" th:id="${friend.id}" th:value="${friend.id}" th:onclick="'javascript:isChecked(this, this.name, this.value, \'' + ${friend.srcProfileType} + '\');'" /></div>
   
      <div id="innerbox">
           <!--start heading -->

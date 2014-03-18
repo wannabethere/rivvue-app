@@ -183,17 +183,17 @@ public class UserActivityCatalogService
                                      String from, String to, String toAppUsers, String access, String start,
                                      String end, String message, String place) throws ActivityDBException {
     logger.debug("creating Activity");
-    isvalidActivity(categoryId, subCategoryId, location, from, to, toAppUsers, access, start, end, message);
+    //isvalidActivity(categoryId, subCategoryId, location, from, to, toAppUsers, access, start, end, message);
 
     UserActivity a = new UserActivity();
     a.setCreatedTimeStamp(Calendar.getInstance().getTime());
     if (access.equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
       a.setVisibility(Message.VISIBILITY.PRIVATE);
-    } else if (access.equalsIgnoreCase(Message.VISIBILITY.PUBLIC.toString())) {
-      a.setVisibility(Message.VISIBILITY.PUBLIC);
     } else if (access.equalsIgnoreCase(Message.VISIBILITY.FRIENDSONLY.toString())) {
       a.setVisibility(Message.VISIBILITY.FRIENDSONLY);
-    }
+    }else  {
+        a.setVisibility(Message.VISIBILITY.PUBLIC);
+     } 
     
     a.setStatus(EVENT_STATUS.PENDING);
     
