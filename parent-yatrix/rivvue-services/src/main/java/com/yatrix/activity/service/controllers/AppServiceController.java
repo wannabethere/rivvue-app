@@ -231,7 +231,7 @@ public class AppServiceController {
 	model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 	model.addAttribute("comments", appCommentsNotPosted);
 	
-	return "event";
+	return "events/events";
   }
   
   @RequestMapping(
