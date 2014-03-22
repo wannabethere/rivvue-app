@@ -18,8 +18,22 @@
    
    <section> 
   <!--topmenu start-->
+<<<<<<< HEAD
+    <div class="topmenu">
+   <ul>
+   <li><a href="#">Events</a> </li>
+   <li>|</li>
+   <li><a href="#" th:href="@{'/calendar/'+${authname}}">Calendar</a> </li>
+   <li>|</li>
+   <li><a href="#" th:href="@{'/friends/'+${authname}}">Contacts</a></li>
+   
+   </ul>
+   
+   </div>
+=======
   <div class="topmenu" th:include="include :: topmenu">
 </div>
+>>>>>>> d39efdfe8baf7907e22c95ed2a1fda6a54010117
    
 <!--topmenu end-->
    
