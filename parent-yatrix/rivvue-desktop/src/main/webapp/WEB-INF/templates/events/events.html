@@ -7,8 +7,40 @@
 <title>RIVVUE</title>
 <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
 <link href="css/stylesheet.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/stylesheet.css}"  />
-<link rel="stylesheet" href="./../../../resources/css/style.css" th:href="@{/resources/css/style.css}" />
+<!-- <link rel="stylesheet" href="./../../../resources/css/style.css" th:href="@{/resources/css/style.css}" /> -->
+<script type="text/javascript"  th:src ="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
+<script type="text/javascript">
+		$(function(){
+			$('#post').on("click", function(){
+				//postMessage();
+				alert("Hey got the event");
+			});
+			
+			$('#message').keyup(function(e){
+			    if((e.keyCode || e.which) == 13) {
+			    	postMessage();
+			    }
+			});
+		});
+		
 
+
+	function postMessage() {
+		alert("submit method called...");
+		var param = {"message":$('#message').val()};
+
+		$.ajax({
+					url : "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/postFBMessage",
+					dataType : "json",
+					data : param,
+					success : function(messagePosted) {
+						alert("Message posted: " + messagePosted);
+						$('#message').val('');
+						$('#commentsTable tr:last').after('<tr><td>' + messagePosted.message +'</td><td> <b> on </b> </td><td>' + messagePosted.createdTime  +'</td><td> <b> by </b> </td><td>' + messagePosted.from.name +'</td></tr>');
+					}
+				});
+	}
+</script>
 </head>
 
 <body>
@@ -81,14 +113,30 @@ survive after an accident leaves them adrift in space.--><br/></p>
     </div>
 
     </div>
+  <div id="eventrec" th:each="appPosts : ${comments}">
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
+     <div id="innerbox">
+          <!--start heading -->
+          <div id="heading">
+          <div class="name" th:text="${appPosts.from.name}">Katie Milburn</div>
+<div class="subname" th:text="${appPosts.message}">I’m Game</div>
+<div class="daytime" th:text="${#dates.format(appPosts.createdTime, 'EEEE dd, MMMM yyyy')}">Friday at 4:31pm</div>
+          </div>
+    
+     <!--end heading -->
+    </div>
+
+    </div>
     
   <div id="formbox">
      
   <form action="" method="get">
+  <input type="hidden" name="username" id="username"  th:value="${authname}"  />
+				<input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
  <div class="inner_form1">
-					<div class="text_field1"><input type="text" name="comment" id="comment"  /></div>
-				<div class="post"><a href="#">POST</a></div>
+					<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>
+				<div class="post"><a href="#" id="post" name="post" onclick="javascript:postMessage()">POST</a></div>
 </div>
 </form>
      
