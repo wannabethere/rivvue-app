@@ -231,7 +231,7 @@ public class AppServiceController {
     	event.setDisplayName(event.getOriginatorUserId()); 
     }
 	
-    model.addAttribute("event", convertToEventDto(event));
+    model.addAttribute("event", event);
 	model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 	model.addAttribute("comments", appCommentsNotPosted);
 	
