@@ -39,34 +39,35 @@
 <!--breadcrumb end-->
 
    <div id="watchmovie">
-     <div id="image"><img src="images/video.jpg" width="56" height="56" /></div>
+     <div id="image"><img th:src="@{/resources/images/video.jpg}" width="56" height="56" /></div>
  
      <div id="innerbox">
       
           <div id="heading">
-          <h1>WATCH MOVIE GRAVITY</h1>
+          <h1 th:text="${event.message}">WATCH MOVIE GRAVITY</h1>
           <div id="rightbox">    8 yorum
-            <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" /><br/>
+            <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" /><br/>
    <div class="daytemp">17*
              </div>
            </div>
            
           </div>
-    <p>A medical engineer and an astronaut work together to<br/>
-survive after an accident leaves them adrift in space.</p>
-        <div class="style1">Friday, 20 Decomber 2013   </div>
-      <div class="style2">8:30am  &rarr; 9:30am (1hour)</div>
-      <div class="style1">7:00pm  &rarr; 8:00pm (PST) </div>
-         <h2><span class="subhead">Ponderosa Park, Sunnyvale,CA  </span><a href="#">(View Map)</a></h2>
+          <!-- We do not have the description in our App yet. -->
+    <p><!--  A medical engineer and an astronaut work together to<br/>
+survive after an accident leaves them adrift in space.--><br/></p>
+        <div class="style1" th:text="${#dates.format(event.startDate, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
+      <div class="style2"><span th:text="${#dates.format(event.startDate, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endDate, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
+      <!-- <div class="style1">7:00pm  &rarr; 8:00pm (PST) </div> -->
+         <h2><span class="subhead" th:text="${event.formattedAddress}">Ponderosa Park, Sunnyvale,CA  </span><a href="#">(View Map)</a></h2>
     </div>
 
     </div>
  
    <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -82,7 +83,7 @@ survive after an accident leaves them adrift in space.</p>
     </div>
     
      <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -113,7 +114,7 @@ survive after an accident leaves them adrift in space.</p>
      <!--end heading -->
         </div>
      <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -127,7 +128,7 @@ survive after an accident leaves them adrift in space.</p>
      <!--end heading -->
     </div>
         <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -145,7 +146,7 @@ survive after an accident leaves them adrift in space.</p>
     </div>
     
   <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -164,7 +165,7 @@ survive after an accident leaves them adrift in space.</p>
 
 
  <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -181,7 +182,7 @@ survive after an accident leaves them adrift in space.</p>
 
     </div>
      <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
@@ -225,7 +226,7 @@ survive after an accident leaves them adrift in space.</p>
     
     <div class= "attending">
     <ul>
-    <li><img src="images/participants.png" alt="" /></li>
+    <li><img th:src="@{/resources/images/participants.png}" alt="" /></li>
     <li><a href="#">Attending (4)</a></li>
     <li class="decline">Declined (2)</li>
     <li class="decline">Maybe (2)</li>
@@ -234,38 +235,38 @@ survive after an accident leaves them adrift in space.</p>
      </div>
        <div id = "topparticipats">
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Barbara Tisiot
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Katie Milburn
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Josh Kripura
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">David
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
@@ -275,16 +276,16 @@ survive after an accident leaves them adrift in space.</p>
       
        <div class="watch"><a href="#">Watch (12)</a></div>
        <div id="topparticipatsbox">
-       <div class="topparticipatsimg1"><img src="images/eventicon.png" alt=""  width="28" height="22"/>
+       <div class="topparticipatsimg1"><img th:src="@{/resources/images/eventicon.png}" alt=""  width="28" height="22"/>
        </div>
        
        <div class="topparticipatscomment1"> Event Pictures(Post Event Activity)      </div>
        </div>
-       <div id="topparticipatsbox"><img src="images/eventimg.png" alt="" /> </div>
+       <div id="topparticipatsbox"><img th:src="@{/resources/images/eventimg.png}" alt="" /> </div>
        <div id="eventheading1">Other Event</div>
        
     	<div id="eventimagenew">
-     <div id="image"><img src="images/eventhead.png" alt=""  border="0" height="292"/></div>
+     <div id="image"><img th:src="@{/resources/images/eventhead.png}" alt=""  border="0" height="292"/></div>
   
      
     
