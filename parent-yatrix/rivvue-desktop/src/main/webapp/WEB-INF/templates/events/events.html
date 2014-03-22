@@ -9,12 +9,12 @@
 <link href="css/stylesheet.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/stylesheet.css}"  />
 <!-- <link rel="stylesheet" href="./../../../resources/css/style.css" th:href="@{/resources/css/style.css}" /> -->
 <script type="text/javascript"  th:src ="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
+<script type="text/javascript"  th:src ="@{/resources/js/dateFormat.js}" th:href="@{/resources/js/dateFormat.js}"></script>
+<script type="text/javascript"  th:src ="@{/resources/js/jquery.dateFormat.js}" th:href="@{/resources/js/jquery.dateFormat.js}"></script>
+
 <script type="text/javascript">
 		$(function(){
-			$('#post').on("click", function(){
-				//postMessage();
-				alert("Hey got the event");
-			});
+
 			
 			$('#message').keyup(function(e){
 			    if((e.keyCode || e.which) == 13) {
@@ -26,7 +26,7 @@
 
 
 	function postMessage() {
-		alert("submit method called...");
+		//alert("submit method called...");
 		var param = {"message":$('#message').val()};
 
 		$.ajax({
@@ -34,9 +34,17 @@
 					dataType : "json",
 					data : param,
 					success : function(messagePosted) {
-						alert("Message posted: " + messagePosted);
+						//alert("Message posted: " + messagePosted);
 						$('#message').val('');
-						$('#commentsTable tr:last').after('<tr><td>' + messagePosted.message +'</td><td> <b> on </b> </td><td>' + messagePosted.createdTime  +'</td><td> <b> by </b> </td><td>' + messagePosted.from.name +'</td></tr>');
+						alert("Date:" + new Date(messagePosted.createdTime));
+						var createMessageDiv = '<div id="eventrec">' +
+     					             '<div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>' +
+     								'<div id="innerbox"> <div id="heading">' +
+          							'<div class="name" >' + messagePosted.from.name + '</div><div class="subname" >' + messagePosted.message + '</div>'+
+          							'<div class="daytime" >' + $.format.date(new Date(messagePosted.createdTime), 'ddd dd, MMMM yyyy') + '</div></div></div></div>';
+						
+						$('#formbox').before(createMessageDiv);
+						//$('#commentsTable tr:last').after('<tr><td>' + messagePosted.message +'</td><td> <b> on </b> </td><td>' + messagePosted.createdTime  +'</td><td> <b> by </b> </td><td>' + messagePosted.from.name +'</td></tr>');
 					}
 				});
 	}
@@ -136,7 +144,7 @@ survive after an accident leaves them adrift in space.--><br/></p>
 				<input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
  <div class="inner_form1">
 					<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>
-				<div class="post"><a href="#" id="post" name="post" onclick="javascript:postMessage()">POST</a></div>
+				<div class="post"><a href="javascript:postMessage()" id="post" name="post" >POST</a></div>
 </div>
 </form>
      
