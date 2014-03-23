@@ -27,7 +27,7 @@ import com.yatrix.activity.ext.domain.google.PlacesSearchResults;
 import com.yatrix.activity.ext.service.IGooglePlacesService;
 import com.yatrix.activity.ext.service.IYelpPlacesService;
 import com.yatrix.activity.hystrix.command.IFacebookCommand;
-import com.yatrix.activity.service.mongo.dto.EventDto;
+import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.exception.ActivityDBException;
 
 import com.yatrix.activity.store.mongo.domain.Activity;
@@ -106,7 +106,9 @@ public class AppServiceController {
     try {
       
     	//TODO: Pass DTO instead of passing so many parameters... --- Kishore
-      UserActivity activity = usercatalogService.createActivity(dto.getCategoryId(), dto.getSubCategoryId(),
+    	dto.setMessage(dto.getTitle());
+    	dto.setCategoryId(dto.getTags());
+       UserActivity userActivity=usercatalogService.createActivity(dto.getTitle(),dto.getTags(),dto.getCategoryId(), dto.getSubCategoryId(),
         dto.getLocation(), dto.getFormattedAddress(), dto.getLocationLat(), dto.getLocationLng(), uuid, dto.getTo(), dto.getToAppUsers(), dto.getAccess(), dto.getStart(), dto.getEnd(),
         dto.getMessage(), dto.getPlace());
       // Facebook facebook = connectionRepository.getPrimaryConnection(Facebook.class).getApi();
@@ -121,6 +123,8 @@ public class AppServiceController {
 
       //activity.setFacebookEventId(result.get().getEventId());
       //usercatalogService.updateActivity(activity);
+       model.addAttribute("activityId",userActivity.getId());
+       model.addAttribute("status","Successully Created: ");
     } catch (ActivityDBException ae) {
       model.addAttribute("status", ae.getMessage());
 
@@ -148,7 +152,7 @@ public class AppServiceController {
       String endTime = format.format(activity.getEndTime());
 
       String eventId = facebook.eventOperations().createEvent(
-        activity.getMessageposted().getMessage(), startTime, endTime);
+      activity.getMessageposted().getMessage(), startTime, endTime);
 
       // System.out.println(dto.getStart() + " : " + dto.getEnd());
       String[] invitees = activity.getParticipants().toArray(new String[0]);

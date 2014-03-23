@@ -4,7 +4,7 @@ import com.yatrix.activity.store.mongo.domain.Role;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.utils.UserAdminService;
-import com.yatrix.activity.service.mongo.dto.UserDto;
+import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -46,8 +46,12 @@
 				center: 'title',
 				right: 'month,agendaWeek,agendaDay'
 			},
+			defaultDate: '2014-01-12',
 			editable: true,
 			droppable: true, // this allows things to be dropped onto the calendar !!!
+			events: {
+			
+			},
 			drop: function(date) { // this function is called when something is dropped
 			
 				// retrieve the dropped element's stored Event Object
@@ -75,6 +79,26 @@
 		
 	});
 
+</script>
+<script type="text/javascript">
+	function addFriendFn(friendId, srcProfileType) {
+		var username = $('#loggedInUser').val();
+		var url = "../events/" + username + "/addFriend";
+		var param = {
+			"profileType" : srcProfileType,
+			"id" : friendId
+		};
+
+		$.ajax({
+			url : url,
+			dataType : "json",
+			type : 'POST',
+			data : param,
+			success : function(data) {
+				alert('Added successfully' + data);
+			}
+		});
+	}
 </script>
 <style>
 
@@ -130,8 +154,9 @@
 <body>
 	<header th:include="include :: header">
 	</header>
+	<div class="topmenu" th:include="include :: topmenu"></div>
 	<div id='wrap'>
-
+		
 		<div id='external-events'>
 			<h4>Draggable Events</h4>
 			<div class='external-event'>My Event 1</div>

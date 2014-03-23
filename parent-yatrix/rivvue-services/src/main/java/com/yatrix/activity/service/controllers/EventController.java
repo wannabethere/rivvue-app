@@ -1,6 +1,9 @@
 package com.yatrix.activity.service.controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,10 +19,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.api.client.util.Joiner;
 import com.yatrix.activity.hystrix.command.HystrixSocialResult;
 import com.yatrix.activity.hystrix.command.IFacebookPostEventFeedCommand;
 
-import com.yatrix.activity.service.mongo.dto.EventDto;
+import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.fb.domain.FacebookReference;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.Category;
@@ -35,26 +39,28 @@ import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 @Controller
 @RequestMapping("/calendarevents")
 public class EventController {
-	
-	
+
+
 	private static final Logger logger = LoggerFactory.getLogger(EventController.class);
-	
+	// Create an instance of SimpleDateFormat used for formatting 
+	// the string representation of date (month/day/year)
+	private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	
 	@Autowired
 	private IUserActivityCatalogService usercatalogService;
-	
+
 	@Autowired
 	private ActivityCatalogService activityCatalogService;
-	
+
 	@Autowired
 	private UserAccountRepository userAccountRepository;
-	
+
 	@Autowired
 	private ProfileService profileService;
 
 	@Autowired
 	private IFacebookPostEventFeedCommand postFeedCommand;
-	
+
 	@RequestMapping(value="/{username}", produces="application/json" ,method=RequestMethod.GET)
 	public String  getAllEvents(@PathVariable String username,ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
@@ -69,8 +75,12 @@ public class EventController {
 			Category category = activityCatalogService.findCategory(event.getCategoryId());
 			dto.setCategoryName(category.getDisplayName());
 			dto.setSubCategoryId(event.getSubCategory());
+			dto.setTitle(event.getTitle());
+			dto.setTags(Joiner.on(',').join(event.getTags()));
 			dto.setStartDate(event.getStartTime());
 			dto.setEndDate(event.getEndTime());
+			dto.setStart(df.format(event.getStartTime()));
+			dto.setEnd(df.format(event.getEndTime()));
 			dto.setLocation(event.getLocation()); 
 			dto.setFormattedAddress(event.getFormattedAddress());
 			dto.setLocationLat(event.getLocationLat());
@@ -78,7 +88,6 @@ public class EventController {
 			if(event.getMessageposted()!=null) {
 				PostMessage message = event.getMessageposted();
 				dto.setMessage(message.getMessage());
-					
 			}
 			List<String> participants = event.getParticipants();
 			StringBuffer temp= new StringBuffer("");
@@ -86,7 +95,7 @@ public class EventController {
 			for(String s :participants) {
 				UserProfile pName = profileService.getByUserId(s);
 				if(index!=participants.size()) {
-				temp.append(pName == null ? s : pName.getName()).append(",");
+					temp.append(pName == null ? s : pName.getName()).append(",");
 				}else {
 					temp.append(pName == null ? s : pName.getName());
 				}
@@ -101,7 +110,7 @@ public class EventController {
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 		return "events/postlogin";
 	}
-	
+
 	/**
 	 * http://localhost:8080/store/calendarevents/publicevents?state=CA
 	 * http://localhost:8080/store/calendarevents/user581/invitedevents
@@ -109,16 +118,16 @@ public class EventController {
 	 * @param model
 	 * @return
 	 */
-	
+
 	@RequestMapping(value="/publicevents", produces="application/json" ,method=RequestMethod.GET)
 	public String  getAllPublicEvents(@RequestParam String state, ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all public events for user" + state);
-		
+
 		List<UserActivity> list =  usercatalogService.findAllPublicUserEventsByState(state);
 		List<EventDto> eventList = new ArrayList<EventDto>();
 		EventDto dto = null;
-		
+
 		for(UserActivity event : list) {
 			//TODO: Write a mapping method to transfer UserActivity to EventDto.
 			dto = new EventDto();
@@ -126,8 +135,12 @@ public class EventController {
 			Category category = activityCatalogService.findCategory(event.getCategoryId());
 			dto.setCategoryName(category.getDisplayName());
 			dto.setSubCategoryId(event.getSubCategory());
+			dto.setTitle(event.getTitle());
+			dto.setTags(Joiner.on(',').join(event.getTags()));
 			dto.setStartDate(event.getStartTime());
 			dto.setEndDate(event.getEndTime());
+			dto.setStart(df.format(event.getStartTime()));
+			dto.setEnd(df.format(event.getEndTime()));
 			dto.setLocation(event.getLocation()); 
 			dto.setFormattedAddress(event.getFormattedAddress());
 			dto.setLocationLat(event.getLocationLat());
@@ -135,18 +148,17 @@ public class EventController {
 			if(event.getMessageposted()!=null) {
 				PostMessage message = event.getMessageposted();
 				dto.setMessage(message.getMessage());
-					
+
 			}
 			List<String> participants = event.getParticipants();
-			
 			StringBuffer temp= new StringBuffer("");
 			int index=1;
 			for(String s :participants) {
-				
+
 				UserProfile pName = profileService.getByUserId(s);
-				
+
 				if(index!=participants.size()) {
-				temp.append(pName == null ? s : pName.getName()).append(",");
+					temp.append(pName == null ? s : pName.getName()).append(",");
 				}else {
 					temp.append(pName == null ? s : pName.getName());
 				}
@@ -166,21 +178,22 @@ public class EventController {
 	public String  getEventsIAmInvited(@PathVariable String username, ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all invited events for user" + username);
-		
 		UserAccount userAccount = userAccountRepository.findByUserId(username);
-		
 		List<UserActivity> list =  usercatalogService.findEventsIAmInvited(username, userAccount.getFacebookId());
 		List<EventDto> eventList = new ArrayList<EventDto>();
 		EventDto dto = null;
-		
 		for(UserActivity event : list) {
 			dto = new EventDto();
 			dto.setId(event.getId());
 			Category category = activityCatalogService.findCategory(event.getCategoryId());
 			dto.setCategoryName(category.getDisplayName());
 			dto.setSubCategoryId(event.getSubCategory());
+			dto.setTitle(event.getTitle());
+			dto.setTags(Joiner.on(',').join(event.getTags()));
 			dto.setStartDate(event.getStartTime());
 			dto.setEndDate(event.getEndTime());
+			dto.setStart(df.format(event.getStartTime()));
+			dto.setEnd(df.format(event.getEndTime()));
 			dto.setLocation(event.getLocation()); 
 			dto.setFormattedAddress(event.getFormattedAddress());
 			dto.setLocationLat(event.getLocationLat());
@@ -188,20 +201,15 @@ public class EventController {
 			if(event.getMessageposted()!=null) {
 				PostMessage message = event.getMessageposted();
 				dto.setMessage(message.getMessage());
-					
 			}
-			
 			dto.setFacebookAccepted(event.getFacebookAccepted());
 			List<String> participants = event.getParticipants();
-			
 			StringBuffer temp= new StringBuffer("");
 			int index=1;
 			for(String s :participants) {
-				
 				UserProfile pName = profileService.getByUserId(s);
-				
 				if(index!=participants.size()) {
-				temp.append(pName == null ? s : pName.getName()).append(",");
+					temp.append(pName == null ? s : pName.getName()).append(",");
 				}else {
 					temp.append(pName == null ? s : pName.getName());
 				}
@@ -215,31 +223,26 @@ public class EventController {
 		model.addAttribute("authname", username);
 		return "events/postlogin";
 	}
+	
+	
+
 	@RequestMapping(value="/{username}/{eventId}/postFBMessage", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody ActivityComment postFeedToFacebook(@PathVariable String username, @PathVariable String eventId, @RequestParam String message, ModelMap model) throws Exception {
-		
+
 		UserActivity activity = usercatalogService.findActivity(eventId);
 		System.out.println("Message in controller - - - - - -- - - - - -" + message);
-		
 		HystrixSocialResult result = postFeedCommand.executeFacebookPostEventFeed(activity, username, message).get();
-		
 		ActivityComment comment = new ActivityComment();
-		
 		String id = "-1";
-		
 		if(result.isSuccess()){
 			id = result.getEventId();
 		}
-			FacebookReference reference = new FacebookReference(username, username);
-			//TODO: Actually it's a feed id. HystrixSocialResult need to be refactored to modify it as id rather than event id.
-			comment = new ActivityComment(id, message, new Date(), reference);
-			
-			activity.getAppComments().add(comment);
-			
-			usercatalogService.updateActivity(activity);
-		
-		
+		FacebookReference reference = new FacebookReference(username, username);
+		//TODO: Actually it's a feed id. HystrixSocialResult need to be refactored to modify it as id rather than event id.
+		comment = new ActivityComment(id, message, new Date(), reference);
+		activity.getAppComments().add(comment);
+		usercatalogService.updateActivity(activity);
 		return comment;
 	}
-	
+
 }

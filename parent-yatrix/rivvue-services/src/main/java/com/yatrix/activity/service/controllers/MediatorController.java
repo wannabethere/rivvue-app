@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.yatrix.activity.service.mongo.dto.EventDto;
+import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.mongo.domain.Category;
 import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserActivity;

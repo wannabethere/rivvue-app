@@ -19,9 +19,9 @@ import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
-import com.yatrix.activity.service.mongo.dto.EventDto;
-import com.yatrix.activity.service.mongo.dto.ProfileListDto;
-import com.yatrix.activity.service.mongo.dto.UserDto;
+import com.yatrix.activity.service.dto.EventDto;
+import com.yatrix.activity.service.dto.ProfileListDto;
+import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.UserMapper;
 
 @Controller
@@ -149,7 +149,6 @@ public class AccessController {
 
 	@RequestMapping("/calendarevents")
 	public String caledarEvents() {
-
 		return "calendarevents";
 	}
 

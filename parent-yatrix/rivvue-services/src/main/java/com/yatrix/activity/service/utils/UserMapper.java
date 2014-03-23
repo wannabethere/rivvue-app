@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
-import com.yatrix.activity.service.mongo.dto.UserDto;
+import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
