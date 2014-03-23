@@ -29,16 +29,17 @@ import com.yatrix.activity.ext.service.IYelpPlacesService;
 import com.yatrix.activity.hystrix.command.IFacebookCommand;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.exception.ActivityDBException;
-
 import com.yatrix.activity.store.mongo.domain.Activity;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.Category;
+import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 import com.yatrix.activity.store.mongo.service.impl.ActivityCatalogService;
-
+import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.social.google.api.Google;
 
 @Controller
@@ -67,7 +68,10 @@ public class AppServiceController {
 
   @Autowired
   private UserAccountRepository userRepository;
-  
+
+  @Autowired
+  private ProfileService profileService;
+
   @RequestMapping(
       value = "/categories",
       method = RequestMethod.GET)
@@ -235,7 +239,46 @@ public class AppServiceController {
 	model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 	model.addAttribute("comments", appCommentsNotPosted);
 	
-	return "event";
+	return "events/events";
+  }
+  
+  private EventDto convertToEventDto(UserActivity event){
+	  EventDto dto = new EventDto();
+		dto.setId(event.getId());
+		Category category = catalogService.findCategory(event.getCategoryId());
+		dto.setCategoryName(category.getDisplayName());
+		dto.setSubCategoryId(event.getSubCategory());
+		dto.setStartDate(event.getStartTime());
+		dto.setEndDate(event.getEndTime());
+		dto.setLocation(event.getLocation()); 
+		dto.setFormattedAddress(event.getFormattedAddress());
+		dto.setLocationLat(event.getLocationLat());
+		dto.setLocationLng(event.getLocationLng()); 
+		if(event.getMessageposted()!=null) {
+			PostMessage message = event.getMessageposted();
+			dto.setMessage(message.getMessage());
+				
+		}
+		
+		dto.setFacebookAccepted(event.getFacebookAccepted());
+		List<String> participants = event.getParticipants();
+		
+		StringBuffer temp= new StringBuffer("");
+		int index=1;
+		for(String s :participants) {
+			
+			UserProfile pName = profileService.getByUserId(s);
+			
+			if(index!=participants.size()) {
+			temp.append(pName == null ? s : pName.getName()).append(",");
+			}else {
+				temp.append(pName == null ? s : pName.getName());
+			}
+			index++;
+		}
+		dto.setTo(temp.toString());
+		
+		return dto;
   }
   
   @RequestMapping(

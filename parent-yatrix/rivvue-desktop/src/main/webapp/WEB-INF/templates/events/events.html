@@ -5,28 +5,55 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RIVVUE</title>
-<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
-<link href="css/stylesheet.css" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="./../../../resources/css/style.css" th:href="@{/resources/css/style.css}" />
+<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
+<link href="css/stylesheet.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/stylesheet.css}"  />
+<!-- <link rel="stylesheet" href="./../../../resources/css/style.css" th:href="@{/resources/css/style.css}" /> -->
+<script type="text/javascript"  th:src ="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
+<script type="text/javascript"  th:src ="@{/resources/js/dateFormat.js}" th:href="@{/resources/js/dateFormat.js}"></script>
+<script type="text/javascript"  th:src ="@{/resources/js/jquery.dateFormat.js}" th:href="@{/resources/js/jquery.dateFormat.js}"></script>
 
+<script type="text/javascript">
+		$(function(){
+
+			
+			$('#message').keyup(function(e){
+			    if((e.keyCode || e.which) == 13) {
+			    	postMessage();
+			    }
+			});
+		});
+		
+
+
+	function postMessage() {
+		//alert("submit method called...");
+		var param = {"message":$('#message').val()};
+
+		$.ajax({
+					url : "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/postFBMessage",
+					dataType : "json",
+					data : param,
+					success : function(messagePosted) {
+						//alert("Message posted: " + messagePosted);
+						$('#message').val('');
+						alert("Date:" + new Date(messagePosted.createdTime));
+						var createMessageDiv = '<div id="eventrec">' +
+     					             '<div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>' +
+     								'<div id="innerbox"> <div id="heading">' +
+          							'<div class="name" >' + messagePosted.from.name + '</div><div class="subname" >' + messagePosted.message + '</div>'+
+          							'<div class="daytime" >' + $.format.date(new Date(messagePosted.createdTime), 'ddd dd, MMMM yyyy') + '</div></div></div></div>';
+						
+						$('#formbox').before(createMessageDiv);
+						//$('#commentsTable tr:last').after('<tr><td>' + messagePosted.message +'</td><td> <b> on </b> </td><td>' + messagePosted.createdTime  +'</td><td> <b> by </b> </td><td>' + messagePosted.from.name +'</td></tr>');
+					}
+				});
+	}
+</script>
 </head>
 
 <body>
 <!--header start-->
-<header>
-   <div id="logo">
-   <img src="images/logo.png" width="150" height="36" /> </div>
-   <nav>
-      <ul>
-         <li><a href="#">What's New</a>
-|         
-</li>
-         <li><a href="#">Sign In</a> 
-|
-         </li>
-         <li><a href="#">Sign Up</a>
-      </li></ul>
-   </nav>
+<header th:include="include :: signedHeader">
 </header>
 <!--header end-->
 <!--content start-->
@@ -36,17 +63,8 @@
    
    <section> 
    <!--topmenu start-->
-   <div class="topmenu">
-   <ul>
-   <li><a href="#">Events</a> </li>
-   <li>|</li>
-   <li><a href="#">Calendar</a> </li>
-   <li>|</li>
-   <li><a href="#">Contacts</a></li>
-   
-   </ul>
-   
-   </div>
+   <div class="topmenu" th:include="include :: topmenu">
+</div> 
    
    <!--topmenu end-->
    <div class="clear:both;"></div>
@@ -61,171 +79,72 @@
 <!--breadcrumb end-->
 
    <div id="watchmovie">
-     <div id="image"><img src="images/video.jpg" width="56" height="56" /></div>
+     <div id="image"><img th:src="@{/resources/images/video.jpg}" width="56" height="56" /></div>
  
      <div id="innerbox">
       
           <div id="heading">
-          <h1>WATCH MOVIE GRAVITY</h1>
+          <h1 th:text="${event.messageposted.message}">WATCH MOVIE GRAVITY</h1>
           <div id="rightbox">    8 yorum
-            <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" />
-           <img src="images/yellowstar.png" width="14" height="14" /><br/>
+            <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
+           <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" /><br/>
    <div class="daytemp">17*
              </div>
            </div>
            
           </div>
-    <p>A medical engineer and an astronaut work together to<br/>
-survive after an accident leaves them adrift in space.</p>
-        <div class="style1">Friday, 20 Decomber 2013   </div>
-      <div class="style2">8:30am  &rarr; 9:30am (1hour)</div>
-      <div class="style1">7:00pm  &rarr; 8:00pm (PST) </div>
-         <h2><span class="subhead">Ponderosa Park, Sunnyvale,CA  </span><a href="#">(View Map)</a></h2>
+          <!-- We do not have the description in our App yet. -->
+    <p><!--  A medical engineer and an astronaut work together to<br/>
+survive after an accident leaves them adrift in space.--><br/></p>
+        <div class="style1" th:text="${#dates.format(event.startTime, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
+      <div class="style2"><span th:text="${#dates.format(event.startTime, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endTime, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
+      <!-- <div class="style1">7:00pm  &rarr; 8:00pm (PST) </div> -->
+         <h2><span class="subhead" th:text="${event.formattedAddress}">Ponderosa Park, Sunnyvale,CA  </span><a href="#">(View Map)</a></h2>
     </div>
 
     </div>
  
-   <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+   <div id="eventrec" th:each="u : ${event.facebookPosts}">
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <div class="name">Katie Milburn</div>
-<div class="subname">I’m Game</div>
-<div class="daytime">Friday at 4:31pm</div>
+          <div class="name" th:text="${u.from.name}">Katie Milburn</div>
+<div class="subname" th:text="${u.message}">I’m Game</div>
+<div class="daytime" th:text="${#dates.format(u.createdTime, 'EEEE dd, MMMM yyyy')}">Friday at 4:31pm</div>
           </div>
     
      <!--end heading -->
     </div>
 
     </div>
-    
-     <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-         <div id="heading">
-          <div class="name">David</div>
-<div class="subname">Awesome going to watch it with you plus</div>
-<div class="daytime">Saturday at 07:50pm</div>
-          </div>
-    
-    
-    
-
-    </div>
-
-</div>
- <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
+  <div id="eventrec" th:each="appPosts : ${comments}">
+     <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <div class="name">Katie Milburn</div>
-<div class="subname">I’m Game</div>
-<div class="daytime">Friday at 4:31pm</div>
+          <div class="name" th:text="${appPosts.from.name}">Katie Milburn</div>
+<div class="subname" th:text="${appPosts.message}">I’m Game</div>
+<div class="daytime" th:text="${#dates.format(appPosts.createdTime, 'EEEE dd, MMMM yyyy')}">Friday at 4:31pm</div>
           </div>
-       
-    </div>
-     <!--end heading -->
-        </div>
-     <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <div class="name">David</div>
-<div class="subname">Awesome going to watch it with you plus</div>
-<div class="daytime">Friday at 4:31pm</div>
-          </div>
-       
-    </div>
+    
      <!--end heading -->
     </div>
-        <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <div class="name">Katie Milburn</div>
-<div class="subname">I’m Game</div>
-<div class="daytime">Friday at 4:31pm</div>
-          </div>
-       
-    </div>
-     <!--end heading -->
-    
-    
-
-    </div>
-    
-  <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <div class="name">David</div>
-<div class="subname">Awesome going to watch it with you plus</div>
-<div class="daytime">Friday at 4:31pm</div>
-          </div>
-       
-    </div>
-     <!--end heading -->
-    
-    
-
-    </div>
-
-
- <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <div class="name">Katie Milburn</div>
-<div class="subname">I’m Game</div>
-<div class="daytime">Friday at 4:31pm</div>
-          </div>
-       
-    </div>
-     <!--end heading -->
-    
-    
-
-    </div>
-     <div id="eventrec">
-     <div id="image"><img src="images/topparticipant.jpg" width="40" height="40" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
-          <div id="heading">
-          <div class="name">David</div>
-<div class="subname">Awesome going to watch it with you plus</div>
-<div class="daytime">Friday at 4:31pm</div>
-          </div>
-       
-    </div>
-    <!--end heading -->
-    
-    
 
     </div>
     
   <div id="formbox">
      
   <form action="" method="get">
+  <input type="hidden" name="username" id="username"  th:value="${authname}"  />
+				<input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
  <div class="inner_form1">
-					<div class="text_field1"><input type="formtext" name="mtitle"></div>
-				<div class="post"><a href="#">POST</a></div>
+					<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>
+				<div class="post"><a href="javascript:postMessage()" id="post" name="post" >POST</a></div>
 </div>
 </form>
      
@@ -247,7 +166,7 @@ survive after an accident leaves them adrift in space.</p>
     
     <div class= "attending">
     <ul>
-    <li><img src="images/participants.png" alt="" /></li>
+    <li><img th:src="@{/resources/images/participants.png}" alt="" /></li>
     <li><a href="#">Attending (4)</a></li>
     <li class="decline">Declined (2)</li>
     <li class="decline">Maybe (2)</li>
@@ -256,38 +175,38 @@ survive after an accident leaves them adrift in space.</p>
      </div>
        <div id = "topparticipats">
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Barbara Tisiot
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Katie Milburn
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">Josh Kripura
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
        <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img src="images/topparticipant.jpg" width="40" height="40" />
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
        </div>
        <div class="topparticipatsname">David
        </div>
-       <div class="topparticipatscomment"><img src="images/connect.png" width="80" height="20" />
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
        </div>
        </div>
        
@@ -297,16 +216,16 @@ survive after an accident leaves them adrift in space.</p>
       
        <div class="watch"><a href="#">Watch (12)</a></div>
        <div id="topparticipatsbox">
-       <div class="topparticipatsimg1"><img src="images/eventicon.png" alt=""  width="28" height="22"/>
+       <div class="topparticipatsimg1"><img th:src="@{/resources/images/eventicon.png}" alt=""  width="28" height="22"/>
        </div>
        
        <div class="topparticipatscomment1"> Event Pictures(Post Event Activity)      </div>
        </div>
-       <div id="topparticipatsbox"><img src="images/eventimg.png" alt="" /> </div>
+       <div id="topparticipatsbox"><img th:src="@{/resources/images/eventimg.png}" alt="" /> </div>
        <div id="eventheading1">Other Event</div>
        
     	<div id="eventimagenew">
-     <div id="image"><img src="images/eventhead.png" alt=""  border="0" height="292"/></div>
+     <div id="image"><img th:src="@{/resources/images/eventhead.png}" alt=""  border="0" height="292"/></div>
   
      
     
@@ -317,10 +236,8 @@ survive after an accident leaves them adrift in space.</p>
   </aside>
   <!--aside close-->
   <!--footer start-->
-  <footer><a href="#">Terms</a> <a href="#">| </a> <a href="#">Privacy Policy</a><a href="#">| </a><a href="#"> About Us</a> <a href="#">| </a> <a href="#">Contact Us</a>
-   <div class="copyright">&copy; 2014 RIVVUE. All Right Reserved
-   </div>
-</footer>
+    <footer th:include="include :: footer">
+   </footer>
 <!--footer close-->
 </div>
 <!--content close-->
