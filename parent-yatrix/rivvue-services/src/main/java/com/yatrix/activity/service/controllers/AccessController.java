@@ -2,6 +2,7 @@ package com.yatrix.activity.service.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
+import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
+import com.yatrix.activity.store.mongo.service.impl.UserAccountService.GENDER;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.dto.ProfileListDto;
 import com.yatrix.activity.service.dto.UserDto;
@@ -29,7 +32,7 @@ import com.yatrix.activity.service.utils.UserMapper;
 public class AccessController {
 
 	@Autowired
-	private UserAccountRepository userRepository;
+	private UserAccountService userRepository;
 
 	@Autowired
 	private ConnectionRepository connectionRepository;
@@ -66,26 +69,26 @@ public class AccessController {
 	public String signup() {
 		return "access/signup";
 	}
+	
+	@RequestMapping("/homeevents")
+	public String loginHome(ModelMap model) {
+		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
+		return "events/postlogin";
+	}
+	
 
 	@RequestMapping("/calendarevent")
-	public String calendarEvent(@RequestParam(
-			value = "status",
-			required = false) String error, ModelMap model) {
-
+	public String calendarEvent(@RequestParam(value = "status",required = false) String error, ModelMap model) {
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		try {
-
 			EventDto eventDto = new EventDto();
-
 			model.addAttribute("userid", authname);
 			eventDto.setFrom(authname);
-
 			model.addAttribute("authname", authname);
 			model.addAttribute("event", eventDto);
 			if (error != null && !error.equals("empty")) {
 				model.addAttribute("status", error);
 			}
-
 		} catch (org.springframework.social.connect.NotConnectedException nce) {
 			System.out.println("not connected");
 		}
@@ -93,57 +96,33 @@ public class AccessController {
 		ProfileListDto userListDto = new ProfileListDto();
 		List<UserDto> users = new ArrayList<UserDto>();
 		//userListDto.setProfiles(service.getAllByUserId(userId));
-
-		UserAccount user = userRepository.findByUserId(authname);
-
-		if(user.getAppFriends() != null && user.getAppFriends().size() > 0){
-			List<UserAccount> appFriends = userRepository.findByUsernameIn(user.getAppFriends().toArray(new String[0]));
-			users = UserMapper.map(appFriends);
-
-		}
-
-		if(user.getFacebookFriends() != null && user.getFacebookFriends().size() > 0){
-			users.addAll(UserMapper.mapUserProfile(service.getUserProfilesIn(user.getFacebookFriends().toArray(new String[0]))));
-
-		}
-
+		UserAccount user = userRepository.getUserAccount(authname);
+		users.addAll(UserMapper.mapUserProfile(service.getMyContacts(user.getId())));
 		userListDto.setProfiles(users);
-
 		model.put("friends", userListDto);
-
 		return "events/createEvent";
 	}
 
 	@RequestMapping("/calendar/{username}")
 	public String calendarView(@PathVariable String username, ModelMap model) {
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 		return "calendar";
 	}
 
 	@RequestMapping(value="/friends/{username}")
-	public String getProfileUsersPage(@PathVariable String username, ModelMap model) {
+	public String getProfileUsersPage(@PathVariable String userId, ModelMap model) {
 		//String authname = SecurityContextHolder.getContext().getAuthentication().getName();
-		log.info("Retrieving profile friends for " + username);;
-
-		UserAccount user = userRepository.findByUserId(username);
-		List<String> fbFriends = user.getFacebookFriends();
-		List<UserDto> users = new ArrayList<UserDto>();			
+		log.info("Retrieving profile friends for " + userId);;
+		UserAccount user = userRepository.getUserAccount(userId);
 		ProfileListDto userListDto = new ProfileListDto();
-
-		if(user.getAppFriends() != null && user.getAppFriends().size() > 0){
-			List<UserAccount> appFriends = userRepository.findByUsernameIn(user.getAppFriends().toArray(new String[0]));
-			users = UserMapper.map(appFriends);
-		}
-
-		if(fbFriends != null && fbFriends.size() > 0){
-			List<UserProfile> userProfiles = service.getUserProfilesIn(fbFriends.toArray(new String[0]));
-			users.addAll(UserMapper.mapUserProfile(userProfiles));
-		}
-
-		//userListDto.setProfiles(userProfiles);
+		List<UserDto> users = new ArrayList<UserDto>();
+		users.addAll(UserMapper.mapUserProfile(service.getMyContacts(user.getId())));
+		userListDto.setProfiles(users);
+		model.put("friends", userListDto);
 		userListDto.setProfiles(users);
 		model.addAttribute("users", userListDto);
-		model.addAttribute("authname", username);
+		model.addAttribute("authname", userId);
 		return "profileusers";
 	}
 
@@ -154,7 +133,6 @@ public class AccessController {
 
 	@RequestMapping("/inviteusers")
 	public String inviteUsers() {
-
 		return "inviteusers";
 	}
 
@@ -162,7 +140,7 @@ public class AccessController {
 			value = "/signup",
 			method = RequestMethod.POST)
 			public String createAccount(UserDto dto, ModelMap model) {
-		if (userRepository.findByUserId(dto.getUsername()) != null) {
+		if (userRepository.getUserAccountByUserName(dto.getUsername()) != null) {
 			model.addAttribute("status", "signup.invalid.username.duplicate");
 			return "access/signup";
 		}
@@ -174,7 +152,7 @@ public class AccessController {
 
 		UserAccount user = UserMapper.map(dto);
 		user.setRoles(new Role[] { Role.ROLE_USER });
-		user = userRepository.save(user);
+		userRepository.createUserAccount(user, GENDER.UNKNOWN, Locale.US);
 		return "redirect:/";
 	}
 }

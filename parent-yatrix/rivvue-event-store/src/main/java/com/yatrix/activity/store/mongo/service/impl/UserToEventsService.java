@@ -12,7 +12,6 @@ public class UserToEventsService implements IUserToEventsService {
 	@Override
 	public List<UserActivity> getUserActivitiesForUser() {
 		List<UserActivity> eventList = new ArrayList<UserActivity>();
-
 		return eventList;
 	}
 

@@ -112,6 +112,7 @@ public class AppServiceController {
     	//TODO: Pass DTO instead of passing so many parameters... --- Kishore
     	dto.setMessage(dto.getTitle());
     	dto.setCategoryId(dto.getTags());
+    	dto.setLocation(dto.getPlace());
        UserActivity userActivity=usercatalogService.createActivity(dto.getTitle(),dto.getTags(),dto.getCategoryId(), dto.getSubCategoryId(),
         dto.getLocation(), dto.getFormattedAddress(), dto.getLocationLat(), dto.getLocationLng(), uuid, dto.getTo(), dto.getToAppUsers(), dto.getAccess(), dto.getStart(), dto.getEnd(),
         dto.getMessage(), dto.getPlace());
@@ -134,8 +135,7 @@ public class AppServiceController {
 
       return "redirect:/calendarevent";
     }
-
-    return "redirect:/calendarevents/" + uuid;
+    return "redirect:/calendarevents/"+uuid;
   }
 
   @SuppressWarnings("unused")

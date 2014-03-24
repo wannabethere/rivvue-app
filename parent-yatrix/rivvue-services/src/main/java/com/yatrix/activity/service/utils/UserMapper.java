@@ -1,5 +1,7 @@
 package com.yatrix.activity.service.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,14 +9,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
+import com.google.api.client.util.Joiner;
+import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.dto.UserDto;
+import com.yatrix.activity.store.mongo.domain.Category;
+import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
+import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
+import com.yatrix.activity.store.mongo.service.impl.ActivityCatalogService;
 
 @SuppressWarnings("deprecation")
 public class UserMapper {
 
+  private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");	
   @SuppressWarnings("boxing")
   public static UserDto map(UserAccount user) {
     UserDto dto = new UserDto();
@@ -55,7 +64,7 @@ public class UserMapper {
 	      dtos.add(map(user));
 	    }
 	    return dtos;
-	  }
+  }
 
   public static List<UserDto> mapUserProfile(List<UserProfile> userProfiles) {
 	  List<UserDto> dtos = new ArrayList<UserDto>();
@@ -64,7 +73,8 @@ public class UserMapper {
 	  }
 	  return dtos; 
   }
-
+  
+  
   public static UserDto mapUserProfile(UserProfile user) {
 	    UserDto dto = new UserDto();
 	    dto.setId(user.getUserId());

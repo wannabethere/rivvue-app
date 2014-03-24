@@ -18,22 +18,8 @@
    
    <section> 
   <!--topmenu start-->
-<<<<<<< HEAD
-    <div class="topmenu">
-   <ul>
-   <li><a href="#">Events</a> </li>
-   <li>|</li>
-   <li><a href="#" th:href="@{'/calendar/'+${authname}}">Calendar</a> </li>
-   <li>|</li>
-   <li><a href="#" th:href="@{'/friends/'+${authname}}">Contacts</a></li>
-   
-   </ul>
-   
-   </div>
-=======
   <div class="topmenu" th:include="include :: topmenu">
 </div>
->>>>>>> d39efdfe8baf7907e22c95ed2a1fda6a54010117
    
 <!--topmenu end-->
    
@@ -53,7 +39,11 @@
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <h1 th:text="${event.message}">RUNNING</h1>
+<<<<<<< HEAD
+          <h1 th:text="${event.title}">RUNNING</h1>
+=======
+          <a th:href="@{'/app/' + ${authname} + '/event/' + ${event.id}}"><h1 th:text="${event.message}">RUNNING</h1></a>
+>>>>>>> 4c6d7a03b7116f1b839987f5ae8cd90da98588b9
           <div id="rightbox"><span class="imdb">IMDB RATING 8.6</span>
           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />

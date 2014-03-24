@@ -21,4 +21,6 @@ public interface ProfileRepository extends MongoRepository<UserProfile, String> 
 	UserProfile findByUserId(String userId);
 	
 	List<UserProfile> findByUserIdIn(String[] userIds);
+	
+	UserProfile findByParentId(String parentId);
 }

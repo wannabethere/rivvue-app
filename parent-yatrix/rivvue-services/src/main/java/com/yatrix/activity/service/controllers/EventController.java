@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,6 +36,7 @@ import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ActivityCatalogService;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
+import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 @Controller
 @RequestMapping("/calendarevents")
@@ -53,7 +55,7 @@ public class EventController {
 	private ActivityCatalogService activityCatalogService;
 
 	@Autowired
-	private UserAccountRepository userAccountRepository;
+	private UserAccountService userAccountRepository;
 
 	@Autowired
 	private ProfileService profileService;
@@ -61,50 +63,12 @@ public class EventController {
 	@Autowired
 	private IFacebookPostEventFeedCommand postFeedCommand;
 
-	@RequestMapping(value="/{username}", produces="application/json" ,method=RequestMethod.GET)
-	public String  getAllEvents(@PathVariable String username,ModelMap model) {
+	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
+	public String  getAllEvents(@PathVariable String userId,ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
-		logger.debug("finding all events for user"+username);
-		List<UserActivity> list =  usercatalogService.findUserEventsByUser(username);
-		List<EventDto> eventList = new ArrayList<EventDto>();
-		EventDto dto = null;
-		for(UserActivity event : list) {
-			//TODO: Write a mapping method to transfer UserActivity to EventDto.
-			dto = new EventDto();
-			dto.setId(event.getId());
-			Category category = activityCatalogService.findCategory(event.getCategoryId());
-			dto.setCategoryName(category.getDisplayName());
-			dto.setSubCategoryId(event.getSubCategory());
-			dto.setTitle(event.getTitle());
-			dto.setTags(Joiner.on(',').join(event.getTags()));
-			dto.setStartDate(event.getStartTime());
-			dto.setEndDate(event.getEndTime());
-			dto.setStart(df.format(event.getStartTime()));
-			dto.setEnd(df.format(event.getEndTime()));
-			dto.setLocation(event.getLocation()); 
-			dto.setFormattedAddress(event.getFormattedAddress());
-			dto.setLocationLat(event.getLocationLat());
-			dto.setLocationLng(event.getLocationLng()); 
-			if(event.getMessageposted()!=null) {
-				PostMessage message = event.getMessageposted();
-				dto.setMessage(message.getMessage());
-			}
-			List<String> participants = event.getParticipants();
-			StringBuffer temp= new StringBuffer("");
-			int index=1;
-			for(String s :participants) {
-				UserProfile pName = profileService.getByUserId(s);
-				if(index!=participants.size()) {
-					temp.append(pName == null ? s : pName.getName()).append(",");
-				}else {
-					temp.append(pName == null ? s : pName.getName());
-				}
-				index++;
-			}
-			dto.setTo(temp.toString());
-			dto.setFacebookAccepted(event.getFacebookAccepted());
-			eventList.add(dto);
-		}
+		logger.debug("finding all events for user"+userId);
+		List<UserActivity> list =  usercatalogService.findUserEventsByUser(userId);
+		List<EventDto> eventList= this.mapUserActivityToEventDtos(list);
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
@@ -123,104 +87,24 @@ public class EventController {
 	public String  getAllPublicEvents(@RequestParam String state, ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all public events for user" + state);
-
 		List<UserActivity> list =  usercatalogService.findAllPublicUserEventsByState(state);
-		List<EventDto> eventList = new ArrayList<EventDto>();
-		EventDto dto = null;
-
-		for(UserActivity event : list) {
-			//TODO: Write a mapping method to transfer UserActivity to EventDto.
-			dto = new EventDto();
-			dto.setId(event.getId());
-			Category category = activityCatalogService.findCategory(event.getCategoryId());
-			dto.setCategoryName(category.getDisplayName());
-			dto.setSubCategoryId(event.getSubCategory());
-			dto.setTitle(event.getTitle());
-			dto.setTags(Joiner.on(',').join(event.getTags()));
-			dto.setStartDate(event.getStartTime());
-			dto.setEndDate(event.getEndTime());
-			dto.setStart(df.format(event.getStartTime()));
-			dto.setEnd(df.format(event.getEndTime()));
-			dto.setLocation(event.getLocation()); 
-			dto.setFormattedAddress(event.getFormattedAddress());
-			dto.setLocationLat(event.getLocationLat());
-			dto.setLocationLng(event.getLocationLng()); 
-			if(event.getMessageposted()!=null) {
-				PostMessage message = event.getMessageposted();
-				dto.setMessage(message.getMessage());
-
-			}
-			List<String> participants = event.getParticipants();
-			StringBuffer temp= new StringBuffer("");
-			int index=1;
-			for(String s :participants) {
-
-				UserProfile pName = profileService.getByUserId(s);
-
-				if(index!=participants.size()) {
-					temp.append(pName == null ? s : pName.getName()).append(",");
-				}else {
-					temp.append(pName == null ? s : pName.getName());
-				}
-				index++;
-			}
-			dto.setFacebookAccepted(event.getFacebookAccepted());
-			dto.setTo(temp.toString());
-			eventList.add(dto);
-		}
+		List<EventDto> eventList= this.mapUserActivityToEventDtos(list);
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 		return "events/postlogin";
 	}
 
-	@RequestMapping(value="/{username}/invitedevents", produces="application/json" ,method=RequestMethod.GET)
-	public String  getEventsIAmInvited(@PathVariable String username, ModelMap model) {
+	@RequestMapping(value="/{userId}/invitedevents", produces="application/json" ,method=RequestMethod.GET)
+	public String  getEventsIAmInvited(@PathVariable String userId, ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
-		logger.debug("finding all invited events for user" + username);
-		UserAccount userAccount = userAccountRepository.findByUserId(username);
-		List<UserActivity> list =  usercatalogService.findEventsIAmInvited(username, userAccount.getFacebookId());
-		List<EventDto> eventList = new ArrayList<EventDto>();
-		EventDto dto = null;
-		for(UserActivity event : list) {
-			dto = new EventDto();
-			dto.setId(event.getId());
-			Category category = activityCatalogService.findCategory(event.getCategoryId());
-			dto.setCategoryName(category.getDisplayName());
-			dto.setSubCategoryId(event.getSubCategory());
-			dto.setTitle(event.getTitle());
-			dto.setTags(Joiner.on(',').join(event.getTags()));
-			dto.setStartDate(event.getStartTime());
-			dto.setEndDate(event.getEndTime());
-			dto.setStart(df.format(event.getStartTime()));
-			dto.setEnd(df.format(event.getEndTime()));
-			dto.setLocation(event.getLocation()); 
-			dto.setFormattedAddress(event.getFormattedAddress());
-			dto.setLocationLat(event.getLocationLat());
-			dto.setLocationLng(event.getLocationLng()); 
-			if(event.getMessageposted()!=null) {
-				PostMessage message = event.getMessageposted();
-				dto.setMessage(message.getMessage());
-			}
-			dto.setFacebookAccepted(event.getFacebookAccepted());
-			List<String> participants = event.getParticipants();
-			StringBuffer temp= new StringBuffer("");
-			int index=1;
-			for(String s :participants) {
-				UserProfile pName = profileService.getByUserId(s);
-				if(index!=participants.size()) {
-					temp.append(pName == null ? s : pName.getName()).append(",");
-				}else {
-					temp.append(pName == null ? s : pName.getName());
-				}
-				index++;
-			}
-			dto.setTo(temp.toString());
-			eventList.add(dto);
-		}
+		logger.debug("finding all invited events for user" + userId);
+		UserAccount userAccount = userAccountRepository.getUserAccount(userId);
+		List<UserActivity> list =  usercatalogService.findEventsIAmInvited(userId, userAccount.getFacebookId());
+		List<EventDto> eventList= this.mapUserActivityToEventDtos(list);
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
-		model.addAttribute("authname", username);
+		model.addAttribute("authname", userId);
 		return "events/postlogin";
 	}
 	
@@ -244,5 +128,73 @@ public class EventController {
 		usercatalogService.updateActivity(activity);
 		return comment;
 	}
+	
+	
+	public @ResponseBody UserActivity addUserToEvent(@PathVariable String userId, @PathVariable String eventId, @RequestParam String message, @RequestParam String requestorId ){
+		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		//Authenticate the user.
+		UserActivity activity = usercatalogService.findActivity(eventId);
+		if(activity!=null){
+			ActivityComment comment=new ActivityComment();
+			comment.setCreatedTime(new java.util.Date());
+			comment.setMessage(message);
+			comment.setId(requestorId);
+			UserAccount acct=userAccountRepository.getUserAccount(requestorId);
+			activity.getAppComments().add(comment);
+			activity.getAppParticipants().add(requestorId);
+			usercatalogService.updateActivity(activity);
+			return activity;
+		}
+		else{
+			return null;
+		}
+		
+	}
+	
+	private  List<EventDto> mapUserActivityToEventDtos(List<UserActivity> activityList){
+		List<EventDto> eventList = new ArrayList<EventDto>();
+		EventDto dto = null;
+		for(UserActivity event : activityList) {
+			//TODO: Write a mapping method to transfer UserActivity to EventDto.
+			dto = new EventDto();
+			dto.setId(event.getId());
+			Category category = activityCatalogService.findCategory(event.getCategoryId());
+			dto.setCategoryName(category.getDisplayName());
+			dto.setSubCategoryId(event.getSubCategory());
+			dto.setTitle(event.getTitle());
+			dto.setTags(Joiner.on(',').join(event.getTags()));
+			dto.setStartDate(event.getStartTime());
+			dto.setEndDate(event.getEndTime());
+			dto.setDuration();
+			dto.setStart(df.format(event.getStartTime()));
+			dto.setEnd(df.format(event.getEndTime()));
+			dto.setLocation(event.getLocation()); 
+			dto.setFormattedAddress(event.getFormattedAddress());
+			dto.setLocationLat(event.getLocationLat());
+			dto.setLocationLng(event.getLocationLng()); 
+			if(event.getMessageposted()!=null) {
+				PostMessage message = event.getMessageposted();
+				dto.setMessage(message.getMessage());
+			}
+			List<String> participants = event.getParticipants();
+			StringBuffer temp= new StringBuffer("");
+			int index=1;
+			for(String s :participants) {
+				UserProfile pName = profileService.getByUserId(s);
+				if(index!=participants.size()) {
+					temp.append(pName == null ? s : pName.getName()).append(",");
+				}else {
+					temp.append(pName == null ? s : pName.getName());
+				}
+				index++;
+			}
+			dto.setTo(temp.toString());
+			dto.setFacebookAccepted(event.getFacebookAccepted());
+			eventList.add(dto);
+		}
+
+		return eventList;
+	}
+
 
 }

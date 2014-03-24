@@ -14,7 +14,7 @@ public interface IUserActivityCatalogService {
 
   boolean updateActivity(UserActivity activity);
 
-  UserActivity createActivity(String categoryId, String subCategoryId, String location, 
+  UserActivity createActivity(String title, String tags,String categoryId, String subCategoryId, String location, 
 		  					  String formattedAddress, String locationLat, String locationLng,
                               String from, String to, String toAppUsers, String access, String start, String end,
                               String message, String place) throws ActivityDBException;

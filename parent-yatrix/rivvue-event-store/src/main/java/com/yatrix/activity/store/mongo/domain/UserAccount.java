@@ -15,82 +15,57 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.util.StringUtils;
 
-@Document(
-    collection = "UserAccount")
-public class UserAccount
-  extends Item
-  implements SocialUserDetails, UserDetails
-{
+@Document(collection = "UserAccount")
+public class UserAccount extends Item implements SocialUserDetails, UserDetails{
 
   /**
 	 * 
 	 */
   private static final long serialVersionUID = 1L;
-
   @Indexed
   private String userId;
-
   private Role[] roles;
-
   private String email;
-
   private String displayName;
-
   private String imageUrl;
-
   private String webSite;
-
   private boolean accountLocked;
-
   private boolean trustedAccount;
-
   private String firstName;
-
   private String lastName;
-  
   private String facebookId;
-
-  @Column(
-      unique = true)
+  @Column(unique = true)
   private String username;
-
   private String password;
-  
-  private List<String> appFriends = new ArrayList<String>();
-  
-  private List<String> facebookFriends = new ArrayList<String>();
+  //Social Connections are used for authenticating the user.
+  @Transient
+  private List<UserSocialConnection> connections;
+  //Avatars are the various Ids I have 
+  @Transient
+  private List<UserProfile> avatars;
 
+  
   public String getFirstName() {
     return firstName;
   }
-
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
-
   public String getLastName() {
     return lastName;
   }
-
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
-
   public void setUsername(String username) {
     this.username = username;
   }
-
   public void setPassword(String password) {
     this.password = password;
   }
-
-  @Transient
-  private List<UserSocialConnection> connections;
-
   public UserAccount() {
     super();
   }
-
   @Override
   public String getUserId() {
     return this.userId;
@@ -250,7 +225,12 @@ public class UserAccount
     }
     return str + "]}";
   }
-
+  
+  public List<UserSocialConnection> getConnections(){
+	  return this.connections;
+  }
+  
+  
   // used for account social connection
   private UserSocialConnection getConnection(String providerId) {
     if (this.connections != null) {
@@ -280,38 +260,24 @@ public class UserAccount
     }
     return false;
   }
-
   public boolean isHasImageUrl() {
     return StringUtils.hasLength(getImageUrl());
   }
-
   @Override
   public String getUsername() {
 	  return this.username;
   }
-
-  public List<String> getAppFriends() {
-	  return appFriends;
-  }
-
-  public void setAppFriends(List<String> appFriends) {
-	  this.appFriends = appFriends;
-  }
-
-  public List<String> getFacebookFriends() {
-	  return facebookFriends;
-  }
-
-  public void setFacebookFriends(List<String> facebookFriends) {
-	  this.facebookFriends = facebookFriends;
-  }
-
   public String getFacebookId() {
 	  return facebookId;
   }
-
   public void setFacebookId(String facebookId) {
 	  this.facebookId = facebookId;
+  }
+  public void setAvatars(List<UserProfile> avatars) {
+	  this.avatars = avatars;
+  }
+  public List<UserProfile> getAvatars() {
+	  return avatars;
   }
   
 }

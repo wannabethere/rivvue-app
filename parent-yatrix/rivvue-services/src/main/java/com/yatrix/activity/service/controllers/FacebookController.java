@@ -1,27 +1,25 @@
 package com.yatrix.activity.service.controllers;
 
-import com.yatrix.activity.service.response.dto.SharedData;
-import com.yatrix.activity.service.response.dto.SharedSUPCObject;
-import com.yatrix.activity.service.utils.SUPCGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+//import java.util.ArrayList;
+//import java.util.List;
+
+//import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.social.OperationNotPermittedException;
+//import org.springframework.social.OperationNotPermittedException;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.NotConnectedException;
 import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.FacebookProfile;
-import org.springframework.social.facebook.api.PagedList;
+//import org.springframework.social.facebook.api.FacebookProfile;
+//import org.springframework.social.facebook.api.PagedList;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+//import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.validation.BindingResult;
+//import org.springframework.util.LinkedMultiValueMap;
+//import org.springframework.util.MultiValueMap;
+//import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,11 +45,6 @@ public class FacebookController {
       model.addAttribute("profileInfo", facebook.userOperations().getUserProfile());
       model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication()
         .getName());
-      System.out.println("\n");
-      System.out.println("\n");
-      System.out.println("\n");
-      System.out.println("\n");
-      System.out.println("\n");
       return "facebook/profile";
     } catch (NotConnectedException e) {
         model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication()
@@ -88,7 +81,7 @@ public class FacebookController {
     return "postsupc";
   }
 
-  @RequestMapping(
+ /** @RequestMapping(
       value = "/friends",
       method = RequestMethod.GET)
   public String showFeed(Model model) {
@@ -109,9 +102,9 @@ public class FacebookController {
       return "facebook/connect";
     }
 
-  }
+  }*/
 
-  @RequestMapping(
+  /*@RequestMapping(
       value = "/sharesupc",
       method = RequestMethod.POST)
   public String postsupc(@ModelAttribute("data") SharedData friends, BindingResult result,
@@ -160,7 +153,7 @@ public class FacebookController {
       e.printStackTrace();
     }
     return "facebook/friends";
-  }
+  }*/
 
   @RequestMapping(
       value = "/post",

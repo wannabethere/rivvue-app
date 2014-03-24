@@ -1,8 +1,9 @@
-package com.yatrix.activity.store.utils;
+package com.yatrix.activity.apps.util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.yatrix.activity.store.mongo.domain.Activity;
 import com.yatrix.activity.store.mongo.domain.Category;
+import com.yatrix.activity.store.utils.CounterService;
 
 
 public class ActivityFeedProcessor {
@@ -86,8 +88,11 @@ public class ActivityFeedProcessor {
 
 	public  void readFile() throws IOException{
 
-		BufferedReader input = new BufferedReader(
-				new FileReader(FEEDFILENAME));
+		/*BufferedReader input = new BufferedReader(
+				new FileReader(FEEDFILENAME));*/
+		
+		BufferedReader input = new BufferedReader(new InputStreamReader
+				(this.getClass().getClassLoader().getResourceAsStream(FEEDFILENAME)));
 		String content;
 		String currentCategory="NOCATEGORY";
 		List<String> subCategory=new ArrayList<String>();

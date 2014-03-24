@@ -14,6 +14,7 @@ public class EventDto {
 	private String start;
 	private String end;
 	private String title;
+	private String description;
 	private String tags;
 	private Date startDate;
 	private Date endDate;
@@ -27,6 +28,7 @@ public class EventDto {
 	private String formattedAddress;
 	private String locationLat;
 	private String locationLng;
+	private long duration;
 	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
 	
 	public String getAccess() {
@@ -143,8 +145,13 @@ public class EventDto {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
+	public void setDuration(){
+		this.duration=((endDate.getTime() -  startDate.getTime())/(1000 * 60 * 60));
+	}
+	
 	public Long getDuration(){
-		return ((endDate.getTime() -  startDate.getTime())/(1000 * 60 * 60));
+		this.duration=((endDate.getTime() -  startDate.getTime())/(1000 * 60 * 60));
+		return duration;
 	}
 	public void setTitle(String title) {
 		this.title = title;
@@ -157,5 +164,11 @@ public class EventDto {
 	}
 	public void setTags(String tags) {
 		this.tags = tags;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getDescription() {
+		return description;
 	}
 }

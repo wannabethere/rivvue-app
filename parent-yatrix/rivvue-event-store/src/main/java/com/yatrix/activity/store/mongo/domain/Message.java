@@ -31,7 +31,7 @@ public abstract class Message
   };
 
   public static enum VISIBILITY {
-    PRIVATE, PUBLIC, FRIENDSONLY
+    PRIVATE, PUBLIC, FRIENDSONLY,ME
   };
 
   private STATUS processedStatus;

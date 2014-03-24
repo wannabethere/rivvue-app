@@ -23,6 +23,7 @@ import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
+import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 
 public class FacebookConnectInterceptor implements ConnectInterceptor<Facebook> {
 
@@ -32,10 +33,10 @@ public class FacebookConnectInterceptor implements ConnectInterceptor<Facebook> 
 
 	private ProfileService service;
 
-	private UserAccountRepository userAccountRepository;
+	private UserAccountService userAccountRepository;
 
 	@Inject
-	public FacebookConnectInterceptor(ProfileService service, UserAccountRepository pUserAccountRepository) {
+	public FacebookConnectInterceptor(ProfileService service, UserAccountService pUserAccountRepository) {
 		this.service = service;
 		userAccountRepository = pUserAccountRepository;
 	}
@@ -44,88 +45,46 @@ public class FacebookConnectInterceptor implements ConnectInterceptor<Facebook> 
 
 
 		log.info("Facebook Post Connect !!!");
-
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		Facebook facebook = connection.getApi();
 		FacebookProfile profile = facebook.userOperations().getUserProfile();
-		UserAccount loggedInUser = userAccountRepository.findByUserId(authname);
-		List<String> existingFriends = loggedInUser.getFacebookFriends();;
-
-		StringBuffer infoProfile = new StringBuffer();
-		infoProfile.append("\nGot Facebook Profile.");
-		infoProfile.append("\nFacebookId: ");
-		infoProfile.append(profile.getId());
-		infoProfile.append("\nUsername: ");
-		infoProfile.append(profile.getUsername());
-		infoProfile.append("\nName: ");
-		infoProfile.append(profile.getName());
-		infoProfile.append("\nFirstName: ");
-		infoProfile.append(profile.getFirstName());
-		infoProfile.append("\nLastName: ");
-		infoProfile.append(profile.getLastName());
-		infoProfile.append("\nGender: ");
-		infoProfile.append(profile.getGender());
-		log.debug(infoProfile.toString());
-		UserProfile userProfile = new UserProfile(profile.getId(), profile.getUsername(), profile.getName(), profile.getFirstName() , profile.getLastName(), profile.getGender(),
-				Locale.ENGLISH);
-		userProfile.setEmail(profile.getEmail());
-		userProfile.setSrcprofileType(PROFILETYPE.FB);
-
-		UserProfile existingUser = service.getByUserId(profile.getId());
-
-		if (existingUser == null) {
-			service.create(userProfile);
-			log.info("Created User profile for userId: " + userProfile.getUserId());
+		UserAccount loggedInUser = userAccountRepository.getUserAccount(authname);
+		if(loggedInUser==null){
+			loggedInUser = userAccountRepository.getUserAccountByUserName(authname);
 		}
 		
+		UserProfile pf=service.appUserCreate(createUserProfile(profile));
 		loggedInUser.setFacebookId(profile.getId());
-
-		Reference pSignificantOther = new Reference(REFERENCETYPE.CONTACTS,
-				authname, null, null, null);
-
+		UserProfile friendProfile= null;
 		PagedList<FacebookProfile> friends = facebook.friendOperations()
 				.getFriendProfiles();
 		for (FacebookProfile friend : friends) {
-
-			StringBuffer infoProfileContact = new StringBuffer();
-			infoProfileContact.append("\nGot Facebook Friend.");
-			infoProfileContact.append("\nFacebookId: ");
-			infoProfileContact.append(friend.getId());
-			infoProfileContact.append("\nUsername: ");
-			infoProfileContact.append(friend.getUsername());
-			infoProfileContact.append("\nName: ");
-			infoProfileContact.append(friend.getName());
-			infoProfileContact.append("\nFirstName: ");
-			infoProfileContact.append(friend.getFirstName());
-			infoProfileContact.append("\nLastName: ");
-			infoProfileContact.append(friend.getLastName());
-			infoProfileContact.append("\nGender: ");
-			infoProfileContact.append(friend.getGender());
-			log.debug(infoProfileContact.toString());
-
-			UserProfile userProfileContact = new UserProfile(friend.getId(), friend.getUsername(), friend.getName(), friend.getFirstName() , friend.getLastName(), friend.getGender(),
-					Locale.ENGLISH);
-			userProfileContact.setSignificantOther(pSignificantOther);
-			userProfileContact.setEmail(friend.getEmail());
-			userProfileContact.setSrcprofileType(PROFILETYPE.FB);
-
-			UserProfile existingUserContact = service.getByUserId(friend.getId());
-
-			if (existingUserContact == null) {		    
-				service.create(userProfileContact);
-				existingFriends.add(friend.getId());
-				log.info("Created User profile  Contact for userId: " + userProfileContact.getUserId());
-			} else if(!existingFriends.contains(friend.getId())){
-				existingFriends.add(friend.getId());
-			}
+			log.debug(friend.toString());
+			friendProfile = createUserProfile(friend);
+			service.addFriend(pf, friendProfile);	
+		}
+	    UserAccountService.GENDER gender= UserAccountService.GENDER.UNKNOWN;
+		if(profile.getGender().toLowerCase().contains("male")){
+			gender=UserAccountService.GENDER.MALE;
+		}
+		else if(profile.getGender().toLowerCase().contains("female")){
+			gender=UserAccountService.GENDER.FEMALE;
 		}
 		
-		loggedInUser.setFacebookFriends(existingFriends);
-		userAccountRepository.save(loggedInUser);
+		userAccountRepository.createUserAccount(loggedInUser, gender, profile.getLocale());
 	}
 
 	public void preConnect(ConnectionFactory<Facebook> connectionFactory,
 			MultiValueMap<String, String> parameters, WebRequest request) {
 		log.debug("Facebook Pre Connect !!!");
+	}
+	
+	private UserProfile createUserProfile(FacebookProfile profile){
+		UserProfile userProfile = new UserProfile(profile.getId(), profile.getUsername(), profile.getName(), profile.getFirstName() , profile.getLastName(), profile.getGender(),
+				Locale.ENGLISH);
+		userProfile.setEmail(profile.getEmail());
+		userProfile.setSrcprofileType(PROFILETYPE.FB);
+		return userProfile;
+		
 	}
 }

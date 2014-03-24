@@ -41,300 +41,275 @@ import org.springframework.util.StringUtils;
 
 @Service
 public class UserActivityCatalogService
-  implements IUserActivityCatalogService
+implements IUserActivityCatalogService
 {
 
-  private static final Logger logger = LoggerFactory.getLogger(UserActivityCatalogService.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserActivityCatalogService.class);
+	public static final String TAG_SEPERATOR= ",";
+	@Autowired
+	private MongoTemplate mongoTemplate;
+	@Inject
+	private UserActivityRepository useractivityRepository;
+	public UserActivityCatalogService() {
+	}
 
-  @Autowired
-  private MongoTemplate mongoTemplate;
+	/**
+	 * Given a String categoryId and query we search the db and return all the activities.
+	 * 
+	 * @param categoryId
+	 * @param query
+	 * @return
+	 */
+	@Override
+	public List<Activity> searchActivities(String categoryId, String query) {
+		logger.debug("Searching Activity Categories");
+		Query q = query(where("categoryId").is(categoryId).and("displayName").regex(query));
+		List<Activity> dbActivities = mongoTemplate.find(q, Activity.class);
+		logger.debug("Searching Categories Done");
+		if (dbActivities.size() == 0) {
+			logger
+			.error("Server Not initialized and Please fix the exception or the query is not working please check it.");
+			logger.info("returning all activities of category");
+			q = query(where("categoryId").is(categoryId));
+			dbActivities = mongoTemplate.find(q, Activity.class);
+		}
+		return dbActivities;
+	}
 
-  @Inject
-  private UserActivityRepository useractivityRepository;
+	/**
+	 * Given a String activityId ,search the db and return the activity.
+	 * 
+	 * @param activityId
+	 * @return
+	 */
+	@Override
+	@Cacheable(
+			value = "activityCache",
+			key = "#activityId")
+			public UserActivity findActivity(String activityId) {
+		logger.debug("Searching Activities..");
+		Query q = query(where("uuid").is(activityId));
+		List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
+		logger.debug("Searching Activities Done");
+		if (dbActivities.size() == 0) {
+			logger.info("no activity found with id " + activityId);
+		}
+		return dbActivities.get(0);
+	}
 
-  public UserActivityCatalogService() {
+	/**
+	 * Given a String activityId ,search the db and return the activity.
+	 * 
+	 * @param activityId
+	 * @return
+	 */
+	/*
+	 * @Override
+	 * @Cacheable( value = "activityCache", key = "#uuid") public List<UserActivity>
+	 * findActivies(String uuid) { logger.debug("Searching Activities.."); Query q =
+	 * query(where("originatorUserId").is(uuid)); List<UserActivity> dbActivities =
+	 * mongoTemplate.find(q, UserActivity.class); logger.debug("Searching Activities Done"); if
+	 * (dbActivities.size() == 0) { logger.info("no activity found for user " + uuid); } return
+	 * dbActivities; }
+	 */
 
-  }
+	/**
+	 * Given a String activityId ,search the db and return the activity.
+	 * 
+	 * @param activityId
+	 * @return
+	 */
+	/*
+	 * @Override public UserActivity findUserEvent(String activityId) {
+	 * logger.debug("Searching Activities.."); Query q = query(where("uuid").is(activityId));
+	 * List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
+	 * logger.debug("Searching Activities Done"); if (dbActivities.size() == 0) {
+	 * logger.info("no activity found with id " + activityId); return null; } else { return
+	 * dbActivities.get(0); } }
+	 */
 
-  /**
-   * Given a String categoryId and query we search the db and return all the activities.
-   * 
-   * @param categoryId
-   * @param query
-   * @return
-   */
-  @Override
-  public List<Activity> searchActivities(String categoryId, String query) {
-    logger.debug("Searching Activity Categories");
-    Query q = query(where("categoryId").is(categoryId).and("displayName").regex(query));
-    List<Activity> dbActivities = mongoTemplate.find(q, Activity.class);
-    logger.debug("Searching Categories Done");
-    if (dbActivities.size() == 0) {
-      logger
-        .error("Server Not initialized and Please fix the exception or the query is not working please check it.");
-      logger.info("returning all activities of category");
-      q = query(where("categoryId").is(categoryId));
-      dbActivities = mongoTemplate.find(q, Activity.class);
-    }
-    return dbActivities;
-  }
+	/**
+	 * Given a String uuid ,search the db and return the activity.
+	 * 
+	 * @param activityId
+	 * @return
+	 */
+	@Override
+	@Cacheable(value = "activityCache",key = "#uuid")
+	public List<UserActivity> findUserEventsByUser(String uuid) {
+		logger.debug("Searching Activities..");
+		Query q = query(where("originatorUserId").is(uuid));
+		List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
+		logger.debug("Searching Activities Done");
+		if (dbActivities.size() == 0) {
+			logger.info("no activity found for user " + uuid);
+		}
+		return dbActivities;
+	}
 
-  /**
-   * Given a String activityId ,search the db and return the activity.
-   * 
-   * @param activityId
-   * @return
-   */
-  @Override
-  @Cacheable(
-      value = "activityCache",
-      key = "#activityId")
-  public UserActivity findActivity(String activityId) {
-    logger.debug("Searching Activities..");
-    Query q = query(where("uuid").is(activityId));
-    List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
-    logger.debug("Searching Activities Done");
-    if (dbActivities.size() == 0) {
-      logger.info("no activity found with id " + activityId);
-    }
-    return dbActivities.get(0);
-  }
+	@Override
+	@Cacheable(value = "activityCache",key = "#state")
+	public List<UserActivity> findAllPublicUserEventsByState(String state) {
+		logger.debug("Searching Activities..");
+		Query q = query(where("place").regex(", " + state + ",").and("visibility").is(VISIBILITY.PUBLIC.toString()));
+		List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
+		logger.debug("Searching Activities Done");
+		if (dbActivities.size() == 0) {
+			logger.info("no activity found for user " + state);
+		}
+		return dbActivities;
+	}
 
-  /**
-   * Given a String activityId ,search the db and return the activity.
-   * 
-   * @param activityId
-   * @return
-   */
-  /*
-   * @Override
-   * @Cacheable( value = "activityCache", key = "#uuid") public List<UserActivity>
-   * findActivies(String uuid) { logger.debug("Searching Activities.."); Query q =
-   * query(where("originatorUserId").is(uuid)); List<UserActivity> dbActivities =
-   * mongoTemplate.find(q, UserActivity.class); logger.debug("Searching Activities Done"); if
-   * (dbActivities.size() == 0) { logger.info("no activity found for user " + uuid); } return
-   * dbActivities; }
-   */
 
-  /**
-   * Given a String activityId ,search the db and return the activity.
-   * 
-   * @param activityId
-   * @return
-   */
-  /*
-   * @Override public UserActivity findUserEvent(String activityId) {
-   * logger.debug("Searching Activities.."); Query q = query(where("uuid").is(activityId));
-   * List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
-   * logger.debug("Searching Activities Done"); if (dbActivities.size() == 0) {
-   * logger.info("no activity found with id " + activityId); return null; } else { return
-   * dbActivities.get(0); } }
-   */
+	/**
+	 * Creates an activity and returns the same.
+	 * 
+	 * @return
+	 * @throws ActivityDBException
+	 */
+	@Override
+	@CacheEvict(value = "activityCache",key = "#from")
+	public UserActivity createActivity(String title, String tags,String categoryId, String subCategoryId, String location,
+			String formattedAddress, String locationLat, String locationLng,
+			String from, String to, String toAppUsers, String access, String start,
+			String end, String message, String place) throws ActivityDBException {
+		logger.debug("creating Activity");
+		isvalidActivity(categoryId, subCategoryId, location, from, to, toAppUsers, access, start, end, message);
 
-  /**
-   * Given a String uuid ,search the db and return the activity.
-   * 
-   * @param activityId
-   * @return
-   */
-  @Override
-  @Cacheable(
-      value = "activityCache",
-      key = "#uuid")
-  public List<UserActivity> findUserEventsByUser(String uuid) {
-    logger.debug("Searching Activities..");
-    Query q = query(where("originatorUserId").is(uuid));
-    List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
-    logger.debug("Searching Activities Done");
-    if (dbActivities.size() == 0) {
-      logger.info("no activity found for user " + uuid);
-    }
-    return dbActivities;
-  }
+		UserActivity a = new UserActivity();
+		a.setCreatedTimeStamp(Calendar.getInstance().getTime());
+		if (access.equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
+			a.setVisibility(Message.VISIBILITY.PRIVATE);
+		} else if (access.equalsIgnoreCase(Message.VISIBILITY.PUBLIC.toString())) {
+			a.setVisibility(Message.VISIBILITY.PUBLIC);
+		} else if (access.equalsIgnoreCase(Message.VISIBILITY.FRIENDSONLY.toString())) {
+			a.setVisibility(Message.VISIBILITY.FRIENDSONLY);
+		}
+		else{
+			a.setVisibility(Message.VISIBILITY.ME);
+		}
+		if(!StringUtils.isEmpty(title)){
+			a.setTitle(title);
+		}
+		if(!StringUtils.isEmpty(tags)){
+			a.setTags(Arrays.asList(tags.split(TAG_SEPERATOR)));
+		}
+		a.setStatus(EVENT_STATUS.PENDING);
+		a.setOriginatorUserId(from);
+		a.setLocation(location);
+		a.setFormattedAddress(formattedAddress);
+		a.setLocationLat(locationLat);
+		a.setLocationLng(locationLng); 
+		a.setCategoryId(categoryId);
+		a.setSubCategory(subCategoryId);
+		a.setPlace(place);
+		// split the invitee list
+		List<String> participants = new ArrayList<String>();
+		participants = Arrays.asList(to.split(TAG_SEPERATOR));
+		List<String> appParticipants = new ArrayList<String>();
+		appParticipants = Arrays.asList(toAppUsers.split(TAG_SEPERATOR));
 
-  @Override
-  @Cacheable(
-	      value = "activityCache",
-	      key = "#state")
-	  public List<UserActivity> findAllPublicUserEventsByState(String state) {
-	    logger.debug("Searching Activities..");
-	    Query q = query(where("place").regex(", " + state + ",").and("visibility").is(VISIBILITY.PUBLIC.toString()));
-	    List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
-	    logger.debug("Searching Activities Done");
-	    if (dbActivities.size() == 0) {
-	      logger.info("no activity found for user " + state);
-	    }
-	    return dbActivities;
-	  }
+		Date startTime = null;
+		Date endTime = null;
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
+		try {
+			startTime = format.parse(start);
+			endTime = format.parse(end);
+		} catch (ParseException e) {
+			logger.error("Event start/end date format is incorrect");
+			throw new ActivityDBException("Activity start/end date format is incorrect");
+		}
+		a.setParticipants(participants);
+		a.setAppParticipants(appParticipants);
+		a.setStartTime(startTime);
+		a.setEndTime(endTime);
+		PostMessage messageposted = new PostMessage();
+		messageposted.setAuthorId(from);
+		messageposted.setMessage(message);
+		a.setMessageposted(messageposted);
+		UserActivity created = useractivityRepository.save(a);
+		logger.debug("activity created");
+		return created;
+	}
 
-  
-  /**
-   * Creates an activity and returns the same.
-   * 
-   * @return
-   * @throws ActivityDBException
-   */
-  @Override
-  @CacheEvict(
-      value = "activityCache",
-      key = "#from")
-  public UserActivity createActivity(String categoryId, String subCategoryId, String location,
-		  							 String formattedAddress, String locationLat, String locationLng,
-                                     String from, String to, String toAppUsers, String access, String start,
-                                     String end, String message, String place) throws ActivityDBException {
-    logger.debug("creating Activity");
-    //isvalidActivity(categoryId, subCategoryId, location, from, to, toAppUsers, access, start, end, message);
+	private boolean isvalidActivity(String categoryId, String subCategoryId, String location,
+			String from, String to, String toAppUsers, String access, String start, String end,
+			String message) throws ActivityDBException {
 
-    UserActivity a = new UserActivity();
-    a.setCreatedTimeStamp(Calendar.getInstance().getTime());
-    if (access.equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
-      a.setVisibility(Message.VISIBILITY.PRIVATE);
-    } else if (access.equalsIgnoreCase(Message.VISIBILITY.FRIENDSONLY.toString())) {
-      a.setVisibility(Message.VISIBILITY.FRIENDSONLY);
-    }else  {
-        a.setVisibility(Message.VISIBILITY.PUBLIC);
-     } 
-    
-    a.setStatus(EVENT_STATUS.PENDING);
-    
-    a.setOriginatorUserId(from);
-    a.setLocation(location);
-    a.setFormattedAddress(formattedAddress);
-    a.setLocationLat(locationLat);
-    a.setLocationLng(locationLng); 
-    a.setCategoryId(categoryId);
-    a.setSubCategory(subCategoryId);
-    
-    a.setPlace(place);
+		if (categoryId == null || categoryId.equals("") || categoryId.equalsIgnoreCase("select")) {
+			logger.error("Activity category value is empty");
+			throw new ActivityDBException("category.empty");
 
-    // split the invitee list
-    List<String> participants = new ArrayList<String>();
-    participants = Arrays.asList(to.split(","));
-    
-    List<String> appParticipants = new ArrayList<String>();
-    appParticipants = Arrays.asList(toAppUsers.split(","));
-    
-    Date startTime = null;
-    Date endTime = null;
-    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
-    try {
-      startTime = format.parse(start);
-      endTime = format.parse(end);
-    } catch (ParseException e) {
-      logger.error("Event start/end date format is incorrect");
+		}
+		if (location == null || location.equals("")) {
+			logger.error("Activity location value is empty");
+			throw new ActivityDBException("location.empty");
 
-      throw new ActivityDBException("Activity start/end date format is incorrect");
-    }
-    a.setParticipants(participants);
-    a.setAppParticipants(appParticipants);
-    a.setStartTime(startTime);
-    a.setEndTime(endTime);
+		}
+		if (from == null || from.equals("")) {
+			logger.error("User name is empty");
 
-    PostMessage messageposted = new PostMessage();
-    messageposted.setAuthorId(from);
-    messageposted.setMessage(message);
-    a.setMessageposted(messageposted);
+			throw new ActivityDBException("user.empty");
 
-    UserActivity created = useractivityRepository.save(a);
-    logger.debug("activity created");
-    return created;
-  }
+		}
+		if ( (to == null || to.equals("")) && (toAppUsers == null || toAppUsers.equals(""))) {
+			logger.error("Invitee user list is empty");
 
-  private boolean isvalidActivity(String categoryId, String subCategoryId, String location,
-                                  String from, String to, String toAppUsers, String access, String start, String end,
-                                  String message) throws ActivityDBException {
+			throw new ActivityDBException("invitee.empty");
 
-    if (categoryId == null || categoryId.equals("") || categoryId.equalsIgnoreCase("select")) {
-      logger.error("Activity category value is empty");
-      throw new ActivityDBException("category.empty");
+		}
+		
+		if (location == null || location.equals("")) {
+			logger.error("Event location value is empty");
+			throw new ActivityDBException("location.empty");
+		}
+		if (start == null || start.equals("")) {
+			logger.error("Event start date value is incorrect");
+			throw new ActivityDBException("startdate.empty");
+		}
+		if (end == null || end.equals("")) {
+			logger.error("Event end date value is incorrect");
+			throw new ActivityDBException("enddate.empty");
+		}
 
-    }
-    if (location == null || location.equals("")) {
-      logger.error("Activity location value is empty");
-      throw new ActivityDBException("location.empty");
+		if (start != null && !start.equals("") && end != null && !end.equals("")) {
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
+			try {
+				format.parse(start);
+				format.parse(end);
+			} catch (ParseException e) {
+				logger.error("Event start/end date format is incorrect");
 
-    }
-    if (from == null || from.equals("")) {
-      logger.error("User name is empty");
+				throw new ActivityDBException("date.error");
+			}
+		}
+		if (message == null || message.equals("")) {
+			logger.error("message value is empty");
 
-      throw new ActivityDBException("user.empty");
+			throw new ActivityDBException("message.empty");
 
-    }
-    if ( (to == null || to.equals("")) && (toAppUsers == null || toAppUsers.equals(""))) {
-      logger.error("Invitee user list is empty");
+		}
+		return true;
+	}
 
-      throw new ActivityDBException("invitee.empty");
-
-    }
-    if (access == null || access.equals("")) {
-      logger.error("Event access value is empty");
-
-      throw new ActivityDBException("access.empty");
-
-    }
-    if (location == null || location.equals("")) {
-      logger.error("Event location value is empty");
-
-      throw new ActivityDBException("location.empty");
-
-    }
-    if (start == null || start.equals("")) {
-      logger.error("Event start date value is incorrect");
-
-      throw new ActivityDBException("startdate.empty");
-    }
-    if (end == null || end.equals("")) {
-      logger.error("Event end date value is incorrect");
-
-      throw new ActivityDBException("enddate.empty");
-    }
-
-    if (start != null && !start.equals("") && end != null && !end.equals("")) {
-      SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
-      try {
-        format.parse(start);
-        format.parse(end);
-      } catch (ParseException e) {
-        logger.error("Event start/end date format is incorrect");
-
-        throw new ActivityDBException("date.error");
-      }
-    }
-    if (message == null || message.equals("")) {
-      logger.error("message value is empty");
-
-      throw new ActivityDBException("message.empty");
-
-    }
-    return true;
-  }
-
-  @Override
-  @Caching(
-      evict = { @CacheEvict(
-          value = "activityCache",
-          key = "#activity.id"), @CacheEvict(
-          value = "activityCache",
-          key = "#activity.originatorUserId") })
-  public boolean updateActivity(UserActivity activity) {
-//    UserActivity existingActivity = findActivity(activity.getId());
-//    if (existingActivity == null) {
-//      return false;
-//    }
-//
-//    existingActivity.setFacebookEventId(activity.getFacebookEventId());
-
-    UserActivity saved = useractivityRepository.save(activity);
-    if (saved == null) {
-      return false;
-    }
-
-    return true;
-  }
+	@Override
+	@Caching(
+			evict = { @CacheEvict(
+					value = "activityCache",
+					key = "#activity.id"), @CacheEvict(
+							value = "activityCache",
+							key = "#activity.originatorUserId") })
+    public boolean updateActivity(UserActivity activity) {
+		UserActivity saved = useractivityRepository.save(activity);
+		if (saved == null) {
+			return false;
+		}
+		return true;
+	}
 	@Override
 	public void save(UserToEvents userToEvent) {
 		mongoTemplate.save(userToEvent);
-		
+
 	}
 
 	@Override
@@ -353,20 +328,20 @@ public class UserActivityCatalogService
 	@Override
 	public List<UserActivity> findActivies(EVENT_STATUS eventStatus,
 			Integer skip, Integer limit) {
-	    
+
 		logger.debug("Searching Activities..");
 
 		Query q = query(where("status").is(eventStatus));
 		q.skip(skip);
 		q.limit(limit);
-	    List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
-	    logger.debug("Searching Activities Done");
-	    
-	    if (dbActivities.size() == 0) {
-	      logger.info("no activity found for status " + eventStatus);
-	    }
-	    
-	    return dbActivities;
+		List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
+		logger.debug("Searching Activities Done");
+
+		if (dbActivities.size() == 0) {
+			logger.info("no activity found for status " + eventStatus);
+		}
+
+		return dbActivities;
 	}
 
 	@Override
@@ -376,21 +351,21 @@ public class UserActivityCatalogService
 		Criteria q = where("appParticipants").in(username);
 		Criteria q1 = where("participants").in(facebookId);
 		Query query;
-		
+
 		if(StringUtils.isEmpty(facebookId)){
 			query = query(new Criteria().orOperator(q));
 		} else {
 			query = query(new Criteria().orOperator(q, q1));	
 		}
-		
-	    List<UserActivity> dbActivities = mongoTemplate.find(query, UserActivity.class);
-	    logger.debug("Searching Activities Done");
-	    
-	    if (dbActivities.size() == 0) {
-	      logger.info("no activity found for user invited " + username);
-	    }
-	    
-	    return dbActivities;
+
+		List<UserActivity> dbActivities = mongoTemplate.find(query, UserActivity.class);
+		logger.debug("Searching Activities Done");
+
+		if (dbActivities.size() == 0) {
+			logger.info("no activity found for user invited " + username);
+		}
+
+		return dbActivities;
 	}
-	
+
 }

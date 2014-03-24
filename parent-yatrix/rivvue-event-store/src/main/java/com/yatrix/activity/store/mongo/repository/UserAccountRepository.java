@@ -16,8 +16,8 @@ public interface UserAccountRepository extends MongoRepository<UserAccount, Stri
 	UserAccount findByUserId(String userId);
 	UserAccount findByUsername(String username);
 	Page<UserAccount> findAllOrderByUserId(Pageable pageable);
-	
 	//@Query("{username: {$in: ?0}}")
+	
 	List<UserAccount> findByUsernameIn(String[] username);
 	
 	@Query("{ \"$or\" : [ { \"email\" : { \"$regex\" : ?0, \"$options\" : \"i\"}} , { \"firstName\" : { \"$regex\" : ?0, \"$options\" : \"i\"}}, { \"lastName\" : { \"$regex\" : ?0, \"$options\" : \"i\"}}]} ")

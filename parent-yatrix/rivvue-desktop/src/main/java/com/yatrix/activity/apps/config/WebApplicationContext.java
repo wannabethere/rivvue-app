@@ -16,8 +16,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.yatrix.activity.apps.social.config.SocialConfig;
 import com.yatrix.activity.batch.config.EventPartitioningJobConfiguration;
-import com.yatrix.activity.social.config.SocialConfig;
 import com.yatrix.activity.store.config.MongoConfig;
 
 
