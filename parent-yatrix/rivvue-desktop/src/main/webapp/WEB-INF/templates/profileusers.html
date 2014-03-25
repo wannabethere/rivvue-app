@@ -115,7 +115,7 @@
 				
 				<div class="socialiconpopup">
 					<ul>
-						<li><a href="#" onmouseout="MM_swapImgRestore()" 
+						<li><a th:href="@{'/friends/' + ${authname} }" onmouseout="MM_swapImgRestore()" 
 							th:onmouseover="'javascript:MM_swapImage(\'Image27\',\'\',\'' + @{/resources/images/normalfacebook.png} +'\',1);'"><img
 								th:src="@{/resources/images/overfacebook.png}" name="Image27"
 								width="107" height="110" border="0" id="Image27" class="img12" /></a></li>
@@ -156,7 +156,7 @@
 							<!--start heading -->
 
 							<div class="name">
-								<span th:text="${u.firstName}" />
+								<a th:href="@{'/profile/details/' + ${authname} + '/' + ${u.id}}" ><span th:text="${u.firstName}" /></a>
 								<a th:if="${isSearchPage == true}" th:onclick="'addFriendFn(\'' + ${u.id} + '\' , \'' + ${u.srcProfileType} + '\');'"><img th:src="@{/resources/images/add.png}" alt="Add as friend" /></a>
 								
 								<div class="correctround">

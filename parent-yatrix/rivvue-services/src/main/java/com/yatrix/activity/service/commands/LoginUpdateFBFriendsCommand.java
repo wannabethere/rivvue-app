@@ -113,7 +113,7 @@ public class LoginUpdateFBFriendsCommand extends HystrixCommand<UserAccount>  {
 		userProfile.setEmail(profile.getEmail());
 		userProfile.setSrcprofileType(PROFILETYPE.FB);
 		userProfile.setMiddleName(profile.getMiddleName());
-		userProfile.setImageUrl(profile.)
+		//userProfile.setImageUrl(profile.getO)
 		return userProfile;
 		
 	}

@@ -19,11 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
 
+import com.yatrix.activity.store.mongo.domain.AjaxResponse;
 import com.yatrix.activity.store.mongo.domain.Reference;
 import com.yatrix.activity.store.mongo.domain.Reference.REFERENCETYPE;
 import com.yatrix.activity.store.mongo.domain.Role;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
+import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
@@ -46,10 +48,8 @@ public class ProfileController {
 
 	@Autowired
 	private UserAccountService userRepository;
-	
-	
-	
 
+	
 	@RequestMapping(value = "/{userId}",method = RequestMethod.POST)
 	public @ResponseBody UserProfile create(@PathVariable String userId, @RequestParam String username, @RequestParam String firstName,
 			@RequestParam String lastName, @RequestParam String gender) {
@@ -129,9 +129,6 @@ public class ProfileController {
 			method = RequestMethod.POST)
 			public String createRefContact(@PathVariable String refUserId, UserDto dto,ModelMap model) {
 
-		UserDto userDto = null;
-		List<UserDto> users = new ArrayList<UserDto>();
-
 		if(dto != null) {
 			StringBuffer info = new StringBuffer();
 			info.append("\n--------------- Inside ProfileController:Create Contact ---------------");
@@ -148,7 +145,6 @@ public class ProfileController {
 			info.append(dto.getLastName());
 			log.info(info.toString());
 
-
 			String name = null;
 			if (!isEmpty(dto.getFirstName())) {
 				name = dto.getFirstName();
@@ -158,34 +154,19 @@ public class ProfileController {
 				}
 			}
 
-			UserAccount user = new UserAccount();
-
-			user.setUserId(dto.getUsername());
-			user.setUsername(dto.getUsername());
-			user.setFirstName(dto.getFirstName());
-			user.setLastName(dto.getLastName());
-			user.setEmail(dto.getEmail());
-
-			PasswordEncoder encoder = new Md5PasswordEncoder();
-			user.setPassword(encoder.encodePassword("activity", null));
-
-			user.setAccountLocked(false);
-
-			user.setRoles(new Role[] { Role.ROLE_USER });
-			userRepository.createUserAccount(user,UserAccountService.GENDER.UNKNOWN, null);
+			UserProfile profile = new UserProfile(dto.getUsername(), dto.getUsername(), name, dto.getFirstName(), dto.getLastName(), null,
+					Locale.ENGLISH);
+			profile.setAppAccount(false);
+			profile.setSrcprofileType(PROFILETYPE.APP);
 			
+			profile = service.create(profile);
 			
+			UserAccount userAccount = userRepository.getUserAccount(refUserId);
+			
+			service.addFriend(userAccount.getFacebookId() == null ? userAccount.getUserId() : userAccount.getFacebookId(), profile);
 		}
-		String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-		List<UserProfile> userProfiles = service.getAllByUserId(userId);
-
-		users.addAll(UserMapper.mapUserProfile(userProfiles));
-		ProfileListDto userListDto = new ProfileListDto();
-		userListDto.setProfiles(users);
-
-		model.addAttribute("users", userListDto);
-		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
-		return "profileusers";
+			
+		return "redirect:/friends/" +refUserId;
 	}
 
 	@RequestMapping(
@@ -255,9 +236,11 @@ public class ProfileController {
 		users = UserMapper.mapUserProfile(userProfiles);
 		users.addAll(UserMapper.map(userAccounts));
 		userListDto.setProfiles(users);
-		//userListDto.setProfiles(userProfiles);
+
 		model.addAttribute("users", userListDto);
 		model.addAttribute("authname", username);
+		model.addAttribute("isSearchPage", Boolean.TRUE);
+		
 		return "profileusers";
 	}
 
@@ -318,10 +301,25 @@ public class ProfileController {
 
 	@RequestMapping(value = "/{userId}/addFriend", method = RequestMethod.POST)
 	public @ResponseBody
-	String addFriend(@PathVariable String userId,
+	AjaxResponse addFriend(@PathVariable String userId,
 			@RequestParam String profileType, @RequestParam String id) {
+		
 		UserAccount user = userRepository.getUserAccount(userId);
-		service.addFriend(userId, id);
-		return "contacts";
+		service.addFriend(user.getFacebookId() == null ? user.getUserId() : user.getFacebookId(), id);
+		
+		return new AjaxResponse("Contact added successfully");
+	}
+	
+	@RequestMapping(value = "/details/{loggedInUser}/{friendId}")
+	public 
+	String getProfileDetails(@PathVariable String loggedInUser,
+			@PathVariable String friendId, ModelMap model ) {
+		
+		UserProfile profile = service.getByUserId(friendId);
+		
+		model.put("authname", loggedInUser);
+		model.put("userProfile", profile);
+		
+		return "userdetails";
 	}
 }

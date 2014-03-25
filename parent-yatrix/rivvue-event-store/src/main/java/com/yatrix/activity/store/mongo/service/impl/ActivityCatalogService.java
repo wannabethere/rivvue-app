@@ -99,4 +99,14 @@ public class ActivityCatalogService {
     }
     return dbActivities;
   }
+  
+  public List<Activity> searchActivities(String query) {
+	  logger.debug("Searching Activity Categories");
+	  Query q = query(where("displayName").regex(query));
+	  q.limit(10);
+	  List<Activity> dbActivities = mongoTemplate.find(q, Activity.class);
+	  logger.debug("Searching Categories Done");
+	  
+	  return dbActivities;
+  }  
 }

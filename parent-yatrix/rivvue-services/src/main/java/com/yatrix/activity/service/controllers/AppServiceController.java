@@ -354,5 +354,17 @@ public class AppServiceController {
 	    return googlePlacesAPI.autoCompleteCities(searchString);
 
 	  }
+  
+  @RequestMapping(
+		  value = "/activityAutocomplete",
+		  produces = "application/json",
+		  method = RequestMethod.GET)
+  public @ResponseBody
+  List<Activity> activityAutocomplete(@RequestParam String searchString)
+		  throws Exception {
+
+	  return catalogService.searchActivities(searchString);
+
+  }
 
 }
