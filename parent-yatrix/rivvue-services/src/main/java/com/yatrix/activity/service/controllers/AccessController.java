@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.StringUtils;
 
 import com.yatrix.activity.store.mongo.domain.Role;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
@@ -97,7 +98,8 @@ public class AccessController {
 		List<UserDto> users = new ArrayList<UserDto>();
 		//userListDto.setProfiles(service.getAllByUserId(userId));
 		UserAccount user = userRepository.getUserAccount(authname);
-		users.addAll(UserMapper.mapUserProfile(service.getMyContacts(user.getId())));
+		//This is the facebook Id only check. Later we have 
+		users.addAll(UserMapper.mapUserProfile(service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId())));
 		userListDto.setProfiles(users);
 		model.put("friends", userListDto);
 		return "events/createEvent";
@@ -110,14 +112,14 @@ public class AccessController {
 		return "calendar";
 	}
 
-	@RequestMapping(value="/friends/{username}")
+	@RequestMapping(value="/friends/{userId}")
 	public String getProfileUsersPage(@PathVariable String userId, ModelMap model) {
 		//String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		log.info("Retrieving profile friends for " + userId);;
 		UserAccount user = userRepository.getUserAccount(userId);
 		ProfileListDto userListDto = new ProfileListDto();
 		List<UserDto> users = new ArrayList<UserDto>();
-		users.addAll(UserMapper.mapUserProfile(service.getMyContacts(user.getId())));
+		users.addAll(UserMapper.mapUserProfile(service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId())));
 		userListDto.setProfiles(users);
 		model.put("friends", userListDto);
 		userListDto.setProfiles(users);

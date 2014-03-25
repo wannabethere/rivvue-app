@@ -37,13 +37,13 @@ public class UserAccount extends Item implements SocialUserDetails, UserDetails{
   @Column(unique = true)
   private String username;
   private String password;
+  private Long updatedTimeStamp;
   //Social Connections are used for authenticating the user.
   @Transient
   private List<UserSocialConnection> connections;
   //Avatars are the various Ids I have 
   @Transient
   private List<UserProfile> avatars;
-
   
   public String getFirstName() {
     return firstName;
@@ -230,7 +230,6 @@ public class UserAccount extends Item implements SocialUserDetails, UserDetails{
 	  return this.connections;
   }
   
-  
   // used for account social connection
   private UserSocialConnection getConnection(String providerId) {
     if (this.connections != null) {
@@ -277,7 +276,16 @@ public class UserAccount extends Item implements SocialUserDetails, UserDetails{
 	  this.avatars = avatars;
   }
   public List<UserProfile> getAvatars() {
+	  if(avatars==null){
+		  avatars= new ArrayList<UserProfile>();
+	  }
 	  return avatars;
   }
+public void setUpdatedTimeStamp(Long updatedTimeStamp) {
+	this.updatedTimeStamp = updatedTimeStamp;
+}
+public Long getUpdatedTimeStamp() {
+	return updatedTimeStamp;
+}
   
 }

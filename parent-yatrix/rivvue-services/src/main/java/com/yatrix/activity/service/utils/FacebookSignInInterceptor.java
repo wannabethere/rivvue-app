@@ -14,6 +14,7 @@ import org.springframework.social.facebook.api.PagedList;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.request.WebRequest;
 
+import com.yatrix.activity.service.commands.LoginUpdateFBFriendsCommand;
 import com.yatrix.activity.store.mongo.domain.Reference;
 import com.yatrix.activity.store.mongo.domain.Reference.REFERENCETYPE;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
@@ -53,8 +54,14 @@ public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Face
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		Facebook facebook = connection.getApi();
 		FacebookProfile profile = facebook.userOperations().getUserProfile();
+		PagedList<FacebookProfile> friends = facebook.friendOperations().getFriendProfiles();
 		log.info("PF"+ profile.toString());
+		//Fire and forget friends.
+		new LoginUpdateFBFriendsCommand(authname, profile, friends, service,userAccountRepository).execute();
+		//log.info(loggedInUser.toString() + " has been updated");
 		
+		/*
+		 * 
 		UserAccount loggedInUser = userAccountRepository.getUserAccount(authname);
 		if(loggedInUser==null){
 			loggedInUser = userAccountRepository.getUserAccountByUserName(authname);
@@ -70,14 +77,16 @@ public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Face
 		
 		loggedInUser.setFacebookId(profile.getId());
 		UserProfile friendProfile= null;
-		PagedList<FacebookProfile> friends = facebook.friendOperations()
-				.getFriendProfiles();
+		
+		List<String> idsAlreadyThere=service.getMyContactIds(pf.getUserId());
+		
 		for (FacebookProfile friend : friends) {
-			log.debug(friend.toString());
-			friendProfile = createUserProfile(friend);
-			if(pf==null){
-				log.info("Empty PF Object:"+ pf);
+			log.debug("Friend Profile"+friend.getId()+" " + friend.toString());
+			if(idsAlreadyThere.contains(friend.getId())){
+				continue;
 			}
+			friendProfile = createUserProfile(friend);
+			friendProfile.setParentId(pf.getUserId());
 			service.addFriend(pf, friendProfile);	
 		}
 	    UserAccountService.GENDER gender= UserAccountService.GENDER.UNKNOWN;
@@ -89,6 +98,7 @@ public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Face
 		}
 		
 		userAccountRepository.createUserAccount(loggedInUser, gender, profile.getLocale());
+		 */
 	}
 
 	private UserProfile createUserProfile(FacebookProfile profile){

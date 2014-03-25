@@ -2,10 +2,12 @@ package com.yatrix.activity.store.mongo.service.impl;
 
 import com.yatrix.activity.store.mongo.domain.Reference;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
+import com.yatrix.activity.store.mongo.domain.UserConnections;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.Reference.REFERENCETYPE;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PSTATUS;
+import com.yatrix.activity.store.mongo.repository.AppConnectionsRepository;
 import com.yatrix.activity.store.mongo.repository.ProfileRepository;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService.GENDER;
 
@@ -26,6 +28,9 @@ public class ProfileService {
 
 	@Autowired
 	private ProfileRepository userRepository;
+	
+	@Autowired
+	private AppConnectionsRepository connectionsRepository;
 
 	/**
 	 * @param profile
@@ -129,7 +134,7 @@ public class ProfileService {
 	 */
 	public UserProfile update(UserProfile profile) {
 		log.info("--------------- Inside ProfileService:update() ---------------");
-		UserProfile existingUser = userRepository.findByUserId(profile.getParentId());
+		UserProfile existingUser = userRepository.findByUserId(profile.getUserId());
 		if (existingUser == null) {
 			throw new UsernameNotFoundException("Didnot find the user");
 		}
@@ -146,23 +151,7 @@ public class ProfileService {
 				throw new UsernameNotFoundException("Didnot find the user");
 			}
 		}
-		
-		Reference ref= new Reference(REFERENCETYPE.CONTACTS, parentId, pf.getId());
-		UserProfile existingFriendPf=null;
-		parentProfile.getSocialIds().add(ref);
-		update(parentProfile);
-		//Now we will also update the friends profile to be connected to the parent ref.
-		//This way when the user becomes the app user then we have already his friends.
-		existingFriendPf=userRepository.findByUserId(pf.getId());
-		if(existingFriendPf!=null){
-			existingFriendPf.getSocialIds().add(ref);
-			update(existingFriendPf);
-		}
-		else{
-			//I didnot find the User Id.
-			pf.getSocialIds().add(ref);
-			create(pf);
-		}
+		this.addFriend(parentProfile, pf);
 		return;
 	}
 	
@@ -175,42 +164,51 @@ public class ProfileService {
 			}
 		}
 		UserProfile existingFriendPf=userRepository.findByUserId(pfId);
-		if(existingFriendPf==null){
-			throw new UsernameNotFoundException("Didnot find the friend I have to add");
-		}
-		Reference ref= new Reference(REFERENCETYPE.CONTACTS, parentId, existingFriendPf.getId());
-		parentProfile.getSocialIds().add(ref);
-		update(parentProfile);
-		//Now we will also update the friends profile to be connected to the parent ref.
-		//This way when the user becomes the app user then we have already his friends.
-		existingFriendPf.getSocialIds().add(ref);
-		update(existingFriendPf);
+		this.addFriend(parentProfile, existingFriendPf);
 		return;
 	}
 	
 	
 	public UserProfile addFriend(UserProfile parentProfile, UserProfile pf){
-		
 		if(parentProfile==null){
 			throw new UsernameNotFoundException("Didnot find the user");
 		}
-		Reference ref= new Reference(REFERENCETYPE.CONTACTS, parentProfile.getUserId(), pf.getId());
+		pf.setParentId(parentProfile.getUserId());
+		Reference ref= new Reference(REFERENCETYPE.CONTACTS, pf.getUserId(), parentProfile.getUserId());
 		UserProfile existingFriendPf=null;
-		parentProfile.getSocialIds().add(ref);
-		update(parentProfile);
+		addConnections(parentProfile, ref);
+		//update(parentProfile);
 		//Now we will also update the friends profile to be connected to the parent ref.
 		//This way when the user becomes the app user then we have already his friends.
 		existingFriendPf=userRepository.findByUserId(pf.getId());
+		ref= new Reference(REFERENCETYPE.CONTACTS, parentProfile.getUserId(), pf.getUserId());
 		if(existingFriendPf!=null){
-			existingFriendPf.getSocialIds().add(ref);
-			update(existingFriendPf);
+			addConnections(parentProfile, ref);
+			//update(existingFriendPf);
 		}
 		else{
 			//I didnot find the User Id.
-			pf.getSocialIds().add(ref);
 			create(pf);
+			addConnections(pf, ref);
+			//pf.getSocialIds().add(ref);
 		}
 		return parentProfile;
+	}
+	
+	
+	private void addConnections(UserProfile userProfile,Reference ref){
+		UserConnections parentConnection=connectionsRepository.findByProfileUserId(userProfile.getUserId());
+		if(parentConnection==null){
+			parentConnection=new UserConnections();
+			parentConnection.setProfileUserId(userProfile.getUserId());
+		}
+		parentConnection.addReference(ref);
+		connectionsRepository.save(parentConnection);
+	}
+	
+	private void removeFriendConnection(String profileUserId, String refId){
+		UserConnections parentConnection=connectionsRepository.findByProfileUserId(profileUserId);
+		parentConnection.removeReference(refId);
 	}
 	
 	public UserProfile removeFriend(String parentId, String refId){
@@ -221,46 +219,43 @@ public class ProfileService {
 				throw new UsernameNotFoundException("Didnot find the user");
 			}
 		}
-		int index=0;
-		for(Reference ref:parentProfile.getSocialIds()){
-			if(ref.getId().equals(refId)){
-				parentProfile.getSocialIds().remove(index);
-			}
-			index++;
-		}
+		removeFriendConnection(parentProfile.getUserId(), refId);
 		return parentProfile;
 	}
 	
-	
+	/**
+	 * TODO: Query only the values u are looking for.
+	 * Hopefully this can be done as a query to improve performance.
+	 * @param parentId
+	 * @return
+	 */
 	public List<String> getMyContactIds(String parentId){
 		UserProfile parentProfile = userRepository.findByUserId(parentId);
 		if (parentProfile == null) {
 			throw new UsernameNotFoundException("Didnot find the user");
 		}
 		List<String> ids=new ArrayList<String>();
-		for(Reference ref:parentProfile.getSocialIds()){
-			ids.add(ref.getId());
+		UserConnections parentConnection=connectionsRepository.findByProfileUserId(parentProfile.getUserId());
+		if(parentConnection==null){
+			return ids;
+		}
+		for(String key: parentConnection.getConnections().keySet()){
+			ids.add(key);
 		}
 		return ids;
 	}
 	
 	/**
+	 * 
 	 * This should not be used for the real application.
 	 * Ajax call should be used to load the data as it finishes.
 	 * @param parentId
 	 * @return
 	 */
 	public List<UserProfile> getMyContacts(String parentId){
-		UserProfile parentProfile = userRepository.findByUserId(parentId);
-		if (parentProfile == null) {
-			throw new UsernameNotFoundException("Didnot find the user");
-
-		}
-		List<UserProfile> ids=new ArrayList<UserProfile>();
-		for(Reference ref:parentProfile.getSocialIds()){
-			ids.add(getByUserId(ref.getId()));
-		}
-		return ids;
+		List<String> ids=getMyContactIds(parentId);
+		String[] sids= ids.toArray(new String[ids.size()]);
+		return getUserProfilesIn(sids);
 	}
 	
 	public List<UserProfile> getUserProfilesIn(String[] userIds){
