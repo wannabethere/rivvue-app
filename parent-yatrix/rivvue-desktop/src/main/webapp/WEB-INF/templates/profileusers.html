@@ -7,10 +7,9 @@
 <title th:text="#{app.name}">RIVVUE</title>
 <link href='http://fonts.googleapis.com/css?family=Oswald'
 	rel='stylesheet' type='text/css' />
-<link href="/resources/css/stylesheet.css" rel="stylesheet"
-	type="text/css" th:href="@{/resources/css/stylesheet.css}" />
-<script type="text/javascript" th:src="@{/resources/js/jQuery.js}"
-	th:href="@{/resources/js/jQuery.js}"></script>
+<link href="/resources/css/stylesheet.css" rel="stylesheet"	type="text/css" th:href="@{/resources/css/stylesheet.css}" />
+<script type="text/javascript"  th:src ="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
+
 <script type="text/javascript" th:inline="javascript">
 	//<![CDATA[
 	function MM_swapImgRestore() { //v3.0
@@ -64,10 +63,10 @@
 	}
 	//]]>
 </script>
-<script type="text/javascript">
-	function addFriendFn(friendId, srcProfileType) {
-		var username = $('#loggedInUser').val();
-		var url = "../profile/" + username + "/addFriend";
+<script type="text/javascript" th:inline="javascript">
+	function addFriendFn(friendId, srcProfileType, url) {
+		var url =  /*[[@{'/profile/' + ${authname} + '/addFriend'}]]*/"wannabethere/profile/user581/addFriend";
+		//alert("URL: " + url);
 		var param = {
 			"profileType" : srcProfileType,
 			"id" : friendId
@@ -78,22 +77,28 @@
 			dataType : "json",
 			type : 'POST',
 			data : param,
+			error : function(jqXHR, exception){
+				alert(jqXHR.responseText + exception);
+			},
 			success : function(data) {
-				alert('Added successfully' + data);
+				alert(data.message);
+				//$('#message').html(data);
 			}
 		});
 	}
+	
+
 </script>
 </head>
 
 <body>
 	<header th:include="include :: signedHeader"> </header>
 
-	<form action="#" th:action="@{'/profile/search/' + ${authname}}"
-		method="get">
+	
 		<input type="hidden" name="loggedInUser" id="loggedInUser"
 			th:value="${authname}" />
 		<div id="content1">
+		<form action="#" th:action="@{'/profile/search/' + ${authname}}" method="get">
 			<div class="newarticle">
 				<!--topmenu start-->
 				<div class="topmenu" th:include="include :: topmenu"></div>
@@ -107,11 +112,16 @@
 					</ul>
 				</div>
 				<div class=" clear"></div>
+				
 				<div class="socialiconpopup">
 					<ul>
 						<li><a href="#" onmouseout="MM_swapImgRestore()" 
 							th:onmouseover="'javascript:MM_swapImage(\'Image27\',\'\',\'' + @{/resources/images/normalfacebook.png} +'\',1);'"><img
 								th:src="@{/resources/images/overfacebook.png}" name="Image27"
+								width="107" height="110" border="0" id="Image27" class="img12" /></a></li>
+						<li><a th:href="@{'/profile/create/' + ${authname}}"  onmouseout="MM_swapImgRestore()" 
+							th:onmouseover="'javascript:MM_swapImage(\'Image27\',\'\',\'' + @{/resources/images/add_friend.png} +'\',1);'"><img
+								th:src="@{/resources/images/add_friend.png}" name="Image27"
 								width="107" height="110" border="0" id="Image27" class="img12" /></a></li>
 						<li><a href="#" onmouseout="MM_swapImgRestore()"
 							th:onmouseover="'javascript:MM_swapImage(\'Image28\',\'\',\'' + @{/resources/images/overtwitter.png} +'\',1);'"><img
@@ -134,8 +144,8 @@
 								width="65" height="110" border="0" id="Image31" class="img12" /></a></li>
 					</ul>
 				</div>
-
-				<div id="profileUsers" th:each="u : ${users.profiles}">
+				
+				<div id="profileUsers"  th:each="u : ${users.profiles}">
 					<div id="invitefriend">
 						<div id="image">
 							<img th:src="@{/resources/images/topparticipant.jpg}" width="40"
@@ -147,9 +157,10 @@
 
 							<div class="name">
 								<span th:text="${u.firstName}" />
+								<a th:if="${isSearchPage == true}" th:onclick="'addFriendFn(\'' + ${u.id} + '\' , \'' + ${u.srcProfileType} + '\');'"><img th:src="@{/resources/images/add.png}" alt="Add as friend" /></a>
+								
 								<div class="correctround">
 									<a href="#"
-										th:onclick="'javascript:addFriendFn(\'' + ${u.id} + '\' , \'' + ${u.srcProfileType} + '\');'"
 										onmouseout="MM_swapImgRestore()"
 										onmouseover="MM_swapImage('Image19','','./../resources/images/correctred.png',1)"><img
 										th:src="@{/resources/images/correctgray.png}" name="Image19"
@@ -159,14 +170,15 @@
 						</div>
 					</div>
 				</div>
-
-			</div>
+				</div>
+</form>
+          
 			<footer th:include="include :: footer">
 </footer>
 		</div>
 		<!--footer start-->
 
 		<!--footer close-->
-	</form>
+	
 </body>
 </html>

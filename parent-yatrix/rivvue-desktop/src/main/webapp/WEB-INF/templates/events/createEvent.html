@@ -43,6 +43,29 @@ $(document).ready(function(){
 	    
 	});
 	
+	$('#categoryId').autocomplete({
+		serviceUrl: "app/"+username+"/activityAutocomplete",
+		paramName: "searchString",
+		delimiter: ",",
+	    transformResult: function(response) {
+	    	//alert(response);
+	    	
+	    	var jsonStr = $.parseJSON(response);
+	    	//alert(jsonStr);
+	    	
+	        return {
+	        	
+	        	suggestions: $.map(jsonStr, function(item) {
+	            	
+	                return { value: item.displayName, data: item.displayName};
+	            })
+	            
+	        };
+	        
+	    }
+	    
+	});
+	
 
 
 				//Examples of how to assign the Colorbox event to elements
@@ -167,35 +190,37 @@ function isChecked(obj, val, name, profileType) {
 				<input type="hidden" name="user" id="user" th:value="${userid}"  />
  <div class="inner_form1">
 					<label>Title :</label>
-					<div class="text_field"><input type="text" name="message" id="message" th:field="*{title}"/></div>
+					<div class="text_field"><input type="text" name="message" id="message" th:field="*{message}"/></div>
 				
 </div>
  <div class="inner_form1">
 					<label>Description: </label>
-					<div class="text_field"><textarea name="textarea" th:field="*{description}"></textarea></div>
+					<div class="text_field"><textarea name="textarea"></textarea></div>
 				
 </div>
  
  <div class="inner_form1">
 					<label>Tags :</label>
-					<div class="text_field"><input type="text" id="categoryId" name="categoryId" th:field="*{tags}"/> <div class="add"><img src="./resources/images/add.png" alt="" /></div></div>
+					<div class="text_field"><input type="text" id="categoryId" name="categoryId" th:field="*{categoryId}"/> 
+					<!-- <div class="add"><img src="./resources/images/add.png" alt="" /></div> -->
+					</div>
 				
 </div>
-<div class="inner_form_button">
-				<input type="submit" value="" class="sport_button" name="button" />
-                <input type="submit" value="" class="fun_button" name="button" />
-                <input type="submit" value="" class="pleasure_button" name="button" />
-				</div>
+
   <div class="inner_form1"></div>
   <div class="inner_form1">
-					<label>Location :</label>
-					<div class="text_field"><input type="text" name="place" id="place" class="locationbox" /></div>
+					<label>Place :</label>
+					<div class="text_field"><input type="text" name="place" id="place" /></div>
 						<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
 							<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
 							<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
 							<input type="hidden" name="access" id ="access" value = "PUBLIC" th:field="*{access}"  /> 
 							<input type="hidden" name="to" id ="to" th:field="*{to}" />
 							<input type="hidden" name="toAppUsers" id ="toAppUsers" th:field="*{toAppUsers}" /> 
+</div>
+  <div class="inner_form1">
+					<label>Location :</label>
+					<div class="text_field"><input type="text" name="location" id="location" class="locationbox" /></div>
 </div>
    <div class="inner_form1">
 					<label>Start Time :</label>
