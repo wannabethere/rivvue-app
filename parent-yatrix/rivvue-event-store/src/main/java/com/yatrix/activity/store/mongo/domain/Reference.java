@@ -19,7 +19,7 @@ public class Reference extends Item{
 	/**
 	 * Owner of the reference. So multiple users can have different references.
 	 */
-	private final String parentId;
+	private final String userId;
 	private final String value;
 
 	public static enum REFERENCETYPE {
@@ -35,8 +35,8 @@ public class Reference extends Item{
 	 * @param userId
 	 * @param refId
 	 */
-	public Reference(REFERENCETYPE type, String parentId, String refId) {
-		this(type, parentId, refId, null, null);
+	public Reference(REFERENCETYPE type, String userId, String refId) {
+		this(type, userId, refId, null, null);
 	}
 
 	/**
@@ -45,8 +45,8 @@ public class Reference extends Item{
 	 * @param refId
 	 * @param name
 	 */
-	public Reference(REFERENCETYPE type, String parentId, String refId, String name) {
-		this(type, parentId, refId, name, null);
+	public Reference(REFERENCETYPE type, String userId, String refId, String name) {
+		this(type, userId, refId, name, null);
 	}
 
 	/**
@@ -56,10 +56,10 @@ public class Reference extends Item{
 	 * @param name
 	 * @param value
 	 */
-	public Reference(REFERENCETYPE type, String parentId, String refId, String name, String value) {
+	public Reference(REFERENCETYPE type, String userId, String refId, String name, String value) {
 		this.refId = refId;
 		this.name = name;
-		this.parentId = parentId;
+		this.userId = userId;
 		this.type = type;
 		this.value = value;
 	}
@@ -88,8 +88,8 @@ public class Reference extends Item{
 	/**
 	 * @return the userId
 	 */
-	public String getParentId() {
-		return parentId;
+	public String getUserId() {
+		return userId;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class Reference extends Item{
 		wBuilder.append(", type=");
 		wBuilder.append(type);
 		wBuilder.append(", userId=");
-		wBuilder.append(parentId);
+		wBuilder.append(userId);
 		wBuilder.append("]");
 		return wBuilder.toString();
 	}

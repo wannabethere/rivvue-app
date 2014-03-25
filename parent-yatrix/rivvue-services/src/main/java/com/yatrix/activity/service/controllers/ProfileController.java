@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.util.StringUtils;
 
 import com.yatrix.activity.store.mongo.domain.Reference;
 import com.yatrix.activity.store.mongo.domain.Reference.REFERENCETYPE;
@@ -214,7 +215,7 @@ public class ProfileController {
 		ProfileListDto userListDto = new ProfileListDto();
 		UserAccount user = userRepository.getUserAccount(userId);
 		if(user!=null){
-			userListDto.setProfiles(UserMapper.mapUserProfile(service.getMyContacts(userId)));
+			userListDto.setProfiles(UserMapper.mapUserProfile(service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId())));
 			return userListDto;
 		}
 		return null;

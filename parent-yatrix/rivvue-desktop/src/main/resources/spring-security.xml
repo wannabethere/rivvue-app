@@ -41,7 +41,7 @@
 		<custom-filter ref="socialAuthenticationFilter" before="PRE_AUTH_FILTER" />
 		<logout invalidate-session="true" 
 			logout-success-url="/logout/success" 
-			logout-url="/logout"/>
+			logout-url="/logout" delete-cookies="rivvue-app"/>
 	</http>
 	
 	<authentication-manager  alias="authenticationManager">

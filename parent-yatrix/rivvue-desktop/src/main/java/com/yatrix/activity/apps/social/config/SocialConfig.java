@@ -36,6 +36,7 @@ import org.springframework.social.security.SocialAuthenticationServiceRegistry;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 
+import com.netflix.hystrix.HystrixCommand;
 import com.yatrix.activity.store.mongo.repository.AutoConnectionSignUp;
 import com.yatrix.activity.store.mongo.repository.ConnectionConverter;
 import com.yatrix.activity.store.mongo.repository.ConnectionService;
@@ -52,6 +53,7 @@ import com.yatrix.activity.apps.util.ActivityFeedProcessor;
 import com.yatrix.activity.store.utils.CounterService;
 import com.yatrix.activity.service.utils.FacebookConnectInterceptor;
 import com.yatrix.activity.service.utils.FacebookSignInInterceptor;
+import com.yatrix.activity.service.utils.HystrixInitialization;
 import com.yatrix.activity.store.utils.UserAdminService;
 
 @Configuration
@@ -127,6 +129,12 @@ public class SocialConfig {
 		return afp;
 	}
 
+	@Bean 
+	public HystrixInitialization initializeHystrix(){
+		HystrixInitialization his=new HystrixInitialization();
+		his.init();
+		return his;
+	}
 
 	@Bean
 	public ConnectionService userSocialConnectionService(){
@@ -193,6 +201,8 @@ public class SocialConfig {
 		PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
 				env.getProperty("application.key"), userAdminService, persistentTokenRepository());
 		rememberMeServices.setAlwaysRemember(true);
+		rememberMeServices.setCookieName("rivvue-app");
+		rememberMeServices.setTokenValiditySeconds(365*86400);
 		return rememberMeServices;
 	}
 

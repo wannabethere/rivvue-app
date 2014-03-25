@@ -36,7 +36,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 	private final String name;
 	private String relationshipStatus;
 	private Reference significantOther;
-	private List<Reference> socialIds = new ArrayList<Reference>();
+	
+	
 	private PROFILETYPE srcprofileType;
 	private String thirdPartyId;
 	private Float timezone;
@@ -200,13 +201,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 		 return significantOther;
 	 }
 
-	 /**
-	  * @return the socialIds
-	  */
-	 public List<Reference> getSocialIds() {
-		 return socialIds;
-	 }
-
+	
 	 /**
 	  * @return the srcprofileType
 	  */
@@ -361,14 +356,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 		 significantOther = pSignificantOther;
 	 }
 
-	 /**
-	  * @param pSocialIds
-	  *          the socialIds to set
-	  */
-	 public void setSocialIds(List<Reference> pSocialIds) {
-		 socialIds = pSocialIds;
-	 }
-
+	 
 	 /**
 	  * @param pSrcprofileType
 	  *          the srcprofileType to set
@@ -451,6 +439,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 		 StringBuilder wBuilder = new StringBuilder();
 		 wBuilder.append("UserProfile [parentId=");
 		 wBuilder.append(parentId);
+		 wBuilder.append(", userId=");
+		 wBuilder.append(userId);
 		 wBuilder.append(", srcprofileType=");
 		 wBuilder.append(srcprofileType);
 		 wBuilder.append(", username=");
@@ -499,8 +489,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 		 wBuilder.append(relationshipStatus);
 		 wBuilder.append(", significantOther=");
 		 wBuilder.append(significantOther);
-		 wBuilder.append(", socialIds=");
-		 wBuilder.append(socialIds);
 		 wBuilder.append(", education=");
 		 wBuilder.append(education);
 		 wBuilder.append("]");
