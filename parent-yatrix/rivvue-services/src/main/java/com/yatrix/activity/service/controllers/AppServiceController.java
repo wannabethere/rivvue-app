@@ -110,11 +110,14 @@ public class AppServiceController {
     try {
       
     	//TODO: Pass DTO instead of passing so many parameters... --- Kishore
-    	dto.setMessage(dto.getTitle());
-    	dto.setCategoryId(dto.getTags());
+    	dto.setTitle(dto.getMessage());
+    	//dto.setCategoryId(dto.getTags());
+    	dto.setTags(dto.getCategoryId());
     	dto.setLocation(dto.getPlace());
+    	String start = dto.getFromdate() + " " + dto.getFromtime();
+    	String end = dto.getTodate() + " " + dto.getTotime();
        UserActivity userActivity=usercatalogService.createActivity(dto.getTitle(),dto.getTags(),dto.getCategoryId(), dto.getSubCategoryId(),
-        dto.getLocation(), dto.getFormattedAddress(), dto.getLocationLat(), dto.getLocationLng(), uuid, dto.getTo(), dto.getToAppUsers(), dto.getAccess(), dto.getStart(), dto.getEnd(),
+        dto.getLocation(), dto.getFormattedAddress(), dto.getLocationLat(), dto.getLocationLng(), uuid, dto.getTo(), dto.getToAppUsers(), dto.getAccess(), start, end,
         dto.getMessage(), dto.getPlace());
       // Facebook facebook = connectionRepository.getPrimaryConnection(Facebook.class).getApi();
 

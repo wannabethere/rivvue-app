@@ -29,6 +29,11 @@ public class EventDto {
 	private String locationLat;
 	private String locationLng;
 	private long duration;
+	private String fromdate;
+	private String fromtime;
+	private String todate;
+	private String totime;
+	
 	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
 	
 	public String getAccess() {
@@ -171,4 +176,29 @@ public class EventDto {
 	public String getDescription() {
 		return description;
 	}
+	public String getFromdate() {
+		return fromdate;
+	}
+	public void setFromdate(String fromdate) {
+		this.fromdate = fromdate;
+	}
+	public String getFromtime() {
+		return fromtime;
+	}
+	public void setFromtime(String fromtime) {
+		this.fromtime = fromtime;
+	}
+	public String getTodate() {
+		return todate;
+	}
+	public void setTodate(String todate) {
+		this.todate = todate;
+	}
+	public String getTotime() {
+		return totime;
+	}
+	public void setTotime(String totime) {
+		this.totime = totime;
+	}
+	
 }

@@ -40,15 +40,15 @@
    
     <!--Form Start-->
  <form id="form" name="form" th:object="${commanduser}" th:action="@{'/profile/'+${authname}+'/createRefContact'}" method="post">
- 				<input type="hidden" name="from" id="from"  th:value="${authname}"  />
+ 				<input type="hidden" name="from" id="from"  th:value="${authname}"   />
 
  <div class="inner_form1">
 					<label>User name :</label>
-					<div class="text_field"><input type="text" name="username" id="username" th:field="*{username}"/></div>
+					<div class="text_field"><input type="text" name="username" id="username" disabled="true" th:field="*{username}"/></div>
 </div>
  <div class="inner_form1">
 					<label>User Id :</label>
-					<div class="text_field"><input type="text" id="id" name="id" th:field="*{id}"/> 
+					<div class="text_field"><input type="text" id="id" name="id" th:field="*{id}" disabled="true"/> 
 					<!-- <div class="add"><img src="./resources/images/add.png" alt="" /></div> -->
 					</div>
 				
@@ -56,30 +56,16 @@
 				
  <div class="inner_form1">
 					<label>First name :</label>
-					<div class="text_field"><input type="text" name="firstName" id="firstName" th:field="*{firstName}"/></div>
+					<div class="text_field"><input type="text" name="firstName" id="firstName" disabled="true" th:field="*{firstName}"/></div>
 				
 </div>
  <div class="inner_form1">
 					<label>Last Name: </label>
-					<div class="text_field"><input type="text" name="lastName" id="lastName" th:field="*{lastName}"/></div>
+					<div class="text_field"><input type="text" name="lastName" id="lastName" disabled="true" th:field="*{lastName}"/></div>
 				
 </div>
  
-
- 
-
-                
-<<<<<<< HEAD
-           <!--<div class="inner_form_button2">
-				<input type="button" value="SUBMIT" class="submit_button" name="button" onclick="changeSubmit()"/>
-=======
-           <div class="inner_form_button2">
-				<input type="submit" value="SUBMIT" class="submit_button" name="submit" />
->>>>>>> 2c4869a4606cc37ec7011360b63e2200d7de41be
-             	 <div class="myevent"><a href="#">Cancel</a></div>
-             
-				</div>-->
-                     
+                 
  </form>
     <!--From box-->
     
