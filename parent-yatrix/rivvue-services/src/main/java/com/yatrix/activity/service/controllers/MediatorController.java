@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.mongo.domain.Category;
 import com.yatrix.activity.store.mongo.domain.PostMessage;
+import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
+import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 
 @Controller
 @RequestMapping("/")
@@ -22,6 +24,8 @@ public class MediatorController {
 
 	@Autowired
 	IUserActivityCatalogService userActivityCatalogService;
+	@Autowired
+	private UserAccountService userRepository;
 
 	@RequestMapping
 	public String getHomePage(ModelMap model) {
@@ -54,8 +58,18 @@ public class MediatorController {
 			eventList.add(dto);
 		}
 		model.addAttribute("events", eventList);
-
-		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
+		model.addAttribute("authusername", SecurityContextHolder.getContext().getAuthentication().getName());
+		String authName=SecurityContextHolder.getContext().getAuthentication().getName();
+		UserAccount user = userRepository.getUserAccount(authName);
+		if(user==null){
+			user = userRepository.getUserAccountByUserName(authName);
+			
+			if(user==null){
+				model.addAttribute("status", "logout.success");
+				return "access/login";
+			}
+		}
+		model.addAttribute("authname", user.getUserId());
 
 		return "events/postlogin";
 	}

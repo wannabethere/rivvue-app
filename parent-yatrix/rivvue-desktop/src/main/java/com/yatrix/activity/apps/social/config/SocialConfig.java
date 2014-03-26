@@ -185,7 +185,7 @@ public class SocialConfig {
 	public ConnectController connectController() {
 		ConnectController controller = new ConnectController(connectionFactoryLocator(), connectionRepository());
 		controller.setApplicationUrl(env.getRequiredProperty("application.url"));
-		controller.addInterceptor(new FacebookConnectInterceptor(profileService, userAccountService)); 
+		controller.addInterceptor(new FacebookSignInInterceptor(profileService, userAccountService)); 
 		return controller;
 	}
 

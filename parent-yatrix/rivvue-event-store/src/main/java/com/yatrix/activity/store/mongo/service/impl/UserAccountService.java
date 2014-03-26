@@ -51,6 +51,7 @@ public class UserAccountService {
 	public void createUserAccount(UserAccount account, GENDER gender, Locale locale){
 		//Create a first cut for the User Profile as well.
 		//Eventually we will use email as the UserName.
+		
 		UserProfile pf=createUserProfileObject(account, gender, locale, true);
 		pf.setSrcprofileType(PROFILETYPE.APP);
 		profileService.create(pf);
@@ -74,7 +75,7 @@ public class UserAccountService {
 	}
 	
 	public static UserProfile createUserProfileObject(UserAccount account, GENDER gender, Locale locale, boolean hasAppAccount){
-		UserProfile pf=new UserProfile(account.getId(), account.getEmail(), account.getDisplayName(), account.getFirstName(),
+		UserProfile pf=new UserProfile(account.getUserId(), account.getEmail(), account.getDisplayName(), account.getFirstName(),
 				account.getLastName(), gender.getGender(), locale);
 		pf.setAppAccount(hasAppAccount);
 		pf.setStatus(PSTATUS.ACTIVE);

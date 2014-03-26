@@ -24,7 +24,6 @@ public class SignInUtils {
 	 * Programmatically signs in the user with the given the user ID.
 	 */
 	public static void signin(String userId) {
-		
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userId, null, null));	
 	}
 	

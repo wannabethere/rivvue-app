@@ -14,26 +14,28 @@
 		<header th:include="include :: signedHeader">
 		</header>
 			<div>
-				<form action="#" th:action="@{'/profile/'+${authname}+'/createRefContact'}" th:object="${commanduser}" method="post">
+				<form action="#" th:action="@{'/profile/'+${authname}+'/contact'}" th:object="${contact}" method="post">
 				<table class="box-table-a">
 					<caption th:text="#{${usertype + '.contact.table.caption'}}">New Contact</caption>
 					<thead>
 						<tr>
-							<!-- <th th:text="#{contact.userid.label}">Userid</th> -->
-							<th th:text="#{contact.username.label}">Username</th>
+							
 							<th th:text="#{contact.firstname.label}">First Name</th>
 							<th th:text="#{contact.lastname.label}">Last Name</th>
 							<th th:text="#{profileuser.email.label}">Email</th>
+							<th th:text="#{profileuser.phone.label}">Phone</th>
+							<th th:text="#{profileuser.homephone.label}">Home Phone</th>
 							<th></th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<!--  <td><input type="text" th:field="*{id}"/></td>-->
-							<td><input type="text" th:field="*{username}"/></td>
+							
 							<td><input type="text" th:field="*{firstName}"/></td>
 							<td><input type="text" th:field="*{lastName}"/></td>
 							<td><input type="text" th:field="*{email}"/></td>
+							<td><input type="text" th:field="*{phone}"/></td>
+							<td><input type="text" th:field="*{homephone}"/></td>
 							<td>
 								<button class="add-button" type="submit" th:text="#{${usertype + '.contact.button.label'}}">Action</button>
 							</td>

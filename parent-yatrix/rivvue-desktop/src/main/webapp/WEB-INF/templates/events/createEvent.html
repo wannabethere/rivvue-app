@@ -8,9 +8,11 @@
 <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
 <link rel="stylesheet" href="./../resources/css/stylesheet.css" th:href="@{/resources/css/stylesheet.css}" />
 <link href="./../../../css/colorbox.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/colorbox.css}"/>
+<link href="./../../../css/easydropdown.metro.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/easydropdown.metro.css}"/>
 
 <script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}" th:href="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}"></script>
 <script type="text/javascript" th:src="@{/resources/js/jquery.autocomplete.min.js}" th:href="@{/resources/js/jquery.autocomplete.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/js/jquery.easydropdown.min.js}" th:href="@{/resources/js/jquery.easydropdown.min.js}"></script>
 <script src="./resources/js/jquery.colorbox.js" language="javascript1.5" th:href="@{/resources/js/jquery.colorbox.js}"></script>
  <script type="text/javascript" th:inline="javascript" >
 //<![CDATA[
@@ -26,21 +28,13 @@ $(document).ready(function(){
 		paramName: "searchString",
 		delimiter: ",",
 	    transformResult: function(response) {
-	    	
 	    	var jsonStr = $.parseJSON(response).predictions;
-	    	//alert(jsonStr);
-	    	
-	        return {
-	        	
+	    	return {
 	        	suggestions: $.map(jsonStr, function(item) {
-	            	
 	                return { value: item.description, data: item.description };
 	            })
-	            
 	        };
-	        
 	    }
-	    
 	});
 	
 	$('#categoryId').autocomplete({
@@ -49,23 +43,47 @@ $(document).ready(function(){
 		delimiter: ",",
 	    transformResult: function(response) {
 	    	//alert(response);
-	    	
 	    	var jsonStr = $.parseJSON(response);
 	    	//alert(jsonStr);
-	    	
-	        return {
-	        	
+	    	return {
 	        	suggestions: $.map(jsonStr, function(item) {
-	            	
-	                return { value: item.displayName, data: item.displayName};
+	            	return { value: item.displayName, data: item.displayName};
 	            })
-	            
 	        };
-	        
 	    }
 	    
 	});
 	
+	//Search Place for event.
+	 $( "#place" ).change(function() {
+			 $( "#location" ).find('option').remove().end().append('<option value="Select">Select</option>');
+		 });
+	$( "#location" ).blur(function() {
+				var query = $( "#place").val().toString();
+				var x = $( "#categoryId" ).val().toString();
+					
+				 searchquery="?query="+query+"&activity="+x;
+				 var nname;
+				 var nval;
+				 
+				  $.ajax({
+					  url: "app/"+username+"/userActivities"+searchquery,
+					  dataType: "json",
+					  success: function(newdata) {
+						  $.each(newdata, function(index) {
+							   nvalue = newdata[index].displayName.toString();
+							   addOther(nvalue,nvalue,"location");
+						  });
+					  }}); 
+			  
+	});
+	
+	function addOther(field,fieldVal,selectbox)  {  
+		var sb = document.getElementById(selectbox);
+	 	var newOpt = new Option(fieldVal, field);  
+	 	var selectLength = document.getElementById(selectbox).options.length;  
+	 	sb.options[selectLength] = newOpt;  
+	}
 
 
 				//Examples of how to assign the Colorbox event to elements
@@ -190,55 +208,70 @@ function isChecked(obj, val, name, profileType) {
 				<input type="hidden" name="user" id="user" th:value="${userid}"  />
  <div class="inner_form1">
 					<label>Title :</label>
-					<div class="text_field"><input type="text" name="message" id="message" th:field="*{message}"/></div>
+					<div class="text_field">
+						<input type="text" name="message" id="message" th:field="*{message}"/>
+					</div>
 				
 </div>
  <div class="inner_form1">
 					<label>Description: </label>
-					<div class="text_field"><textarea name="textarea"></textarea></div>
-				
+					<div class="text_field">
+						<textarea name="textarea"></textarea>
+					</div>
 </div>
  
  <div class="inner_form1">
 					<label>Tags :</label>
-					<div class="text_field"><input type="text" id="categoryId" name="categoryId" th:field="*{categoryId}"/> 
+					<div class="text_field">
+					<input type="text" id="categoryId" name="categoryId" th:field="*{categoryId}"/> 
 					<!-- <div class="add"><img src="./resources/images/add.png" alt="" /></div> -->
 					</div>
 				
 </div>
 
+
   <div class="inner_form1"></div>
   <div class="inner_form1">
 					<label>Place :</label>
-					<div class="text_field"><input type="text" name="place" id="place" /></div>
-						<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
-							<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
-							<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
-							<input type="hidden" name="access" id ="access" value = "PUBLIC" th:field="*{access}"  /> 
-							<input type="hidden" name="to" id ="to" th:field="*{to}" />
-							<input type="hidden" name="toAppUsers" id ="toAppUsers" th:field="*{toAppUsers}" /> 
-</div>
+					<div class="text_field">
+						<input type="text" name="place" id="place" th:field="*{place}" />
+					</div>
+					<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
+					<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
+					<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
+  </div>
+  <div class="inner_form1"></div>
   <div class="inner_form1">
 					<label>Location :</label>
-					<div class="text_field"><input type="text" name="location" id="location" class="locationbox" /></div>
-</div>
+					<div class="text_field">
+					<select class="dropdown" tabindex="6" data-settings='{"wrapperClass":"metro"}' name="location" id="location" th:field="*{location}" >
+						
+					</select>	
+					</div>
+   </div>
    <div class="inner_form1">
-					<label>Start Time :</label>
-					<div class="text_field"><input id="start" name="start" th:field="*{start}" class="timeinput watchbox" /><label>End Time :</label>
-					<input type="text" id = "end" name="end" th:field="*{end}" class="timeinput watchbox" /></div>
-				
-</div>
+   					<label>Start Time :</label>
+					<div class="text_field">
+						<input id="start" name="start" th:field="*{start}" class="timeinput watchbox" />
+						<label>End Time :</label>
+						<input type="text" id = "end" name="end" th:field="*{end}" class="timeinput watchbox" />
+					</div>
+  </div>
   <div class="inner_form_button1">
 				<a class='inline' href="#inline_content"><input type="submit" value="" class="invitefriend_button" name="button" /></a>
                 <a class='inline' href="#inline_content1"><input type="submit" value="" class="looking_button" name="button" /></a>
+                			
+							<input type="hidden" name="access" id ="access" value = "PUBLIC" th:field="*{access}"  /> 
+							<input type="hidden" name="to" id ="to" th:field="*{to}" />
+							<input type="hidden" name="toAppUsers" id ="toAppUsers" th:field="*{toAppUsers}" /> 
              
-				</div>
+  </div>
                 
-           <div class="inner_form_button2">
+  <div class="inner_form_button2">
 				<input type="button" value="SUBMIT" class="submit_button" name="button" onclick="changeSubmit()"/>
              	 <div class="myevent"><a href="#">Cancel</a></div>
              
-				</div>
+  </div>
                      
  </form>
     <!--From box-->

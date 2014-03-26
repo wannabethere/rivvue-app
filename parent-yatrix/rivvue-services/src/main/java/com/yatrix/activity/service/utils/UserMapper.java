@@ -10,6 +10,7 @@ import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
 import com.google.api.client.util.Joiner;
+import com.yatrix.activity.service.dto.ContactDto;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.store.mongo.domain.Category;
@@ -19,6 +20,7 @@ import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
 import com.yatrix.activity.store.mongo.service.impl.ActivityCatalogService;
+import com.yatrix.activity.store.mongo.service.impl.UserAccountService.GENDER;
 
 @SuppressWarnings("deprecation")
 public class UserMapper {
@@ -86,4 +88,10 @@ public class UserMapper {
 	    
 	    return dto;
   }
+  
+  public static UserProfile createContact(ContactDto contact, String createdId){
+	  UserProfile profile = new UserProfile(createdId, contact.getEmail(), contact.getFirstName()+" "+contact.getLastName(), contact.getFirstName(), contact.getLastName(), GENDER.UNKNOWN.getGender(), null);
+	  return profile;
+  }
+  
 }

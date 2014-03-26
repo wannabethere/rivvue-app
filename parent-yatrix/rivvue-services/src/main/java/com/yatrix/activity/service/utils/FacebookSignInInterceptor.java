@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
+import org.springframework.social.connect.web.ConnectInterceptor;
 import org.springframework.social.connect.web.ProviderSignInInterceptor;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.FacebookProfile;
@@ -25,7 +26,7 @@ import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService.GENDER;
 
-public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Facebook> {
+public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Facebook>,ConnectInterceptor<Facebook> {
 
 	private Logger log = Logger.getLogger(FacebookConnectInterceptor.class
 			.getName());
@@ -50,7 +51,7 @@ public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Face
 	@Override
 	public void postSignIn(Connection<Facebook> connection, WebRequest request) {
 
-		log.info("Facebook Post Connect !!!");
+		log.info("Facebook Post Signin !!!");
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		Facebook facebook = connection.getApi();
 		FacebookProfile profile = facebook.userOperations().getUserProfile();
@@ -108,6 +109,20 @@ public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Face
 		userProfile.setSrcprofileType(PROFILETYPE.FB);
 		return userProfile;
 		
+	}
+
+
+	@Override
+	public void preConnect(ConnectionFactory<Facebook> connectionFactory,
+			MultiValueMap<String, String> parameters, WebRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void postConnect(Connection<Facebook> connection, WebRequest request) {
+		log.info("Facebook Post Connect !!!");		
 	}
 	
 }

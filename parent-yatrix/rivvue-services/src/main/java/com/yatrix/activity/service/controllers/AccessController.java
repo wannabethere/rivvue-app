@@ -23,6 +23,7 @@ import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService.GENDER;
+import com.yatrix.activity.store.utils.CounterService;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.dto.ProfileListDto;
 import com.yatrix.activity.service.dto.UserDto;
@@ -40,6 +41,9 @@ public class AccessController {
 
 	@Autowired
 	private ProfileService service;
+	
+	@Autowired
+	private CounterService counterService;
 
 	private Logger log = Logger.getLogger(ProfileController.class.getName());
 
@@ -73,7 +77,19 @@ public class AccessController {
 	
 	@RequestMapping("/homeevents")
 	public String loginHome(ModelMap model) {
-		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		model.addAttribute("authusername", SecurityContextHolder.getContext().getAuthentication().getName());
+		String authName=SecurityContextHolder.getContext().getAuthentication().getName();
+		UserAccount user = userRepository.getUserAccount(authName);
+		if(user==null){
+			user = userRepository.getUserAccountByUserName(authName);
+			
+			if(user==null){
+				model.addAttribute("status", "logout.success");
+				return "access/login";
+			}
+		}
+		model.addAttribute("authname", user.getUserId());
 		return "events/postlogin";
 	}
 	
@@ -81,6 +97,7 @@ public class AccessController {
 	@RequestMapping("/calendarevent")
 	public String calendarEvent(@RequestParam(value = "status",required = false) String error, ModelMap model) {
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("AUTH NAME:" + authname);
 		try {
 			EventDto eventDto = new EventDto();
 			model.addAttribute("userid", authname);
@@ -98,8 +115,17 @@ public class AccessController {
 		List<UserDto> users = new ArrayList<UserDto>();
 		//userListDto.setProfiles(service.getAllByUserId(userId));
 		UserAccount user = userRepository.getUserAccount(authname);
-		//This is the facebook Id only check. Later we have 
-		users.addAll(UserMapper.mapUserProfile(service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId())));
+		if(user==null){
+			user = userRepository.getUserAccountByUserName(authname);
+			if(user==null){
+				return "access/login";
+			}
+		}
+		//This is the facebook Id only check. Later we have
+		List<UserProfile> friends=service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId());
+		if(friends!=null){
+			users.addAll(UserMapper.mapUserProfile(friends));
+		}
 		userListDto.setProfiles(users);
 		model.put("friends", userListDto);
 		return "events/createEvent";
@@ -153,6 +179,7 @@ public class AccessController {
 		}
 
 		UserAccount user = UserMapper.map(dto);
+		user.setUserId(counterService.getNextUserIdSequence()+"");
 		user.setRoles(new Role[] { Role.ROLE_USER });
 		userRepository.createUserAccount(user, GENDER.UNKNOWN, Locale.US);
 		return "redirect:/";

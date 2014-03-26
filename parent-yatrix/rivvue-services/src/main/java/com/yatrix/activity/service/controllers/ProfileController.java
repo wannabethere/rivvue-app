@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
 
-import com.yatrix.activity.store.mongo.domain.AjaxResponse;
+import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.store.mongo.domain.Reference;
 import com.yatrix.activity.store.mongo.domain.Reference.REFERENCETYPE;
 import com.yatrix.activity.store.mongo.domain.Role;
@@ -29,6 +29,8 @@ import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
 import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
+import com.yatrix.activity.store.utils.CounterService;
+import com.yatrix.activity.service.dto.ContactDto;
 import com.yatrix.activity.service.dto.ProfileListDto;
 import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.UserMapper;
@@ -48,6 +50,9 @@ public class ProfileController {
 
 	@Autowired
 	private UserAccountService userRepository;
+	
+	@Autowired
+	private CounterService counterService;
 
 	
 	@RequestMapping(value = "/{userId}",method = RequestMethod.POST)
@@ -85,40 +90,12 @@ public class ProfileController {
 	}
 
 	@RequestMapping(
-			value = "/{refUserId}/createContact",
+			value = "/{userId}/contact",
 			method = RequestMethod.POST)
 			public @ResponseBody
-			UserProfile createContact(@PathVariable String refUserId, @RequestParam String userId, @RequestParam String username, @RequestParam String firstName,
-					@RequestParam String lastName, @RequestParam String gender) {
-		StringBuffer info = new StringBuffer();
-		info.append("\n--------------- Inside ProfileController:Create Contact ---------------");
-		info.append("\nParams:");
-		info.append("\nUserId: ");
-		info.append(userId);
-		info.append("\nReference UserId: ");
-		info.append(refUserId);
-		info.append("\nUsername: ");
-		info.append(username);
-		info.append("\nFirstName: ");
-		info.append(firstName);
-		info.append("\nLastName: ");
-		info.append(lastName);
-		info.append("\nGender: ");
-		info.append(gender);
-		log.info(info.toString());
-
-
-		String name = null;
-		if (!isEmpty(firstName)) {
-			name = firstName;
-
-			if (!isEmpty(lastName)) {
-				name = name + " " + lastName;
-			}
-		}
-
-		UserProfile profile = new UserProfile(userId, username, name, firstName, lastName, gender,
-				Locale.ENGLISH);
+			UserProfile createContact(@PathVariable String userId,  ContactDto contact) {
+		
+		UserProfile profile=UserMapper.createContact(contact, counterService.getNextUserIdSequence()+"");
 		service.addFriend(userId,profile);
 		return profile;
 	}
@@ -306,7 +283,6 @@ public class ProfileController {
 		
 		UserAccount user = userRepository.getUserAccount(userId);
 		service.addFriend(user.getFacebookId() == null ? user.getUserId() : user.getFacebookId(), id);
-		
 		return new AjaxResponse("Contact added successfully");
 	}
 	
