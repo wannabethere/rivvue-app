@@ -226,7 +226,7 @@ public class ProfileController {
 		model.addAttribute("authname", username);
 		model.addAttribute("commanduser", new UserDto());
 		model.addAttribute("usertype", "new");
-		return "user";
+		return "userdetails";
 	}
 
 
@@ -296,7 +296,7 @@ public class ProfileController {
 		UserProfile profile = service.getByUserId(friendId);
 		
 		model.put("authname", loggedInUser);
-		model.put("userProfile", profile);
+		model.put("commanduser", UserMapper.mapUserProfile(profile));
 		
 		return "userdetails";
 	}
