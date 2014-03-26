@@ -144,24 +144,18 @@ public class ProfileService {
 	}
 
 	public void addFriend(String parentId, UserProfile pf){
-		UserProfile parentProfile = userRepository.findByParentId(parentId);
-		if (parentProfile == null) {
-			parentProfile=userRepository.findByUserId(parentId);
-			if(parentProfile==null){
-				throw new UsernameNotFoundException("Didnot find the user");
-			}
+		UserProfile parentProfile =userRepository.findByUserId(parentId);
+		if(parentProfile==null){
+			throw new UsernameNotFoundException("Didnot find the user");
 		}
 		this.addFriend(parentProfile, pf);
 		return;
 	}
 	
 	public void addFriend(String parentId, String pfId){
-		UserProfile parentProfile = userRepository.findByParentId(parentId);
-		if (parentProfile == null) {
-			parentProfile=userRepository.findByUserId(parentId);
-			if(parentProfile==null){
-				throw new UsernameNotFoundException("Didnot find the user");
-			}
+		UserProfile	parentProfile=userRepository.findByUserId(parentId);
+		if(parentProfile==null){
+			throw new UsernameNotFoundException("Didnot find the user");
 		}
 		UserProfile existingFriendPf=userRepository.findByUserId(pfId);
 		this.addFriend(parentProfile, existingFriendPf);
@@ -174,7 +168,11 @@ public class ProfileService {
 			throw new UsernameNotFoundException("Didnot find the user");
 		}
 		pf.setParentId(parentProfile.getUserId());
+		log.info(pf.toString());
+		log.info(parentProfile.toString());
+		
 		Reference ref= new Reference(REFERENCETYPE.CONTACTS, pf.getUserId(), parentProfile.getUserId());
+		
 		UserProfile existingFriendPf=null;
 		addConnections(parentProfile, ref);
 		//update(parentProfile);
@@ -182,6 +180,7 @@ public class ProfileService {
 		//This way when the user becomes the app user then we have already his friends.
 		existingFriendPf=userRepository.findByUserId(pf.getId());
 		ref= new Reference(REFERENCETYPE.CONTACTS, parentProfile.getUserId(), pf.getUserId());
+		log.info(ref.toString());
 		if(existingFriendPf!=null){
 			addConnections(parentProfile, ref);
 			//update(existingFriendPf);
@@ -198,6 +197,7 @@ public class ProfileService {
 	
 	private void addConnections(UserProfile userProfile,Reference ref){
 		UserConnections parentConnection=connectionsRepository.findByProfileUserId(userProfile.getUserId());
+		log.info(ref.toString());
 		if(parentConnection==null){
 			parentConnection=new UserConnections();
 			parentConnection.setProfileUserId(userProfile.getUserId());

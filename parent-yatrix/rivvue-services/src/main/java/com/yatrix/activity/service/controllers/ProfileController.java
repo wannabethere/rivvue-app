@@ -281,7 +281,9 @@ public class ProfileController {
 	AjaxResponse addFriend(@PathVariable String userId,
 			@RequestParam String profileType, @RequestParam String id) {
 		
+		log.info("User Id:" + userId);
 		UserAccount user = userRepository.getUserAccount(userId);
+		log.info("User Id found:" + user);
 		service.addFriend(user.getFacebookId() == null ? user.getUserId() : user.getFacebookId(), id);
 		return new AjaxResponse("Contact added successfully");
 	}
