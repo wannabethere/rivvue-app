@@ -29,6 +29,7 @@ import com.yatrix.activity.ext.service.IYelpPlacesService;
 import com.yatrix.activity.hystrix.command.IFacebookCommand;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.exception.ActivityDBException;
+import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.mongo.domain.Activity;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.Category;
@@ -212,10 +213,12 @@ public class AppServiceController {
   @RequestMapping(
       value = "/event/{useractivityId}",
       method = RequestMethod.GET)
-  public String getUserActivity(@PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
-	  //String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+  public String getUserActivity(@PathVariable String uuid, @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
+	String authname = SecurityContextHolder.getContext().getAuthentication().getName();
     UserActivity event = usercatalogService.findActivity(useractivityId);
     List<ActivityComment> appCommentsNotPosted = new ArrayList<ActivityComment>();
+    UserAccount userAccount = null;
+    boolean displayJoinButton = true;
     
     if (event == null) {
       ActivityDBException noactivity = new ActivityDBException("no user event found ");
@@ -223,7 +226,7 @@ public class AppServiceController {
     }
     
     try {
-    	UserAccount userAccount = userRepository.findByUserId(event.getOriginatorUserId());
+    	userAccount = userRepository.findByUserId(event.getOriginatorUserId());
     	event.setDisplayName(userAccount.getFirstName()); 
     	
     	if(event.getAppComments() != null && event.getAppComments().size() > 0){
@@ -237,15 +240,47 @@ public class AppServiceController {
     	logger.error(e.getMessage());
     	event.setDisplayName(event.getOriginatorUserId()); 
     }
+    
+    System.out.println("UserId: " + uuid);
+    System.out.println("Originator: " + event.getOriginatorUserId().equalsIgnoreCase(uuid));
+    System.out.println("Already joined: " + event.getAppAccepted().contains(uuid));
+    System.out.println("Joined thru Facebook: " + isJoinThruFacebook(uuid, event));
+    
+    if(event.getOriginatorUserId().equalsIgnoreCase(uuid) || event.getAppAccepted().contains(uuid) 
+    		|| isJoinThruFacebook(uuid, event)){
+    	displayJoinButton = false;
+    }
 	
+    System.out.println("displayJoin: " + displayJoinButton);
+    model.addAttribute("displayJoin", displayJoinButton);
     model.addAttribute("event", event);
-	model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
+	model.addAttribute("authname", authname);
 	model.addAttribute("comments", appCommentsNotPosted);
 	
 	return "events/events";
   }
   
-  private EventDto convertToEventDto(UserActivity event){
+  private boolean isJoinThruFacebook(String userId, UserActivity event) {
+	
+	  UserAccount userAccount = userRepository.findByUserId(userId);
+	  
+	  System.out.println("User Account: " + userAccount);
+	  System.out.println("Event: " + event);
+	  
+	  if(userAccount.getFacebookId() == null || event.getFacebookAccepted() == null){
+		  return false;
+	  }
+	  
+	  for(FacebookInvitee facebookAccepted : event.getFacebookAccepted()){
+		  if(userAccount.getFacebookId().equalsIgnoreCase(facebookAccepted.getId())){
+			  return true;
+		  }
+	  }
+	  
+	return false;
+}
+
+private EventDto convertToEventDto(UserActivity event){
 	  EventDto dto = new EventDto();
 		dto.setId(event.getId());
 		Category category = catalogService.findCategory(event.getCategoryId());

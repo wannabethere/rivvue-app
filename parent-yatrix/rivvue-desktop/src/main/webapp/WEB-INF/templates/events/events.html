@@ -21,9 +21,23 @@
 			    	postMessage();
 			    }
 			});
+			
+			$('#join').on("click", function(e){
+			    	joinEvent();
+			});
 		});
 		
 
+		function joinEvent(){
+			$.ajax({
+				url : "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/joinEvent",
+				dataType : "json",
+				success : function(messagePosted) {
+					alert("Message posted: " + messagePosted);
+					
+				}
+			});
+		}
 
 	function postMessage() {
 		//alert("submit method called...");
@@ -84,7 +98,7 @@
      <div id="innerbox">
       
           <div id="heading">
-          <h1 th:text="${event.messageposted.message}">WATCH MOVIE GRAVITY</h1>
+          <h1 th:text="${event.messageposted.message}">WATCH MOVIE GRAVITY</h1>    <input th:if="${displayJoin == true}" type="button" id="join" name="join" value="join"/> 
           <div id="rightbox">    8 yorum
             <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />

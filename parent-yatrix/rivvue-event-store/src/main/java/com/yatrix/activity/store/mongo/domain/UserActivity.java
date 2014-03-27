@@ -36,6 +36,7 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 	private List<String> appParticipants = new ArrayList<String>();
 	private List<PostMessage> postedMessage = new ArrayList<PostMessage>();
 	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
+	private List<String> appAccepted = new ArrayList<String>();
 	private List<FacebookInvitee> facebookRejected = new ArrayList<FacebookInvitee>();
 	private List<FacebookInvitee> facebookUnsure = new ArrayList<FacebookInvitee>();
 	private List<FacebookPost> facebookPosts = new ArrayList<FacebookPost>();
@@ -253,6 +254,14 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 	public Long getDuration(){
 		this.duration=((endTime.getTime() -  startTime.getTime())/(1000 * 60 * 60));
 		return duration;
+	}
+	
+	public List<String> getAppAccepted() {
+		return appAccepted;
+	}
+
+	public void setAppAccepted(List<String> appAccepted) {
+		this.appAccepted = appAccepted;
 	}
 
 	@Override

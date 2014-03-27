@@ -22,13 +22,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.api.client.util.Joiner;
 import com.yatrix.activity.hystrix.command.HystrixSocialResult;
+import com.yatrix.activity.hystrix.command.IFacebookJoinEventCommand;
 import com.yatrix.activity.hystrix.command.IFacebookPostEventFeedCommand;
-
+import com.yatrix.activity.hystrix.command.impl.FacebookJoinEventCommand;
+import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.store.fb.domain.FacebookReference;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.Category;
-
 import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
@@ -61,7 +62,13 @@ public class EventController {
 	private ProfileService profileService;
 
 	@Autowired
+	private IFacebookJoinEventCommand facebookJoinCommand;
+	
+	@Autowired
 	private IFacebookPostEventFeedCommand postFeedCommand;
+	
+	@Autowired
+	private UserAccountService userAccountService;
 
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
 	public String  getAllEvents(@PathVariable String userId,ModelMap model) {
@@ -127,6 +134,26 @@ public class EventController {
 		activity.getAppComments().add(comment);
 		usercatalogService.updateActivity(activity);
 		return comment;
+	}
+	
+	@RequestMapping(value="/{authname}/{eventId}/joinEvent", produces="application/json", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse joinEvent(@PathVariable String authname, @PathVariable String eventId, ModelMap model) throws Exception {
+
+		UserActivity activity = usercatalogService.findActivity(eventId);
+		//System.out.println("Message in controller - - - - - -- - - - - -" + message);
+		UserAccount userAccount = userAccountService.getUserAccountByUserName(authname);
+		
+		if(userAccount.getFacebookId() == null){
+			List<String> appAccepted = activity.getAppAccepted();
+			appAccepted.add(userAccount.getUserId());
+			activity.setAppAccepted(appAccepted);
+			usercatalogService.updateActivity(activity);
+		} else{
+			facebookJoinCommand.executeFacebookJoinEvent(activity, userAccount.getUserId()).get();	
+		}
+		
+		
+		return new AjaxResponse("User join successful");
 	}
 	
 	
