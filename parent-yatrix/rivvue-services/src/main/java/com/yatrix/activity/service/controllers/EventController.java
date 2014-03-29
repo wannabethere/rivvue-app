@@ -156,6 +156,20 @@ public class EventController {
 		return new AjaxResponse("User join successful");
 	}
 	
+	@RequestMapping(value="/{authname}/{eventId}/deleteEvent", produces="application/json", method=RequestMethod.GET)
+	public String deleteEvent(@PathVariable String authname, @PathVariable String eventId, ModelMap model) throws Exception {
+
+		UserActivity activity = usercatalogService.findActivity(eventId);
+		
+		try{
+			usercatalogService.delete(activity, authname);
+		}catch(Exception ex){
+			logger.error("Error while deleting event", ex);
+		}
+		
+		return "redirect:/calendarevents/" + authname;
+	}
+	
 	
 	public @ResponseBody UserActivity addUserToEvent(@PathVariable String userId, @PathVariable String eventId, @RequestParam String message, @RequestParam String requestorId ){
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();

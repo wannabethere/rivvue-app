@@ -369,4 +369,11 @@ implements IUserActivityCatalogService
 		return dbActivities;
 	}
 
+	@Override
+	@CacheEvict(value = "activityCache",key = "#from")
+	public void delete(UserActivity activity, String from) {
+		mongoTemplate.remove(activity);
+		
+	}
+
 }

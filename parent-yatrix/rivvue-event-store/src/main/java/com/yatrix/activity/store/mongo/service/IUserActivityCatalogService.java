@@ -40,4 +40,6 @@ public interface IUserActivityCatalogService {
 
 	List<UserActivity> findEventsIAmInvited(String username, String facebookId);
 
+	void delete(UserActivity activity, String from);
+
 }

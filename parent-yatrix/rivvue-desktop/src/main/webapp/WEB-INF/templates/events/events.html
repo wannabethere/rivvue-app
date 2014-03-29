@@ -12,7 +12,8 @@
 <script type="text/javascript"  th:src ="@{/resources/js/dateFormat.js}" th:href="@{/resources/js/dateFormat.js}"></script>
 <script type="text/javascript"  th:src ="@{/resources/js/jquery.dateFormat.js}" th:href="@{/resources/js/jquery.dateFormat.js}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" >
+
 		$(function(){
 
 			
@@ -25,7 +26,18 @@
 			$('#join').on("click", function(e){
 			    	joinEvent();
 			});
+			
+			$("#Delete").on("click", function(e){
+				deleteEvent();
+			});
 		});
+		
+		function deleteEvent(){
+			var deleteUrl =  "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/deleteEvent";
+			alert("Url: " + deleteUrl);
+			$("#event_details").get(0).setAttribute("action", deleteUrl);
+			$("#event_details").submit();
+		}
 		
 
 		function joinEvent(){
@@ -99,6 +111,7 @@
       
           <div id="heading">
           <h1 th:text="${event.messageposted.message}">WATCH MOVIE GRAVITY</h1>    <input th:if="${displayJoin == true}" type="button" id="join" name="join" value="join"/> 
+          <input type="button" id="Delete" name="Delete" value="Delete"/>
           <div id="rightbox">    8 yorum
             <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
@@ -153,7 +166,7 @@
     
   <div id="formbox">
      
-  <form action="" method="get">
+  <form id="event_details" action="" method="get">
   <input type="hidden" name="username" id="username"  th:value="${authname}"  />
 				<input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
  <div class="inner_form1">
