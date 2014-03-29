@@ -100,33 +100,46 @@ $(document).ready(function(){
 			 $( "#location" ).find('option').remove().end().append('<option value="Select">Select</option>');
 		 });
 	$( "#place" ).blur(function() {
-				var query = $( "#place").val().toString();
-				var x = $( "#categoryId" ).val().toString();
-					
-				 searchquery="?query="+query+"&activity="+x;
-				 var nname;
-				 var nval;
-				 
-				  $.ajax({
-					  url: locationAutoCompleteUrl+searchquery,
-					  dataType: "json",
-					  success: function(newdata) {
-						  $( "#locationCombo" ).empty();
-						  $.each(newdata.results, function(index) {
-								
-							   nname=newdata.results[index].reference.toString();
-							   nvalue = newdata.results[index].name.toString();
-							 
-							   addressObj[nname]=newdata.results[index].formatted_address;
-							   referenceObj[nname]=newdata.results[index].name.toString();
-							   locationLat[nname]=newdata.results[index].geometry.location.lat;
-							   locationLng[nname]=newdata.results[index].geometry.location.lng;
-							   
-							   addOther(nname,nvalue,"locationCombo");
-						  });
-					  }}); 
+		populateLocationCombo();
+	});
+
+	$( "#categoryId").blur(function() {
+		populateLocationCombo();
 			  
 	});
+	
+	function populateLocationCombo(){
+		var query = $( "#place").val().toString();
+		var x = $( "#categoryId" ).val().toString();
+			
+		 searchquery="?query="+query+"&activity="+x;
+		 var nname;
+		 var nval;
+		 
+		// alert(query + " : " + x);
+		// alert("alert:" + (!query));
+		 if(query && x){
+			  $.ajax({
+				  url: locationAutoCompleteUrl+searchquery,
+				  dataType: "json",
+				  success: function(newdata) {
+					  $( "#locationCombo" ).empty();
+					  $.each(newdata.results, function(index) {
+							
+						   nname=newdata.results[index].reference.toString();
+						   nvalue = newdata.results[index].name.toString();
+						 
+						   addressObj[nname]=newdata.results[index].formatted_address;
+						   referenceObj[nname]=newdata.results[index].name.toString();
+						   locationLat[nname]=newdata.results[index].geometry.location.lat;
+						   locationLng[nname]=newdata.results[index].geometry.location.lng;
+						   
+						   addOther(nname,nvalue,"locationCombo");
+					  });
+				  }}); 
+			 
+		 }
+	}
 	
 	function addOther(field,fieldVal,selectbox)  {  
 		var sb = document.getElementById(selectbox);
@@ -184,7 +197,7 @@ var selectedNames = new Array();
 function changeSubmit(){
 	
 	var locStr = $('#locationCombo').val();
-	alert("Location: " + locStr);
+	//alert("Location: " + locStr);
 	$('#formattedAddress').val(addressObj[locStr]);
 	$('#locationLat').val(locationLat[locStr]);
 	$('#locationLng').val(locationLng[locStr]);
