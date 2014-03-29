@@ -22,6 +22,7 @@
     var locationLng={};
     var addressObj={};
     var referenceObj={};
+    var locationObj={};
     var username;
 	var userId;
 	var citiAutoCompleteUrl =  /*[[@{'/app/' + ${authname} + '/citiAutocomplete'}]]*/"wannabethere/app/user581/citiAutocomplete";
@@ -44,8 +45,8 @@ $(document).ready(function(){
 		timepicker:false,
 		format:'d/m/Y',
 		formatDate:'Y/m/d',
-		minDate:'-1970/01/02', // yesterday is minimum date
-		maxDate:'+1970/01/02' // and tommorow is maximum date calendar
+		minDate:'-1970/01/02' // yesterday is minimum date
+		//maxDate:'+1970/01/02' // and tommorow is maximum date calendar
 	});
 	
 	$('#totime').datetimepicker({
@@ -58,8 +59,8 @@ $(document).ready(function(){
 		timepicker:false,
 		format:'d/m/Y',
 		formatDate:'Y/m/d',
-		minDate:'-1970/01/02', // yesterday is minimum date
-		maxDate:'+1970/01/02' // and tommorow is maximum date calendar
+		minDate:'-1970/01/02' // yesterday is minimum date
+		//maxDate:'+1970/01/02' // and tommorow is maximum date calendar
 	});
 	
 	$('#place').autocomplete({
@@ -112,15 +113,15 @@ $(document).ready(function(){
 					  success: function(newdata) {
 						  $.each(newdata.results, function(index) {
 								
-							   nname=newdata.results[index].name.toString();
+							   nname=newdata.results[index].reference.toString();
 							   nvalue = newdata.results[index].name.toString();
 							 
-							   addressObj[nvalue]=newdata.results[index].formatted_address;
-							   referenceObj[nvalue]=newdata.results[index].reference;
-							   locationLat[nvalue]=newdata.results[index].geometry.location.lat;
-							   locationLng[nvalue]=newdata.results[index].geometry.location.lng;
+							   addressObj[nname]=newdata.results[index].formatted_address;
+							   referenceObj[nname]=newdata.results[index].name.toString();
+							   locationLat[nname]=newdata.results[index].geometry.location.lat;
+							   locationLng[nname]=newdata.results[index].geometry.location.lng;
 							   
-							   addOther(nname,nvalue,"location");
+							   addOther(nname,nvalue,"locationCombo");
 						  });
 					  }}); 
 			  
@@ -181,14 +182,27 @@ var selectedNames = new Array();
 
 function changeSubmit(){
 	
-	var locStr = $('#location').val();
+	var locStr = $('#locationCombo').val();
+	alert("Location: " + locStr);
 	$('#formattedAddress').val(addressObj[locStr]);
 	$('#locationLat').val(locationLat[locStr]);
 	$('#locationLng').val(locationLng[locStr]);
-	
+	$('#location').val(referenceObj[locStr]);
+	//alert("Obj: " + referenceObj);
+	//alert("Access: " + referenceObj[locStr]);
 	$("#form").get(0).setAttribute("action", submitUrl);
 	$("#form").submit();
 		
+}
+
+function setAccess(accessObj){
+	//alert("Access: " + accessObj.checked);
+	if(accessObj.checked){
+		$("#access").val(accessObj.value);	
+	} else {
+		$("#access").val("");
+	}
+	
 }
 
 function isChecked(obj, val, name, profileType) {
@@ -261,7 +275,7 @@ function isChecked(obj, val, name, profileType) {
  <div class="inner_form1">
 					<label>Description: </label>
 					<div class="text_field">
-						<textarea name="textarea"></textarea>
+						<textarea name="description" id="description" th:field="*{description}"></textarea>
 					</div>
 </div>
  
@@ -284,12 +298,13 @@ function isChecked(obj, val, name, profileType) {
 					<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
 					<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
 					<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
+					<input type="hidden" name="location" id ="location" th:field="*{location}" />
   </div>
   <div class="inner_form1"></div>
   <div class="inner_form1">
 					<label>Location :</label>
 					<div class="text_field">
-					<select class="dropdown" tabindex="6" data-settings='{"wrapperClass":"metro"}' name="location" id="location" th:field="*{location}" >
+					<select class="dropdown" tabindex="6" data-settings='{"wrapperClass":"metro"}' name="locationCombo" id="locationCombo"  >
 						
 					</select>	
 					</div>
@@ -447,26 +462,26 @@ function isChecked(obj, val, name, profileType) {
   <tbody><tr>
     <td width="50" class="tab1"><img alt="" th:src="@{/resources/images/gloabe.png}"/></td>
     <td width="448" class="publictxt tab1">Public</td>
-    <td class="borderrig tab1" width="50" ><input type="checkbox" value="" name="" /></td>
-    <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab1" width="50" ><input type="checkbox" value="PUBLIC" name="PUBLIC" id="PUBLIC" onclick="setAccess(this)"/></td>
+   <!-- <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td> --> 
   </tr>
 <tr>
     <td width="50" class="tab2"><img th:src="@{/resources/images/friends.png}" alt="" /></td>
     <td width="448" class="publictxt tab2">Friends</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
-    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="FRIENDSONLY" name="FRIENDSONLY" id="FRIENDSONLY" onclick="setAccess(this)"/></td>
+    <!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
   </tr>
   <tr>
     <td width="50" class="tab2"><img th:src="@{/resources/images/invites.png}" alt="" /></td>
     <td width="448" class="publictxt tab2">Invitees</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
-    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="PRIVATE" name="PRIVATE" id="PRIVATE" onclick="setAccess(this)"/></td>
+    <!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
   </tr>
    <tr>
     <td width="50" class="tab2"><img th:src="@{/resources/images/notonly.png}" alt="" /></td>
     <td width="448" class="publictxt tab2">Only Me</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
-    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="ME" name="ME" id="ME" onclick="setAccess(this)"/></td>
+    <!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
   </tr>
 </tbody></table>
 <div class="contenttxtpop">Using the audience selector right where you post events. This Control 

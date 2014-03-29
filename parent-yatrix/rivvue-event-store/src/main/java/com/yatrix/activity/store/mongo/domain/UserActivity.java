@@ -25,6 +25,8 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 	}
 
 	private String title;
+	
+	private String description;
 
 	private String categoryId;
 
@@ -262,6 +264,14 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 
 	public void setAppAccepted(List<String> appAccepted) {
 		this.appAccepted = appAccepted;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override

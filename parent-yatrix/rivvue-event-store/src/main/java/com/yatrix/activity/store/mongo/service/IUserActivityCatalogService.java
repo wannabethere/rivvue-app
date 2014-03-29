@@ -17,7 +17,7 @@ public interface IUserActivityCatalogService {
   UserActivity createActivity(String title, String tags,String categoryId, String subCategoryId, String location, 
 		  					  String formattedAddress, String locationLat, String locationLng,
                               String from, String to, String toAppUsers, String access, String start, String end,
-                              String message, String place) throws ActivityDBException;
+                              String message, String place, String description) throws ActivityDBException;
 
   List<UserActivity> findUserEventsByUser(String uuid);
 

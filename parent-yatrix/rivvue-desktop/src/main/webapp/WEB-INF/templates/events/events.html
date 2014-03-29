@@ -107,11 +107,11 @@
    <div class="daytemp">17*
              </div>
            </div>
-           
+                 
           </div>
           <!-- We do not have the description in our App yet. -->
-    <p><!--  A medical engineer and an astronaut work together to<br/>
-survive after an accident leaves them adrift in space.--><br/></p>
+<p th:text="${event.description}">In product Help provides access to all documentation and instructional content available at the time the software ships. It is available through the Help menu in your Adobe software.</p>
+<p>Created By: <span th:text="${event.displayName}"></span></p>
         <div class="style1" th:text="${#dates.format(event.startTime, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
       <div class="style2"><span th:text="${#dates.format(event.startTime, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endTime, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
       <!-- <div class="style1">7:00pm  &rarr; 8:00pm (PST) </div> -->

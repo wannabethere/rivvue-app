@@ -151,7 +151,7 @@ implements IUserActivityCatalogService
 	@Cacheable(value = "activityCache",key = "#state")
 	public List<UserActivity> findAllPublicUserEventsByState(String state) {
 		logger.debug("Searching Activities..");
-		Query q = query(where("place").regex(", " + state + ",").and("visibility").is(VISIBILITY.PUBLIC.toString()));
+		Query q = query(where("location").regex(", " + state + ",").and("visibility").is(VISIBILITY.PUBLIC.toString()));
 		List<UserActivity> dbActivities = mongoTemplate.find(q, UserActivity.class);
 		logger.debug("Searching Activities Done");
 		if (dbActivities.size() == 0) {
@@ -172,7 +172,7 @@ implements IUserActivityCatalogService
 	public UserActivity createActivity(String title, String tags,String categoryId, String subCategoryId, String location,
 			String formattedAddress, String locationLat, String locationLng,
 			String from, String to, String toAppUsers, String access, String start,
-			String end, String message, String place) throws ActivityDBException {
+			String end, String message, String place, String description) throws ActivityDBException {
 		logger.debug("creating Activity");
 		isvalidActivity(categoryId, subCategoryId, location, from, to, toAppUsers, access, start, end, message);
 
@@ -196,6 +196,7 @@ implements IUserActivityCatalogService
 		}
 		a.setStatus(EVENT_STATUS.PENDING);
 		a.setOriginatorUserId(from);
+		a.setDescription(description);
 		a.setLocation(location);
 		a.setFormattedAddress(formattedAddress);
 		a.setLocationLat(locationLat);
