@@ -143,6 +143,13 @@ public class AccessController {
 		//String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		log.info("Retrieving profile friends for " + userId);;
 		UserAccount user = userRepository.getUserAccount(userId);
+		if(user == null){
+			user = userRepository.getUserAccountByUserName(userId);
+			
+			if(user == null){
+				return "access/login";
+			}
+		}
 		ProfileListDto userListDto = new ProfileListDto();
 		List<UserDto> users = new ArrayList<UserDto>();
 		users.addAll(UserMapper.mapUserProfile(service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId())));

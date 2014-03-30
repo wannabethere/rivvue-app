@@ -107,6 +107,13 @@ public class EventController {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all invited events for user" + userId);
 		UserAccount userAccount = userAccountRepository.getUserAccount(userId);
+		if(userAccount == null){
+			userAccount = userAccountRepository.getUserAccountByUserName(userId);
+			
+			if(userAccount == null){
+				return "access/login";
+			}
+		}
 		List<UserActivity> list =  usercatalogService.findEventsIAmInvited(userId, userAccount.getFacebookId());
 		List<EventDto> eventList= this.mapUserActivityToEventDtos(list);
 		logger.debug("number of events found :"+eventList.size());
@@ -142,6 +149,9 @@ public class EventController {
 		UserActivity activity = usercatalogService.findActivity(eventId);
 		//System.out.println("Message in controller - - - - - -- - - - - -" + message);
 		UserAccount userAccount = userAccountService.getUserAccountByUserName(authname);
+		if(userAccount == null){
+			userAccount = userAccountService.getUserAccount(authname);
+		}
 		
 		if(userAccount.getFacebookId() == null){
 			List<String> appAccepted = activity.getAppAccepted();

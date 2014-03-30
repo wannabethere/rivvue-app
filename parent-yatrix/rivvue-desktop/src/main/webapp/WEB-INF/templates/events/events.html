@@ -34,7 +34,7 @@
 		
 		function deleteEvent(){
 			var deleteUrl =  "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/deleteEvent";
-			alert("Url: " + deleteUrl);
+			//alert("Url: " + deleteUrl);
 			$("#event_details").get(0).setAttribute("action", deleteUrl);
 			$("#event_details").submit();
 		}
@@ -45,7 +45,7 @@
 				url : "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/joinEvent",
 				dataType : "json",
 				success : function(messagePosted) {
-					alert("Message posted: " + messagePosted);
+					alert("Join successful." );
 					
 				}
 			});
@@ -163,12 +163,12 @@
     </div>
 
     </div>
-    
+        
   <div id="formbox">
      
   <form id="event_details" action="" method="get">
   <input type="hidden" name="username" id="username"  th:value="${authname}"  />
-				<input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
+   <input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
  <div class="inner_form1">
 					<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>
 				<div class="post"><a href="javascript:postMessage()" id="post" name="post" >POST</a></div>
@@ -268,5 +268,6 @@
 <!--footer close-->
 </div>
 <!--content close-->
+
 </body>
 </html>
