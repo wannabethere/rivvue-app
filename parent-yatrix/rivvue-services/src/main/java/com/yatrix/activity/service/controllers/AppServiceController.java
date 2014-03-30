@@ -227,7 +227,9 @@ public class AppServiceController {
     
     try {
     	userAccount = userRepository.findByUserId(event.getOriginatorUserId());
-    	event.setDisplayName(userAccount.getUserId()); 
+    	UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId()); 
+    	event.setDisplayName(userAccount.getUserId());
+    	event.setAuthorName(pf.getFirstName() + " " + pf.getLastName());
     	
     	if(event.getAppComments() != null && event.getAppComments().size() > 0){
     		for(ActivityComment comment : event.getAppComments()){

@@ -25,14 +25,11 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 	}
 
 	private String title;
-	
 	private String description;
-
 	private String categoryId;
-
 	private String subCategory;
-
 	private String displayName;
+	private String authorName;
 
 	private List<String> tags = new ArrayList<String>();
 	private List<String> appParticipants = new ArrayList<String>();
@@ -272,6 +269,14 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setAuthorName(String authorName) {
+		this.authorName = authorName;
+	}
+
+	public String getAuthorName() {
+		return authorName;
 	}
 
 	@Override
