@@ -119,7 +119,7 @@ public class AppServiceController {
     	String end = dto.getTodate() + " " + dto.getTotime();
        UserActivity userActivity=usercatalogService.createActivity(dto.getTitle(),dto.getTags(),dto.getCategoryId(), dto.getSubCategoryId(),
         dto.getLocation(), dto.getFormattedAddress(), dto.getLocationLat(), dto.getLocationLng(), uuid, dto.getTo(), dto.getToAppUsers(), dto.getAccess(), start, end,
-        dto.getMessage(), dto.getPlace());
+        dto.getMessage(), dto.getPlace(), dto.getDescription());
       // Facebook facebook = connectionRepository.getPrimaryConnection(Facebook.class).getApi();
 
       // TODO: Remove this when a processor is implemented and processed event thru Life Cycle of an
@@ -227,7 +227,7 @@ public class AppServiceController {
     
     try {
     	userAccount = userRepository.findByUserId(event.getOriginatorUserId());
-    	event.setDisplayName(userAccount.getFirstName()); 
+    	event.setDisplayName(userAccount.getUserId()); 
     	
     	if(event.getAppComments() != null && event.getAppComments().size() > 0){
     		for(ActivityComment comment : event.getAppComments()){
@@ -263,6 +263,10 @@ public class AppServiceController {
   private boolean isJoinThruFacebook(String userId, UserActivity event) {
 	
 	  UserAccount userAccount = userRepository.findByUserId(userId);
+	  
+	  if(userAccount == null){
+		  userAccount = userRepository.findByUsername(userId);
+	  }
 	  
 	  System.out.println("User Account: " + userAccount);
 	  System.out.println("Event: " + event);

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+	
+<head>
+    <meta charset="utf-8" />
+	<link rel="stylesheet" href="../../resources/css/stylesheet.css" th:href="@{/resources/css/stylesheet.css}" />
+	<title th:text="#{user.title}">Title</title>
+</head>
+
+<body>
+	<div class="skin">
+		<div class="content">
+		<header th:include="include :: signedHeader">
+		</header>
+			<div>
+				<form action="#" th:action="@{'/profile/'+${authname}+'/contact'}" th:object="${contact}" method="post">
+				<table class="box-table-a">
+					<caption th:text="#{${usertype + '.contact.table.caption'}}">New Contact</caption>
+					<thead>
+						<tr>
+							
+							<th th:text="#{contact.firstname.label}">First Name</th>
+							<th th:text="#{contact.lastname.label}">Last Name</th>
+							<th th:text="#{profileuser.email.label}">Email</th>
+							<th th:text="#{profileuser.phone.label}">Phone</th>
+							<th th:text="#{profileuser.homephone.label}">Home Phone</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							
+							<td><input type="text" th:field="*{firstName}"/></td>
+							<td><input type="text" th:field="*{lastName}"/></td>
+							<td><input type="text" th:field="*{email}"/></td>
+							<td><input type="text" th:field="*{phone}"/></td>
+							<td><input type="text" th:field="*{homephone}"/></td>
+							<td>
+								<button class="add-button" type="submit" th:text="#{${usertype + '.contact.button.label'}}">Action</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</form>
+			</div>
+		</div>
+					<footer th:include="include :: footer">
+</footer>
+	</div>
+</body>
+</html>

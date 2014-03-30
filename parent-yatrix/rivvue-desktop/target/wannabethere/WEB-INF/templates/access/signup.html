@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title th:text="#{app.name}" >RIVVUE</title>
+	<link href="http://fonts.googleapis.com/css?family=Oswald"  rel="stylesheet" type="text/css"  />
+	<link href="./../../../resources/css/stylesheet.css"  rel="stylesheet" type="text/css"  th:href="@{/resources/css/stylesheet.css}"/>
+</head>
+
+<body>
+<header th:include="include :: header">
+</header>
+<div id="content1">
+	<div class="newarticle">
+    	 <div id="signin">
+   			<h1>sign in</h1>
+   			<div  class="form_center">
+   			    <form action="#" th:action="@{/signup}" method="post" >
+   			    <fieldset>
+    			<div class="inner_formlogin">
+					<div class="text_fieldlogin">
+						<input id="firstName" type="text" name="firstName" value="firstName LastName" class="userna"/>
+					</div>
+				</div>
+				<div class="inner_formlogin">
+					<div class="text_fieldlogin">
+						<input id="email" type="text" name="email" value="Email@rivvue.com" class="userna"/>
+					</div>
+				</div>
+				<div class="inner_formlogin">
+					<div class="text_fieldlogin">
+						<input id="username" type="text" name="username" value="userid" class="userna"/>
+					</div>
+				</div>
+  				<div class="inner_formlogin">
+					<div class="text_fieldlogin">
+						<input name="password" class="passwo" value="password" type="password"/>
+					</div>
+				</div>
+				<div class="inner_formlogin">
+					<div class="text_fieldlogin">
+						<input name="repassword" class="passwo" value="password" type="password"/>
+					</div>
+				</div>
+  				<div class="inner_formlogin">
+					<button class="submitlogin" th:text="#{login.button}"></button>
+            	</div>
+            	</fieldset>
+            	</form>
+    			<div class="clear"></div>
+    			<div class="forgetpass">
+    			<ul>
+    				<li><a href="#" th:href="@{/signup}" class="coloforget">Forgot Password?</a></li>
+    				<li><a href="#" th:href="@{/signup}" >Create an account</a></li>
+    			</ul> 
+    			</div>
+  				<div class="or1">OR 
+  					<span class="line1">
+  						<img src="./../../resources/images/line.png"  border="0"/>
+  					</span>
+  				</div>
+  				<div class="signuplogin">
+ 			 	<ul>
+  					<li class="center">Sign up with</li>
+  					<li>
+  						<a href="#">
+  						<form name="fb_signin" id="fb_signin" action="#" th:action="@{/signin/facebook}" method="post">
+  							<input type="hidden" name="scope" value="create_event,read_friendlists,publish_stream,user_photos,offline_access,friends_events,user_activities,user_events,user_checkins" />
+  							<button type="submit"><img src="./../../resources/images/facebookicon.png" th:src="@{/resources/images/facebookicon.png}" alt="" border="0" /></button>
+  						</form>
+  						</a>
+  					</li>
+  					
+				</ul>
+    			</div>
+   			</div>
+   </div> 
+    </div>
+   <!--footer start-->
+   <footer th:include="include :: footer">
+   </footer>
+<!--footer close-->
+   </div>
+ 
+
+</body>
+</html>
