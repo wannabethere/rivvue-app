@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RIVVUE</title>
+<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
+<link rel="stylesheet" href="./../resources/css/stylesheet.css" th:href="@{/resources/css/stylesheet.css}" />
+<link href="./../../../css/colorbox.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/colorbox.css}"/>
+<link href="./../../../css/easydropdown.metro.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/easydropdown.metro.css}"/>
+<link href="./../../../css/jquery.datetimepicker.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/jquery.datetimepicker.css}"/>
+
+<script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}" th:href="@{https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/js/jquery.autocomplete.min.js}" th:href="@{/resources/js/jquery.autocomplete.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/js/jquery.easydropdown.min.js}" th:href="@{/resources/js/jquery.easydropdown.min.js}"></script>
+<script th:src="@{/resources/js/jquery.colorbox.js}" language="javascript1.5" th:href="@{/resources/js/jquery.colorbox.js}"></script>
+<script th:src="@{/resources/js/jquery.datetimepicker.js}" language="javascript1.5" th:href="@{/resources/js/jquery.datetimepicker.js}"></script>
+ <script type="text/javascript" th:inline="javascript" >
+//<![CDATA[
+    var locationLat={};
+    var locationLng={};
+    var addressObj={};
+    var referenceObj={};
+    var username;
+	var userId;
+	var citiAutoCompleteUrl =  /*[[@{'/app/' + ${authname} + '/citiAutocomplete'}]]*/"wannabethere/app/user581/citiAutocomplete";
+	var activityAutoCompleteUrl =  /*[[@{'/app/' + ${authname} + '/activityAutocomplete'}]]*/"wannabethere/app/user581/activityAutocomplete";
+	var locationAutoCompleteUrl =  /*[[@{'/app/' + ${authname} + '/userActivities'}]]*/"wannabethere/app/user581/userActivities";
+	var submitUrl = /*[[@{'/app/' + ${authname} + '/userevent'}]]*/"wannabethere/app/"+username+"/userevent";
+	
+$(document).ready(function(){
+	
+	username = document.getElementById("from").value;
+	userId = document.getElementById("user").value;
+	
+	$('#fromtime').datetimepicker({
+		datepicker:false,
+		format:'H:i',
+		step:15
+	});
+	$('#fromdate').datetimepicker({
+		lang:'en',
+		timepicker:false,
+		format:'d/m/Y',
+		formatDate:'Y/m/d',
+		minDate:'-1970/01/02', // yesterday is minimum date
+		maxDate:'+2040/01/02' // and tommorow is maximum date calendar
+	});
+	
+	$('#totime').datetimepicker({
+		datepicker:false,
+		format:'H:i',
+		step:15
+	});
+	$('#todate').datetimepicker({
+		lang:'en',
+		timepicker:false,
+		format:'d/m/Y',
+		formatDate:'Y/m/d',
+		minDate:'-1970/01/02', // yesterday is minimum date
+		maxDate:'+2040/01/02' // and tommorow is maximum date calendar
+	});
+	
+	$('#place').autocomplete({
+		
+		serviceUrl: citiAutoCompleteUrl,
+		paramName: "searchString",
+		delimiter: ",",
+	    transformResult: function(response) {
+	    	var jsonStr = $.parseJSON(response).predictions;
+	    	return {
+	        	suggestions: $.map(jsonStr, function(item) {
+	                return { value: item.description, data: item.description };
+	            })
+	        };
+	    }
+	});
+	
+	$('#categoryId').autocomplete({
+		serviceUrl: activityAutoCompleteUrl,
+		paramName: "searchString",
+		delimiter: ",",
+	    transformResult: function(response) {
+	    	//alert(response);
+	    	var jsonStr = $.parseJSON(response);
+	    	//alert(jsonStr);
+	    	return {
+	        	suggestions: $.map(jsonStr, function(item) {
+	            	return { value: item.displayName, data: item.displayName};
+	            })
+	        };
+	    }
+	    
+	});
+	
+	//Search Place for event.
+	 $( "#place" ).change(function() {
+			 $( "#location" ).find('option').remove().end().append('<option value="Select">Select</option>');
+		 });
+	$( "#place" ).blur(function() {
+				var query = $( "#place").val().toString();
+				var x = $( "#categoryId" ).val().toString();
+					
+				 searchquery="?query="+query+"&activity="+x;
+				 var nname;
+				 var nval;
+				 
+				  $.ajax({
+					  url: locationAutoCompleteUrl+searchquery,
+					  dataType: "json",
+					  success: function(newdata) {
+						  $.each(newdata.results, function(index) {
+								
+							   nname=newdata.results[index].name.toString();
+							   nvalue = newdata.results[index].name.toString();
+							 
+							   addressObj[nvalue]=newdata.results[index].formatted_address;
+							   referenceObj[nvalue]=newdata.results[index].reference;
+							   locationLat[nvalue]=newdata.results[index].geometry.location.lat;
+							   locationLng[nvalue]=newdata.results[index].geometry.location.lng;
+							   
+							   addOther(nname,nvalue,"location");
+						  });
+					  }}); 
+			  
+	});
+	
+	function addOther(field,fieldVal,selectbox)  {  
+		var sb = document.getElementById(selectbox);
+	 	var newOpt = new Option(fieldVal, field);  
+	 	var selectLength = document.getElementById(selectbox).options.length;  
+	 	sb.options[selectLength] = newOpt;  
+	}
+
+
+				//Examples of how to assign the Colorbox event to elements
+				$(".inline").colorbox({inline:true, width:"50%"});
+				$(".callbacks").colorbox({
+					onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+					onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+					onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+					onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+					onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+				});
+
+				$('.non-retina').colorbox({rel:'group5', transition:'none'})
+				$('.retina').colorbox({rel:'group5', transition:'none', retinaImage:true, retinaUrl:true});
+				
+				//Example of preserving a JavaScript event for inline calls.
+				$("#click").click(function(){ 
+					$('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+					return false;
+				});
+			});
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+var selectedIds = new Array();
+var selectedAppUsers =  new Array();
+var selectedNames = new Array();
+
+function changeSubmit(){
+	
+	var locStr = $('#location').val();
+	$('#formattedAddress').val(addressObj[locStr]);
+	$('#locationLat').val(locationLat[locStr]);
+	$('#locationLng').val(locationLng[locStr]);
+	
+	$("#form").get(0).setAttribute("action", submitUrl);
+	$("#form").submit();
+		
+}
+
+function isChecked(obj, val, name, profileType) {
+	//alert("Profile Type: " + profileType);
+	
+	if ($(obj).is(':checked')) {
+		if (profileType == 'APP') {
+			selectedAppUsers.push($(obj).val());
+		} else {
+			selectedIds.push($(obj).val());
+		}
+		selectedNames.push(name);
+	} else {
+		var i = '';
+		if (profileType == 'APP') {
+			selectedAppUsers.indexOf($(obj).val());
+			selectedAppUsers.splice(i, 1);
+		} else {
+			selectedIds.indexOf($(obj).val());
+			selectedIds.splice(i, 1);				
+		}
+		i = selectedNames.indexOf($(obj).val());
+		selectedNames.splice(i, 1);
+	}
+	
+	$('#to').val(selectedIds);
+	//$(window.opener.document).find('#toNames').val(selectedNames);
+	$('#toAppUsers').val(selectedAppUsers);
+
+}
+
+//]]>
+</script>
+</head>
+
+<body onload="MM_preloadImages('./resources/images/correctred.png','./resources/images/normalfacebook.png','./resources/images/overtwitter.png','./resources/images/overgoogleplus.png','./resources/images/overphone.png','./resources/images/searchover.png')">
+
+<header th:include="include :: signedHeader">
+</header>
+<div id="content1">
+
+   <article>
+   
+   <section> 
+   <!--topmenu start-->
+  <div class="topmenu" th:include="include :: topmenu">
+</div>  
+   <!--topmenu end-->
+   <div id="breadcrumb1">
+<ul>
+<li><a href="#">home</a> ></li>
+<li>Events</li>
+
+</ul>
+</div>
+   <div class=" clear"></div>
+  
+   
+    <!--Form Start-->
+ <form id="form" name="form" th:object="${event}"  method="post">
+ 				<input type="hidden" name="from" id="from"  th:value="${authname}"  />
+				<input type="hidden" name="user" id="user" th:value="${userid}"  />
+ <div class="inner_form1">
+					<label>Title :</label>
+					<div class="text_field">
+						<input type="text" name="message" id="message" th:field="*{message}"/>
+					</div>
+				
+</div>
+ <div class="inner_form1">
+					<label>Description: </label>
+					<div class="text_field">
+						<textarea name="textarea"></textarea>
+					</div>
+</div>
+ 
+ <div class="inner_form1">
+					<label>Tags :</label>
+					<div class="text_field">
+					<input type="text" id="categoryId" name="categoryId" th:field="*{categoryId}"/> 
+					<!-- <div class="add"><img th:src="@{/resources/images/add.png}" alt="" /></div> -->
+					</div>
+				
+</div>
+
+
+  <div class="inner_form1"></div>
+  <div class="inner_form1">
+					<label>Place :</label>
+					<div class="text_field">
+						<input type="text" name="place" id="place" th:field="*{place}" />
+					</div>
+					<input type="hidden" name="formattedAddress" id ="formattedAddress" th:field="*{formattedAddress}" />
+					<input type="hidden" name="locationLat" id ="locationLat" th:field="*{locationLat}" />
+					<input type="hidden" name="locationLng" id ="locationLng" th:field="*{locationLng}" />
+  </div>
+  <div class="inner_form1"></div>
+  <div class="inner_form1">
+					<label>Location :</label>
+					<div class="text_field">
+					<select class="dropdown" tabindex="6" data-settings='{"wrapperClass":"metro"}' name="location" id="location" th:field="*{location}" >
+						
+					</select>	
+					</div>
+   </div>
+   <div class="inner_form1">
+   					<label>Start Date :</label>
+					<div class="text_field">
+						<input type="text" id="fromdate" name="fromdate" th:field="*{fromdate}" class="timeinput watchbox" />
+						<input type="text" id="fromtime" name="fromtime" th:field="*{fromtime}" class="timeinput watchbox" />
+						
+					</div>
+  </div>
+    <div class="inner_form1">
+    	<label>End Time :</label>
+   					<div class="text_field">
+					
+						<input type="text" id = "todate" name="todate" th:field="*{todate}" class="timeinput watchbox" />
+						<input type="text" id = "totime" name="totime" th:field="*{totime}" class="timeinput watchbox" />
+					</div>
+  </div>
+  <div class="inner_form_button1">
+				<a class='inline' href="#inline_content"><input type="submit" value="" class="invitefriend_button" name="button" /></a>
+                <a class='inline' href="#inline_content1"><input type="submit" value="" class="looking_button" name="button" /></a>
+                			
+							<input type="hidden" name="access" id ="access" value = "PUBLIC" th:field="*{access}"  /> 
+							<input type="hidden" name="to" id ="to" th:field="*{to}" />
+							<input type="hidden" name="toAppUsers" id ="toAppUsers" th:field="*{toAppUsers}" /> 
+             
+  </div>
+                
+  <div class="inner_form_button2">
+				<input type="button" value="SUBMIT" class="submit_button" name="button" onclick="changeSubmit()"/>
+             	 <div class="myevent"><a href="#">Cancel</a></div>
+             
+  </div>
+                     
+ </form>
+    <!--From box-->
+    
+   </section>
+    
+   </article> 
+   
+   
+   
+   
+  <!--aside start--> 
+  <aside>
+      <div class="calenderbutton">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img th:src="@{/resources/images/calender.jpg}" width="110" height="36" /></td>
+    <td><img th:src="@{/resources/images/group.jpg}" width="110" height="36" /></td>
+  </tr>
+</table>
+
+    </div>
+    <div class="calender">
+       <img th:src="@{/resources/images/date.jpg}" width="232" height="207" /> 
+       </div>
+    <div class= "topparti">Top Participats </div>
+       <div id = "topparticipats">
+       <div id = "topparticipatsbox">
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
+       </div>
+       <div class="topparticipatsname">Barbara Tisiot
+       </div>
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
+       </div>
+       </div>
+       
+       <div id = "topparticipatsbox">
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
+       </div>
+       <div class="topparticipatsname">Katie Milburn
+       </div>
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
+       </div>
+       </div>
+       
+       <div id = "topparticipatsbox">
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
+       </div>
+       <div class="topparticipatsname">Josh Kripura
+       </div>
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
+       </div>
+       </div>
+       
+       <div id = "topparticipatsbox">
+       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
+       </div>
+       <div class="topparticipatsname">David
+       </div>
+       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
+       </div>
+       </div>
+       
+       
+       </div>
+       
+  </aside>
+  <!--aside close-->
+  <!--footer start-->
+    <footer><a href="#">Terms</a> <a href="#">| </a> <a href="#">Privacy Policy</a><a href="#">| </a><a href="#"> About Us</a> <a href="#">| </a> <a href="#">Contact Us</a>
+   <div class="copyright">&copy; 2014 RIVVUE. All Right Reserved
+   </div>
+</footer>
+<!--footer close-->
+</div>
+<!--content close-->
+<div style='display:none'>
+			<div id='inline_content' style='padding:10px; background:#fff;'>
+            <div  class="headingpop">Invite</div>
+            <div class="socialiconpopup">
+            <ul>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image27','','./resources/images/normalfacebook.png',1)"><img th:src="@{/resources/images/overfacebook.png}" name="Image27" width="139" height="115" border="0" id="Image27" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image28','','./resources/images/overtwitter.png',1)"><img th:src="@{/resources/images/normaltwitter.png}" name="Image28" width="139" height="115" border="0" id="Image28" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image29','','./resources/images/overgoogleplus.png',1)"><img th:src="@{/resources/images/normalgoogle.png}" name="Image29" width="139" height="115" border="0" id="Image29" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image30','','./resources/images/overphone.png',1)"><img th:src="@{/resources/images/phonecontact.png}" name="Image30" width="139" height="116" border="0" id="Image30" /></a></li>
+            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image31','','./resources/images/searchover.png',1)"><img th:src="@{/resources/images/searchnor.png}" name="Image31" width="139" height="115" border="0" id="Image31" /></a></li>
+            </ul>
+            
+            
+            
+            </div>
+            
+            
+            
+			<div id="invitefriend"  th:each="friend : ${friends.profiles}">
+     <div id="image"><input type="checkbox" th:name="${friend.username == null ? '' : friend.username}" th:id="${friend.id}" th:value="${friend.id}" th:onclick="'javascript:isChecked(this, this.name, this.value, \'' + ${friend.srcProfileType} + '\');'" /></div>
+  
+     <div id="innerbox">
+          <!--start heading -->
+        
+          <div class="name"><span th:text="${friend.lastName}" >Jack</span>, <span th:text="${friend.firstName}" >Mcleish </span>
+          	<div class="correctround">
+          		<a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)">
+          			<img th:src="@{/resources/images/correctgray.png}" name="Image19" width="55" height="54" border="0" id="Image19" />
+          		</a>
+          	</div>
+        </div>
+    </div>
+</div>	
+
+  </div>
+		</div>
+        
+        <div style='display:none'>
+			<div id='inline_content1' style='padding:10px; background:#fff;'>
+           
+            <div class="headingpop">Looking For &amp; Viewable</div>
+            <div  class="mheading"><ul><li>Viewable By</li> <li>Open To</li> </ul></div>
+        <table width="100%" cellpadding="0" border="0" cellspacing="0"  class="tab1">
+  <tbody><tr>
+    <td width="50" class="tab1"><img alt="" th:src="@{/resources/images/gloabe.png}"/></td>
+    <td width="448" class="publictxt tab1">Public</td>
+    <td class="borderrig tab1" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+  </tr>
+<tr>
+    <td width="50" class="tab2"><img th:src="@{/resources/images/friends.png}" alt="" /></td>
+    <td width="448" class="publictxt tab2">Friends</td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+  </tr>
+  <tr>
+    <td width="50" class="tab2"><img th:src="@{/resources/images/invites.png}" alt="" /></td>
+    <td width="448" class="publictxt tab2">Invitees</td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+  </tr>
+   <tr>
+    <td width="50" class="tab2"><img th:src="@{/resources/images/notonly.png}" alt="" /></td>
+    <td width="448" class="publictxt tab2">Only Me</td>
+    <td class="borderrig tab2" width="50" ><input type="checkbox" value="" name="" /></td>
+    <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>
+  </tr>
+</tbody></table>
+<div class="contenttxtpop">Using the audience selector right where you post events. This Control 
+remebers your selection so future posts will be shared with the same
+audiences unless you change it</div>
+
+			</div>
+			
+		</div>
+</body>
+</html>
