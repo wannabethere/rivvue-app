@@ -28,6 +28,9 @@ import com.yatrix.activity.ext.service.IGooglePlacesService;
 import com.yatrix.activity.ext.service.IYelpPlacesService;
 import com.yatrix.activity.hystrix.command.IFacebookCommand;
 import com.yatrix.activity.service.dto.EventDto;
+import com.yatrix.activity.service.dto.ProfileListDto;
+import com.yatrix.activity.service.dto.UserDto;
+import com.yatrix.activity.service.utils.UserMapper;
 import com.yatrix.activity.store.exception.ActivityDBException;
 import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.mongo.domain.Activity;
@@ -219,6 +222,7 @@ public class AppServiceController {
     List<ActivityComment> appCommentsNotPosted = new ArrayList<ActivityComment>();
     UserAccount userAccount = null;
     boolean displayJoinButton = true;
+    boolean isInviteeToEvent = false;
     
     if (event == null) {
       ActivityDBException noactivity = new ActivityDBException("no user event found ");
@@ -241,23 +245,49 @@ public class AppServiceController {
     	event.setDisplayName(event.getOriginatorUserId()); 
     }
     
-    System.out.println("UserId: " + uuid);
-    System.out.println("Originator: " + event.getOriginatorUserId().equalsIgnoreCase(uuid));
-    System.out.println("Already joined: " + event.getAppAccepted().contains(uuid));
-    System.out.println("Joined thru Facebook: " + isJoinThruFacebook(uuid, event));
-    
     if(event.getOriginatorUserId().equalsIgnoreCase(uuid) || event.getAppAccepted().contains(uuid) 
     		|| isJoinThruFacebook(uuid, event)){
     	displayJoinButton = false;
     }
+    	
+    ProfileListDto userListDto = new ProfileListDto();
+	List<UserDto> users = new ArrayList<UserDto>();
+	UserAccount user = userRepository.findByUserId(authname);
+	if(user==null){
+		user = userRepository.findByUsername(authname);
+		if(user==null){
+			return "access/login";
+		}
+	}
+	//This is the facebook Id only check. Later we have
+	List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId());
+	if(friends!=null){
+		users.addAll(UserMapper.mapUserProfile(friends));
+	}
 	
-    System.out.println("displayJoin: " + displayJoinButton);
+	if(isUserInvitedForThisEvent(user, event)){
+		isInviteeToEvent = true;
+	}
+	
+	userListDto.setProfiles(users);
+
+	model.put("friends", userListDto);
     model.addAttribute("displayJoin", displayJoinButton);
+    //model.addAttribute("isInviteeToEvent", isInviteeToEvent);
     model.addAttribute("event", event);
 	model.addAttribute("authname", authname);
 	model.addAttribute("comments", appCommentsNotPosted);
 	
-	return "events/events";
+	return isInviteeToEvent ? "events/events2" :"events/events";
+  }
+  
+  private boolean isUserInvitedForThisEvent(UserAccount user, UserActivity event){
+	  if((event.getAppParticipants() != null && event.getAppParticipants().contains(user.getUserId())) ||
+			  (event.getParticipants() != null && event.getParticipants().contains(user.getFacebookId()))){
+		  return true;
+	  } 
+	  
+	  return false;
   }
   
   private boolean isJoinThruFacebook(String userId, UserActivity event) {

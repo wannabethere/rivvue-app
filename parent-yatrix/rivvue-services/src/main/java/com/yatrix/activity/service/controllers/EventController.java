@@ -166,6 +166,20 @@ public class EventController {
 		return new AjaxResponse("User join successful");
 	}
 	
+	@RequestMapping(value="/{authname}/{eventId}/rejectEvent", produces="application/json", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse rejectEvent(@PathVariable String authname, @PathVariable String eventId, ModelMap model) throws Exception {
+
+		
+		return new AjaxResponse("User rejected successful");
+	}
+	
+	@RequestMapping(value="/{authname}/{eventId}/maybeEvent", produces="application/json", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse maybeEvent(@PathVariable String authname, @PathVariable String eventId, ModelMap model) throws Exception {
+
+		
+		return new AjaxResponse("Tentatively accepted");
+	}
+	
 	@RequestMapping(value="/{authname}/{eventId}/deleteEvent", produces="application/json", method=RequestMethod.GET)
 	public String deleteEvent(@PathVariable String authname, @PathVariable String eventId, ModelMap model) throws Exception {
 
