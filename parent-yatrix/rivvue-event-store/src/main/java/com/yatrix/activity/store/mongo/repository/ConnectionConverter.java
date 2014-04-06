@@ -88,6 +88,10 @@ public class ConnectionConverter {
 		return userConn;
 	}
 	
+	public String decryptAccessToken(String accessToken){
+		return decrypt(accessToken);
+	}
+	
 	public ConnectionFactoryLocator getConnectionFactoryLocator() {
 		return connectionFactoryLocator;
 	}

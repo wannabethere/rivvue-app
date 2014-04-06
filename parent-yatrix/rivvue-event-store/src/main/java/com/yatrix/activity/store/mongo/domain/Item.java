@@ -22,7 +22,7 @@ public abstract class Item
 
   public Item(UUID guid) {
     Assert.notNull(guid, "UUID is required");
-    setUuid(guid.toString());
+    setUuid(guid.toString().replaceAll("-", ""));
     this.timeCreated = new Date();
     this.id = uuid;
   }

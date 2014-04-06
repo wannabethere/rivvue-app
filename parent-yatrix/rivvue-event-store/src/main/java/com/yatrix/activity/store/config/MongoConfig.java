@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.util.StringUtils;
 
 /**
  * Configuration for MongoDB.
@@ -17,7 +18,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @Configuration
 @EnableMongoRepositories(
-    basePackages = "com.yatrix.activity.store.mongo.repository")
+    basePackages = "com.yatrix.activity.store.mongo")
 public class MongoConfig
   extends AbstractMongoConfiguration
 {
@@ -27,7 +28,8 @@ public class MongoConfig
 
   @Override
   public String getDatabaseName() {
-    return environment.getProperty("mongo.db.name");
+	  //Bad Hack to figure out the env
+    return StringUtils.isEmpty(environment.getProperty("mongo.db.name"))?"testDb":environment.getProperty("mongo.db.name");
   }
 
   /*
@@ -44,8 +46,15 @@ public class MongoConfig
   @Override
   public Mongo mongo() throws Exception {
     @SuppressWarnings("boxing")
-    Mongo mongo = new Mongo(environment.getProperty("mongo.host.name"), environment.getProperty(
-      "mongo.host.port", Integer.class));
+    Mongo mongo;
+    if(environment!=null && !StringUtils.isEmpty(environment.getProperty("mongo.host.name"))){
+    	 mongo = new Mongo(environment.getProperty("mongo.host.name"), environment.getProperty(
+    		      "mongo.host.port", Integer.class));
+    }
+    else{
+    	 mongo = new Mongo("localhost",27017);
+    }
+   
     mongo.setWriteConcern(WriteConcern.SAFE);
     return mongo;
   }

@@ -327,6 +327,9 @@ public class UserSocialConnectionService
 
     return userIds;
   }
+  
+  
+  
 
   // helper methods
 
@@ -338,5 +341,14 @@ public class UserSocialConnectionService
     }
 
     return l;
+  }
+
+  @Override
+  public UserSocialConnection getSocialConnection(String providerUserId,
+		  String providerId) {
+	  Query q = query(where("providerId").is(providerId).and("providerUserId").is(providerUserId));
+	  UserSocialConnection mc=mongoTemplate.findOne(q, UserSocialConnection.class);
+	  mc.setAccessToken(converter.decryptAccessToken(mc.getAccessToken()));
+	  return mc;
   }
 }

@@ -22,6 +22,8 @@ import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.util.MultiValueMap;
 
+import com.yatrix.activity.store.mongo.domain.UserSocialConnection;
+
 public interface ConnectionService {
 
 	int getMaxRank(String userId, String providerId);
@@ -37,6 +39,8 @@ public interface ConnectionService {
 
 	Connection<?> getPrimaryConnection(String userId,
 			String providerId);
+	
+	UserSocialConnection getSocialConnection(String userId, String providerUserId);
 
 	Connection<?> getConnection(String userId,
 			String providerId, String providerUserId);

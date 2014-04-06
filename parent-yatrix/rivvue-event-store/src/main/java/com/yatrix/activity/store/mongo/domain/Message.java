@@ -35,9 +35,7 @@ public abstract class Message
   };
 
   private STATUS processedStatus;
-
   private VISIBILITY visibility;
-
   private MESSAGE_TYPE messageStatus;
 
   public String getOriginatorUserId() {

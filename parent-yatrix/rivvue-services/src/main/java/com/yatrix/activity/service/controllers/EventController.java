@@ -3,17 +3,17 @@ package com.yatrix.activity.service.controllers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.List;
 
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,17 +24,17 @@ import com.google.api.client.util.Joiner;
 import com.yatrix.activity.hystrix.command.HystrixSocialResult;
 import com.yatrix.activity.hystrix.command.IFacebookJoinEventCommand;
 import com.yatrix.activity.hystrix.command.IFacebookPostEventFeedCommand;
-import com.yatrix.activity.hystrix.command.impl.FacebookJoinEventCommand;
 import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDto;
+import com.yatrix.activity.service.facebook.FacebookEventService;
 import com.yatrix.activity.store.fb.domain.FacebookReference;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.Category;
 import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+
 import com.yatrix.activity.store.mongo.domain.UserProfile;
-import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.service.impl.ActivityCatalogService;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
@@ -57,9 +57,13 @@ public class EventController {
 
 	@Autowired
 	private UserAccountService userAccountRepository;
-
+	
+	
 	@Autowired
 	private ProfileService profileService;
+	
+	@Autowired 
+	private FacebookEventService facebookService;
 
 	@Autowired
 	private IFacebookJoinEventCommand facebookJoinCommand;
@@ -159,7 +163,7 @@ public class EventController {
 			activity.setAppAccepted(appAccepted);
 			usercatalogService.updateActivity(activity);
 		} else{
-			facebookJoinCommand.executeFacebookJoinEvent(activity, userAccount.getUserId()).get();	
+			facebookJoinCommand.executeFacebookJoinEvent(activity, userAccount.getUserId());	
 		}
 		
 		
@@ -197,6 +201,7 @@ public class EventController {
 	
 	public @ResponseBody UserActivity addUserToEvent(@PathVariable String userId, @PathVariable String eventId, @RequestParam String message, @RequestParam String requestorId ){
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		Log.info("Auth Name: logged Security issue: " + authname);
 		//Authenticate the user.
 		UserActivity activity = usercatalogService.findActivity(eventId);
 		if(activity!=null){
@@ -204,7 +209,7 @@ public class EventController {
 			comment.setCreatedTime(new java.util.Date());
 			comment.setMessage(message);
 			comment.setId(requestorId);
-			UserAccount acct=userAccountRepository.getUserAccount(requestorId);
+			//UserAccount acct=userAccountRepository.getUserAccount(requestorId);
 			activity.getAppComments().add(comment);
 			activity.getAppParticipants().add(requestorId);
 			usercatalogService.updateActivity(activity);
@@ -215,6 +220,8 @@ public class EventController {
 		}
 		
 	}
+	
+	
 	
 	private  List<EventDto> mapUserActivityToEventDtos(List<UserActivity> activityList){
 		List<EventDto> eventList = new ArrayList<EventDto>();

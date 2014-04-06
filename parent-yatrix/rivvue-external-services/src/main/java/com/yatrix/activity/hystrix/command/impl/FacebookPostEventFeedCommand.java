@@ -105,7 +105,6 @@ implements IFacebookPostEventFeedCommand
 		userActivity = pUserActivity;
 		username = pUserId;
 		message = pMessage;
-		
 		return this.queue();
 	}
 
@@ -114,9 +113,7 @@ implements IFacebookPostEventFeedCommand
 		logger
 		.info("* * * * * * * * * * * * * * * * * *Running fallback method * * * * * * * * * * * * * * * * * *");
 		Throwable exception = getFailedExecutionException();
-
 		logger.error("Facebook command exception: ", exception);
-
 		return new HystrixSocialResult(Boolean.FALSE, null, "Event feed post failed!");
 	}
 

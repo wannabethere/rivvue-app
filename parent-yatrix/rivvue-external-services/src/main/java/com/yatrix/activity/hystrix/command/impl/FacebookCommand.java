@@ -71,6 +71,7 @@ public class FacebookCommand
     String userName = userActivity.getOriginatorUserId();
     @SuppressWarnings("unchecked")
     Connection<Facebook> connection = (Connection<Facebook>)userSocialConnectionService.getPrimaryConnection(userName, providerId);
+    
     facebook = connection.getApi();
 
     String message = userActivity.getMessageposted() == null ? "" : userActivity.getMessageposted().getMessage();

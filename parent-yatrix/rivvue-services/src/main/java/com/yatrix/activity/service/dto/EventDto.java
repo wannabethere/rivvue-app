@@ -33,8 +33,12 @@ public class EventDto {
 	private String fromtime;
 	private String todate;
 	private String totime;
+	private String authorFullName;
+	
+	private List<com.yatrix.activity.service.dto.Invitees> RsvpStatusses = new ArrayList<com.yatrix.activity.service.dto.Invitees>();
 	
 	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
+	
 	
 	public String getAccess() {
 		return access;
@@ -199,6 +203,20 @@ public class EventDto {
 	}
 	public void setTotime(String totime) {
 		this.totime = totime;
+	}
+	public String getAuthorFullName() {
+		return authorFullName;
+	}
+	public void setAuthorFullName(String authorFullName) {
+		this.authorFullName = authorFullName;
+	}
+	
+	public List<com.yatrix.activity.service.dto.Invitees> getRsvpStatusses() {
+		return RsvpStatusses;
+	}
+	public void setRsvpStatusses(
+			List<com.yatrix.activity.service.dto.Invitees> rsvpStatusses) {
+		RsvpStatusses = rsvpStatusses;
 	}
 	
 }

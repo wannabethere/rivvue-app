@@ -2,6 +2,7 @@ package com.yatrix.activity.service.commands;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,10 @@ public class LoginUpdateFBFriendsCommand extends HystrixCommand<UserAccount>  {
 		userAccountRepository.createUserAccount(loggedInUser, gender, profile.getLocale());
 		
 		return loggedInUser;
+	}
+	
+	public Future<UserAccount> executeLogin(){
+		return this.queue();
 	}
 	
 	

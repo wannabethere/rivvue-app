@@ -47,6 +47,7 @@ import com.yatrix.activity.store.mongo.repository.UserAccountRepository;
 import com.yatrix.activity.store.mongo.repository.UserSocialConnectionService;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
+import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 import com.yatrix.activity.service.signin.utils.GoogleConnectionFactory;
 import com.yatrix.activity.service.signin.utils.SimpleSignInAdapter;
 import com.yatrix.activity.apps.util.ActivityFeedProcessor;
@@ -76,6 +77,9 @@ public class SocialConfig {
 
 	@Inject 
 	private ProfileService profileService;
+	
+	@Inject 
+	private UserEventsService eventsService;
 	
 	@Inject 
 	private UserAccountService userAccountService;

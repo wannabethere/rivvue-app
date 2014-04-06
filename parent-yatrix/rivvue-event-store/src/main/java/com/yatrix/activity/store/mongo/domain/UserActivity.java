@@ -2,24 +2,24 @@ package com.yatrix.activity.store.mongo.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.fb.domain.FacebookPost;
+import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 
 @Document(
 		collection = "UserEvents")
-		public class UserActivity
-		extends Message
-		{
+public class UserActivity extends Message{
 
 	/**
 	 * Serial Version UID.
 	 */
 	private static final long serialVersionUID = 2242068081611181292L;
-
 	public static enum EVENT_STATUS {
 		PENDING, PROCESSING, INVITED,ME
 	}
@@ -30,17 +30,6 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 	private String subCategory;
 	private String displayName;
 	private String authorName;
-
-	private List<String> tags = new ArrayList<String>();
-	private List<String> appParticipants = new ArrayList<String>();
-	private List<PostMessage> postedMessage = new ArrayList<PostMessage>();
-	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
-	private List<String> appAccepted = new ArrayList<String>();
-	private List<FacebookInvitee> facebookRejected = new ArrayList<FacebookInvitee>();
-	private List<FacebookInvitee> facebookUnsure = new ArrayList<FacebookInvitee>();
-	private List<FacebookPost> facebookPosts = new ArrayList<FacebookPost>();
-	private List<ActivityComment> appComments = new ArrayList<ActivityComment>();
-	private List<ActivityCalendarReference> replies = new ArrayList<ActivityCalendarReference>();
 	private Date startTime;
 	private Date endTime;
 	private String location;
@@ -53,7 +42,21 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 	private EVENT_STATUS status;
 	private String place;
 	private Long duration;
+	private List<String> tags = new ArrayList<String>();
 
+	//Handling participants.
+	private Map<RSVPSTATUS,List<Participant>> activityParticipants = new HashMap<RSVPSTATUS,List<Participant>>();
+	private List<String> appParticipants = new ArrayList<String>();
+	private List<PostMessage> postedMessage = new ArrayList<PostMessage>();
+	
+	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
+	private List<String> appAccepted = new ArrayList<String>();
+	private List<FacebookInvitee> facebookRejected = new ArrayList<FacebookInvitee>();
+	private List<FacebookInvitee> facebookUnsure = new ArrayList<FacebookInvitee>();
+	private List<FacebookPost> facebookPosts = new ArrayList<FacebookPost>();
+	private List<ActivityComment> appComments = new ArrayList<ActivityComment>();
+	private List<ActivityCalendarReference> replies = new ArrayList<ActivityCalendarReference>();
+	
 	public void setCategoryId(String id) {
 		this.categoryId = id;
 	}
@@ -277,6 +280,14 @@ import com.yatrix.activity.store.fb.domain.FacebookPost;
 
 	public String getAuthorName() {
 		return authorName;
+	}
+
+	public Map<RSVPSTATUS,List<Participant>> getActivityParticipants() {
+		return activityParticipants;
+	}
+
+	public void setActivityParticipants(Map<RSVPSTATUS,List<Participant>> activityParticipants) {
+		this.activityParticipants = activityParticipants;
 	}
 
 	@Override

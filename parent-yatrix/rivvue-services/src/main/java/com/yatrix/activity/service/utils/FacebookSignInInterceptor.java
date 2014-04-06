@@ -58,7 +58,7 @@ public class FacebookSignInInterceptor implements ProviderSignInInterceptor<Face
 		PagedList<FacebookProfile> friends = facebook.friendOperations().getFriendProfiles();
 		log.info("PF"+ profile.toString());
 		//Fire and forget friends.
-		new LoginUpdateFBFriendsCommand(authname, profile, friends, service,userAccountRepository).execute();
+		new LoginUpdateFBFriendsCommand(authname, profile, friends, service,userAccountRepository).executeLogin();
 		//log.info(loggedInUser.toString() + " has been updated");
 		
 		/*
