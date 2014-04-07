@@ -15,6 +15,8 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import com.yatrix.activity.store.exception.ActivityDBException;
 import com.yatrix.activity.store.mongo.domain.Comment;
 import com.yatrix.activity.store.mongo.domain.Participant;
@@ -83,7 +85,7 @@ public class UserEventsService {
 		p.setLupd(lupd);
 		existingEvent.addInvitedId(existingParticipant);
 		//Adding a Message
-		existingEvent.addComment(this.createComment(p, message));
+		existingEvent.addComment(this.createComment(p, null));
 		existingEvent.setLupd(lupd);
 		//Add the notification that this event has to be propogated to FB, TWITTER, GOOGLE etc...
 		return userEventRepository.save(existingEvent);
@@ -121,15 +123,15 @@ public class UserEventsService {
 				break;
 			}
 		}
-		String message=p.getStatus().getMessage();
+		//String message=p.getStatus().getMessage();
 		if(existingParticipant!=null){
 			//Create a new Participant.
 			logger.info("Updating existing Participant " + existingParticipant.toString());
-			message=p.getStatus().getJoinedMessage();
+			//message=p.getStatus().getJoinedMessage();
 			existingEvent.removedInvited(existingParticipant);
 			//Remove this from the existingParticipant to update the current status.
 		}
-		existingEvent.addComment(this.createComment(p, message));
+		//existingEvent.addComment(this.createComment(p, p.getInviteeName() + " is not coming to the event"));
 		existingEvent.setLupd(lupd);
 		return userEventRepository.save(existingEvent);
 	}
@@ -326,7 +328,24 @@ public class UserEventsService {
 	
 	
 	private Comment createComment(Participant p, String message){
-		Comment comment=new Comment(message, System.currentTimeMillis(), p);
+		
+		String messageForEvent = "";
+		if(p.getStatus().equals(RSVPSTATUS.ATTENDING)){
+			messageForEvent=p.getInviteeName()  + " is joining you.";
+		}
+		else if(p.getStatus().equals(RSVPSTATUS.DECLINED)){
+			messageForEvent=p.getInviteeName()  + " is going to miss the event.";
+		}
+		else if(p.getStatus().equals(RSVPSTATUS.MAYBE)){
+			messageForEvent=p.getInviteeName()  + " is not sure about coming to the event.";
+		}
+		else{
+			messageForEvent=p.getInviteeName()  + " has been invited.";
+		}
+		if(!StringUtils.isEmpty(message)){
+			messageForEvent=message;
+		}
+		Comment comment=new Comment(messageForEvent, System.currentTimeMillis(), p);
 		return comment;
 	}
 	

@@ -218,5 +218,71 @@ public class EventDto {
 			List<com.yatrix.activity.service.dto.Invitees> rsvpStatusses) {
 		RsvpStatusses = rsvpStatusses;
 	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("EventDto [id=");
+		builder.append(id);
+		builder.append(", categoryId=");
+		builder.append(categoryId);
+		builder.append(", categoryName=");
+		builder.append(categoryName);
+		builder.append(", subCategoryId=");
+		builder.append(subCategoryId);
+		builder.append(", start=");
+		builder.append(start);
+		builder.append(", end=");
+		builder.append(end);
+		builder.append(", title=");
+		builder.append(title);
+		builder.append(", description=");
+		builder.append(description);
+		builder.append(", tags=");
+		builder.append(tags);
+		builder.append(", startDate=");
+		builder.append(startDate);
+		builder.append(", endDate=");
+		builder.append(endDate);
+		builder.append(", location=");
+		builder.append(location);
+		builder.append(", from=");
+		builder.append(from);
+		builder.append(", to=");
+		builder.append(to);
+		builder.append(", toAppUsers=");
+		builder.append(toAppUsers);
+		builder.append(", message=");
+		builder.append(message);
+		builder.append(", access=");
+		builder.append(access);
+		builder.append(", place=");
+		builder.append(place);
+		builder.append(", formattedAddress=");
+		builder.append(formattedAddress);
+		builder.append(", locationLat=");
+		builder.append(locationLat);
+		builder.append(", locationLng=");
+		builder.append(locationLng);
+		builder.append(", duration=");
+		builder.append(duration);
+		builder.append(", fromdate=");
+		builder.append(fromdate);
+		builder.append(", fromtime=");
+		builder.append(fromtime);
+		builder.append(", todate=");
+		builder.append(todate);
+		builder.append(", totime=");
+		builder.append(totime);
+		builder.append(", authorFullName=");
+		builder.append(authorFullName);
+		builder.append(", RsvpStatusses=");
+		builder.append(RsvpStatusses);
+		builder.append(", facebookAccepted=");
+		builder.append(facebookAccepted);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 	
 }

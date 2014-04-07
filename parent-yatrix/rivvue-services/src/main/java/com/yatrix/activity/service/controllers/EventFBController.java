@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import com.yatrix.activity.hystrix.fb.command.IFacebookJoinEventCommand;
+import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventCreateCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventFeedCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventJoinCommand;
 import com.yatrix.activity.service.dto.AjaxResponse;
@@ -35,6 +37,7 @@ import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
+import com.yatrix.activity.store.mongo.repository.ConnectionService;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
@@ -56,6 +59,10 @@ public class EventFBController {
 
 	@Autowired
 	private ProfileService profileService;
+	@Autowired
+	private ConnectionService userSocialConnectionService;
+	@Autowired
+	private ConnectionFactoryLocator connectionFactoryLocator;
 	
 	
 	@Autowired
@@ -77,12 +84,20 @@ public class EventFBController {
 	}
 	
 	@RequestMapping(value = "/{userid}", produces = "application/json",method = RequestMethod.POST)
-	public String createActivity(@PathVariable String userid, EventDto dto, ModelMap model) throws InterruptedException, ExecutionException {
+	public String createUserEvent(@PathVariable String userid, EventDto dto, ModelMap model) throws InterruptedException, ExecutionException {
 			String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 			Log.info("Auth Name: "+ authname);
 			UserAccount acct=userAccountRepository.getUserAccount(userid);
 			UserEvent event=EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB");
-			eventsService.createUserEvent(event);
+			event=eventsService.createUserEvent(event);
+			if(!StringUtils.isEmpty(acct.getFacebookId())){
+				FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
+				createCommand.setConnectionFactoryLocator(connectionFactoryLocator);
+				createCommand.setEventsService(eventsService);
+				createCommand.setUserSocialConnectionService(userSocialConnectionService);
+				createCommand.executeFacebookEventFeed();
+			}
+			
 			model.addAttribute("activityId",event.getId());
 			model.addAttribute("status","Successully Created: ");
 			return "redirect:/calendarevents/"+userid;

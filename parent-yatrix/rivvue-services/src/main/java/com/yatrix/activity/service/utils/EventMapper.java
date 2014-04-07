@@ -103,12 +103,13 @@ public class EventMapper {
 		Date endTime = null;
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
 		try {
-			startTime = format.parse(event.getStart());
-			endTime = format.parse(event.getEnd());
+			startTime = format.parse(event.getFromdate() + " " + event.getFromtime());
+			endTime = format.parse(event.getTodate() + " " + event.getTotime());
 		} catch (ParseException e) {
 			logger.error("Event start/end date format is incorrect");
 			throw new IllegalStateException("Activity start/end date format is incorrect", e);
 		}
+		
 		userActivity.setParticipants(participants);
 		userActivity.setAppParticipants(appParticipants);
 		userActivity.setStartTime(startTime);
@@ -125,6 +126,7 @@ public class EventMapper {
 	public static UserEvent toCreateUserEventObject(EventDto event, ProfileService profileService, String fromUserType){
 		isvalidEvent(event);
 		UserEvent userActivity= new UserEvent();
+		
 		userActivity.setFromUserType(fromUserType);
 		userActivity.setCreatedTimeStamp(Calendar.getInstance().getTime().getTime());
 		if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
@@ -140,8 +142,10 @@ public class EventMapper {
 		if(!StringUtils.isEmpty(event.getTitle())){
 			userActivity.setTitle(event.getTitle());
 		}
+		else{
+			userActivity.setTitle(event.getMessage());
+		}
 		String tags=event.getTags();
-		
 		userActivity.setStatus(UserEvent.EVENT_STATUS.PENDING);
 		userActivity.setOriginatorUserId(event.getFrom());
 		userActivity.setDescription(event.getDescription());
@@ -159,39 +163,43 @@ public class EventMapper {
 		// split the invitee list
 		List<String> participants = new ArrayList<String>();
 		participants = Arrays.asList(event.getTo().split(TAG_SEPERATOR));
-		
 		List<Participant> actParts= new ArrayList<Participant>();
 		for(String participantId: participants ){
 			Participant p = new Participant();
 			p.setStatus(RSVPSTATUS.NOT_REPLIED);
 			p.setUserType(TYPE.FB);
-			p.setInviteeName(profileService.getByUserId(participantId).getName());  
+			if(!StringUtils.isEmpty(participantId)){
+				p.setInviteeName(profileService.getByUserId(participantId).getName());
+			}
 			p.setUserId(participantId);
 			actParts.add(p);
-
+			userActivity.addInvitedId(p);
 		}
-
 		List<String> appParticipants = new ArrayList<String>();
-		appParticipants = Arrays.asList(event.getToAppUsers().split(TAG_SEPERATOR));
-		for(String participantId: appParticipants ){
-			Participant p = new Participant();
-			p.setStatus(RSVPSTATUS.NOT_REPLIED);
-			p.setUserType(TYPE.APP);
-			p.setInviteeName(profileService.getByUserId(participantId).getName());
-			p.setUserId(participantId);
-			actParts.add(p);
+		if(!StringUtils.isEmpty(event.getToAppUsers())){
+			appParticipants = Arrays.asList(event.getToAppUsers().split(TAG_SEPERATOR));
+			for(String participantId: appParticipants ){
+				Participant p = new Participant();
+				p.setStatus(RSVPSTATUS.NOT_REPLIED);
+				p.setUserType(TYPE.APP);
+				if(!StringUtils.isEmpty(participantId)){
+					p.setInviteeName(profileService.getByUserId(participantId).getName());
+				}
+				p.setUserId(participantId);
+				actParts.add(p);
+				userActivity.addInvitedId(p);
+			}
 		}
 		Date startTime = null;
 		Date endTime = null;
-		
 		try {
-			startTime = format.parse(event.getStart());
-			endTime = format.parse(event.getEnd());
+			startTime = format.parse(event.getFromdate() + " " + event.getFromtime());
+			endTime = format.parse(event.getTodate() + " " + event.getTotime());
 		} catch (ParseException e) {
 			logger.error("Event start/end date format is incorrect");
 			throw new IllegalStateException("Activity start/end date format is incorrect", e);
 		}
-		
+		//userActivity.setInvitedIds(actParts);
 		userActivity.setStartTime(startTime.getTime());
 		userActivity.setEndTime(endTime.getTime());
 		Comment comment= new Comment();
@@ -199,7 +207,7 @@ public class EventMapper {
 		comment.setFromAuthorName(profileService.getByUserId(event.getFrom()).getName());
 		comment.setMessage(event.getMessage());
 		//TODO MAKE IT MORE ROBUST
-		comment.addCommentSync("appCommentID1", COMMENTTYPE.APP,System.currentTimeMillis());
+		//comment.addCommentSync("appCommentID1", COMMENTTYPE.APP,System.currentTimeMillis());
 		userActivity.addComment(comment);
 		PostMessage messageposted = new PostMessage();
 		messageposted.setAuthorId(event.getFrom());
@@ -310,28 +318,34 @@ public class EventMapper {
 	
 	
 	private static boolean isvalidEvent(EventDto event) {
-
+		
+		logger.info(event.toString());
 		if (StringUtils.isEmpty(event.getCategoryId()) || event.getCategoryId().equalsIgnoreCase("select")) {
-			logger.error("Activity category value is empty");
+			logger.error("Activity category value is empty " + event.toString());
 			throw new IllegalStateException("category.empty");
 
 		}
 		if (StringUtils.isEmpty(event.getFrom())) {
-			logger.error("User name is empty");
+			logger.error("User name is empty " + event.toString());
 			throw new IllegalStateException("user.empty");
 		}
-		if ( StringUtils.isEmpty(event.getTo()) ||StringUtils.isEmpty(event.getToAppUsers()) ) {
-			logger.error("Invitee user list is empty");
+		if ( StringUtils.isEmpty(event.getTo()) && StringUtils.isEmpty(event.getToAppUsers()) ) {
+			logger.error("Invitee user list is empty " + event.toString());
 			throw new IllegalStateException("invitee.empty");
 		}
 		if (StringUtils.isEmpty(event.getLocation())) {
 			logger.error("Event location value is empty");
 			throw new IllegalStateException("location.empty");
 		}
-		if (StringUtils.isEmpty(event.getStart()) || StringUtils.isEmpty(event.getEnd())) {
+		if (StringUtils.isEmpty(event.getFromdate()) || StringUtils.isEmpty(event.getTodate())) {
 			logger.error("Event start/end date format is incorrect");
 			throw new IllegalStateException("date.error");			
 		}
+		if (StringUtils.isEmpty(event.getFromtime()) && StringUtils.isEmpty(event.getTotime())) {
+			logger.error("Event start/end date format is incorrect");
+			throw new IllegalStateException("date.error");			
+		}
+		
 		if (StringUtils.isEmpty(event.getDescription())) {
 			logger.error("Description value is empty");
 			throw new IllegalStateException("message.empty");
