@@ -33,7 +33,7 @@
 		});
 		
 		function deleteEvent(){
-			var deleteUrl =  "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/deleteEvent";
+			var deleteUrl =  "/wannabethere/myactivities/" + $('#username').val() + "/" + $('#eventId').val() + "/deleteEvent";
 			//alert("Url: " + deleteUrl);
 			$("#event_details").get(0).setAttribute("action", deleteUrl);
 			$("#event_details").submit();
@@ -42,7 +42,7 @@
 
 		function joinEvent(){
 			$.ajax({
-				url : "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/joinEvent",
+				url : "/wannabethere/myactivities/" + $('#username').val() + "/" + $('#eventId').val() + "/joinEvent",
 				dataType : "json",
 				success : function(messagePosted) {
 					alert("Join successful." );
@@ -56,7 +56,7 @@
 		var param = {"message":$('#message').val()};
 
 		$.ajax({
-					url : "/wannabethere/calendarevents/" + $('#username').val() + "/" + $('#eventId').val() + "/postFBMessage",
+					url : "/wannabethere/myactivities/" + $('#username').val() + "/" + $('#eventId').val() + "/postFBMessage",
 					dataType : "json",
 					data : param,
 					success : function(messagePosted) {
