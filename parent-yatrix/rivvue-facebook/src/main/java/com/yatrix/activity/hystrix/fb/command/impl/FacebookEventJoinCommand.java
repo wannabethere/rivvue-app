@@ -35,13 +35,8 @@ public class FacebookEventJoinCommand extends HystrixCommand<HystrixSocialResult
 	
 	private static final Logger logger = LoggerFactory.getLogger(FacebookEventJoinCommand.class);
 
-	@Autowired
 	ConnectionService userSocialConnectionService;
-
-	@Autowired
 	ConnectionFactoryLocator connectionFactoryLocator;
-	
-	@Autowired
 	UserEventsService eventsService;
 	UserEvent userActivity;
 	Participant participant;
@@ -58,6 +53,20 @@ public class FacebookEventJoinCommand extends HystrixCommand<HystrixSocialResult
 		userActivity = pUserActivity;
 		participant=p;
 		this.addUser=addUser;
+	}
+	
+	public void setUserSocialConnectionService(
+			ConnectionService userSocialConnectionService) {
+		this.userSocialConnectionService = userSocialConnectionService;
+	}
+
+	public void setEventsService(UserEventsService eventsService) {
+		this.eventsService = eventsService;
+	}
+
+	public void setConnectionFactoryLocator(
+			ConnectionFactoryLocator connectionFactoryLocator) {
+		this.connectionFactoryLocator = connectionFactoryLocator;
 	}
 
 	@Override

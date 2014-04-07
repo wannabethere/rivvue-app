@@ -36,15 +36,9 @@ import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 		proxyMode = ScopedProxyMode.INTERFACES)
 public class FacebookEventFeedCommand extends HystrixCommand<HystrixSocialResult>{
 	private static final Logger logger = LoggerFactory.getLogger(FacebookEventFeedCommand.class);
-	@Autowired
 	ConnectionService userSocialConnectionService;
-
-	@Autowired
 	UserEventsService eventsService;
-
-	@Autowired
 	ConnectionFactoryLocator connectionFactoryLocator;
-	
 	String userActivityId;
 	UserEvent userEvent;
 	String username;
@@ -81,6 +75,20 @@ public class FacebookEventFeedCommand extends HystrixCommand<HystrixSocialResult
 		username = pUserId;
 		comment=pComment;
 		
+	}
+	
+	public void setUserSocialConnectionService(
+			ConnectionService userSocialConnectionService) {
+		this.userSocialConnectionService = userSocialConnectionService;
+	}
+
+	public void setEventsService(UserEventsService eventsService) {
+		this.eventsService = eventsService;
+	}
+
+	public void setConnectionFactoryLocator(
+			ConnectionFactoryLocator connectionFactoryLocator) {
+		this.connectionFactoryLocator = connectionFactoryLocator;
 	}
 
 	@Override

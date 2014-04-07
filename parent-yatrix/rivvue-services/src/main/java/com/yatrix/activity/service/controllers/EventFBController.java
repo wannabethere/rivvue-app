@@ -28,11 +28,18 @@ import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventFeedCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventJoinCommand;
 import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDto;
+import com.yatrix.activity.service.dto.ProfileListDto;
+import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.EventMapper;
+import com.yatrix.activity.service.utils.UserMapper;
+import com.yatrix.activity.store.exception.ActivityDBException;
+import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.mongo.domain.Comment;
 import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
+import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
+import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
@@ -68,6 +75,76 @@ public class EventFBController {
 	@Autowired
 	private UserAccountService userAccountService;
 
+	/*
+	 * Given useractvityId, search the db and return
+	 * @Param
+	 */
+	@RequestMapping(
+			value = "{userid}/event/{useractivityId}",
+			method = RequestMethod.GET)
+	public String getUserActivity(@PathVariable String userid, @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
+		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		Log.info("Auth Name: "+ authname);
+		UserAccount acct=userAccountRepository.getUserAccount(userid);
+		if(acct==null){
+			acct = userAccountService.getUserAccount(authname);
+			if(acct==null){
+				return "access/login";
+			}
+		}
+		UserEvent event = eventsService.getActivity(useractivityId);
+		List<Comment> appCommentsNotPosted = new ArrayList<Comment>();
+		
+		boolean displayJoinButton = true;
+		boolean isInviteeToEvent = false;
+
+		if (event == null) {
+			ActivityDBException noactivity = new ActivityDBException("no user event found ");
+			throw noactivity;
+		}
+
+		try {
+			UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(acct.getFacebookId())?acct.getUserId():acct.getFacebookId()); 
+			event.setDisplayName(acct.getUserId());
+			event.setAuthorName(pf.getFirstName() + " " + pf.getLastName());
+			//Will fix the not synced comments later.
+			/*if(event.getAppComments() != null && event.getAppComments().size() > 0){
+				for(Comment comment : event.getAppComments()){
+					if("-1".equalsIgnoreCase(comment.getId())){
+						appCommentsNotPosted.add(comment);
+					}
+				}
+			}*/
+		} catch(Exception e) {
+			logger.error(e.getMessage());
+			event.setDisplayName(event.getOriginatorUserId()); 
+		}
+
+		if(event.getOriginatorUserId().equalsIgnoreCase(userid) ||alreadyInvited(userid, event)  
+				|| isJoinThruFacebook(userid, event)){
+			displayJoinButton = false;
+			isInviteeToEvent = true;
+		}
+
+		ProfileListDto userListDto = new ProfileListDto();
+		List<UserDto> users = new ArrayList<UserDto>();
+		
+		//This is the facebook Id only check. Later we have
+		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
+		if(friends!=null){
+			users.addAll(UserMapper.mapUserProfile(friends));
+		}
+		userListDto.setProfiles(users);
+		model.put("friends", userListDto);
+		model.addAttribute("displayJoin", displayJoinButton);
+		//model.addAttribute("isInviteeToEvent", isInviteeToEvent);
+		model.addAttribute("event", event);
+		model.addAttribute("authname", authname);
+		model.addAttribute("comments", appCommentsNotPosted);
+
+		return isInviteeToEvent ? "events/events2" :"events/events";
+	}
+	
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
 	public String  getAllEvents(@PathVariable String userId,ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
@@ -172,6 +249,9 @@ public class EventFBController {
 		comment.setCreatedTime(System.currentTimeMillis());
 		event.addComment(comment);
 		FacebookEventFeedCommand fbPostCommand = new FacebookEventFeedCommand(event, userId, comment);
+		fbPostCommand.setConnectionFactoryLocator(connectionFactoryLocator);
+		fbPostCommand.setEventsService(eventsService);
+		fbPostCommand.setUserSocialConnectionService(userSocialConnectionService);
 		fbPostCommand.executeFacebookEventFeed();
 		return comment;
 	}
@@ -212,6 +292,9 @@ public class EventFBController {
 		boolean addUser=true;
 		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,addUser);
 		//Running the request in asynchronous mode.
+		command.setConnectionFactoryLocator(connectionFactoryLocator);
+		command.setEventsService(eventsService);
+		command.setUserSocialConnectionService(userSocialConnectionService);
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
 		return new AjaxResponse("User join request Successful");
@@ -241,6 +324,9 @@ public class EventFBController {
 		}
 		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,false);
 		//Running the request in asynchronous mode.
+		command.setConnectionFactoryLocator(connectionFactoryLocator);
+		command.setEventsService(eventsService);
+		command.setUserSocialConnectionService(userSocialConnectionService);
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
 		return new AjaxResponse("User reject Successful");
@@ -271,6 +357,9 @@ public class EventFBController {
 		}
 		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,false);
 		//Running the request in asynchronous mode.
+		command.setConnectionFactoryLocator(connectionFactoryLocator);
+		command.setEventsService(eventsService);
+		command.setUserSocialConnectionService(userSocialConnectionService);
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
 		return new AjaxResponse("Tentatively accepted");
@@ -302,6 +391,9 @@ public class EventFBController {
 		}
 		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,false);
 		//Running the request in asynchronous mode.
+		command.setConnectionFactoryLocator(connectionFactoryLocator);
+		command.setEventsService(eventsService);
+		command.setUserSocialConnectionService(userSocialConnectionService);
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
 		return new AjaxResponse("Tentatively accepted");
@@ -318,11 +410,52 @@ public class EventFBController {
 	}
 	
 	
-	
-	
-	
-	
-	
+	private boolean isJoinThruFacebook(String userId, UserEvent event) {
 
+		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
 
+		if(userAccount == null){
+			userAccount = userAccountService.getUserAccount(userId);
+		}
+
+		System.out.println("User Account: " + userAccount);
+		System.out.println("Event: " + event);
+
+		if(userAccount.getFacebookId() == null || event.getAcceptedIds() == null){
+			return false;
+		}
+
+		for(Participant facebookAccepted : event.getAcceptedIds()){
+			if(userAccount.getFacebookId().equalsIgnoreCase(facebookAccepted.getUserId())){
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	private boolean alreadyInvited(String userId, UserEvent event){
+		//event.getAcceptedIds().contains(userid)
+		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
+
+		if(userAccount == null){
+			userAccount = userAccountService.getUserAccount(userId);
+		}
+
+		System.out.println("User Account: " + userAccount);
+		System.out.println("Event: " + event);
+
+		if(userAccount.getFacebookId() == null || event.getAcceptedIds() == null){
+			return false;
+		}
+
+		
+		for(Participant facebookAccepted : event.getInvitedIds()){
+			if(userAccount.getFacebookId().equalsIgnoreCase(facebookAccepted.getUserId())){
+				return true;
+			}
+		}
+		return true;
+	}
+	
 }
