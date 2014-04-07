@@ -62,9 +62,6 @@ public class EventController {
 	@Autowired
 	private ProfileService profileService;
 	
-	@Autowired 
-	private FacebookEventService facebookService;
-
 	@Autowired
 	private IFacebookJoinEventCommand facebookJoinCommand;
 	

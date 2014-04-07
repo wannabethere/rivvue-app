@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yatrix.activity.hystrix.fb.command.IFacebookJoinEventCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventFeedCommand;
-import com.yatrix.activity.hystrix.fb.command.impl.FacebookJoinEventCommand;
+import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventJoinCommand;
 import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.utils.EventMapper;
@@ -47,8 +47,6 @@ public class EventFBController {
 	// Create an instance of SimpleDateFormat used for formatting 
 	// the string representation of date (month/day/year)
 	private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	
-
 
 	@Autowired
 	private UserAccountService userAccountRepository;
@@ -58,9 +56,6 @@ public class EventFBController {
 
 	@Autowired
 	private ProfileService profileService;
-	
-	@Autowired
-	private IFacebookJoinEventCommand facebookJoinCommand;
 	
 	
 	@Autowired
@@ -200,7 +195,7 @@ public class EventFBController {
 			p.setUserType(TYPE.APP);
 		}
 		boolean addUser=true;
-		FacebookJoinEventCommand command = new FacebookJoinEventCommand(event, p,addUser);
+		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,addUser);
 		//Running the request in asynchronous mode.
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
@@ -229,7 +224,7 @@ public class EventFBController {
 		else{
 			p.setUserType(TYPE.APP);
 		}
-		FacebookJoinEventCommand command = new FacebookJoinEventCommand(event, p,false);
+		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,false);
 		//Running the request in asynchronous mode.
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
@@ -259,7 +254,7 @@ public class EventFBController {
 		else{
 			p.setUserType(TYPE.APP);
 		}
-		FacebookJoinEventCommand command = new FacebookJoinEventCommand(event, p,false);
+		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,false);
 		//Running the request in asynchronous mode.
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 
@@ -290,7 +285,7 @@ public class EventFBController {
 		else{
 			p.setUserType(TYPE.APP);
 		}
-		FacebookJoinEventCommand command = new FacebookJoinEventCommand(event, p,false);
+		FacebookEventJoinCommand command = new FacebookEventJoinCommand(event, p,false);
 		//Running the request in asynchronous mode.
 		command.executeFacebookJoinEvent();
 		//We will update the result later. 

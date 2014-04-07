@@ -50,8 +50,8 @@ public abstract class Item
     return timeCreated;
   }
 
-  public UUID getUuid() {
-    return UUID.fromString(uuid);
+  public String getUuid() {
+    return uuid;
   }
 
   public int getVersion() {
