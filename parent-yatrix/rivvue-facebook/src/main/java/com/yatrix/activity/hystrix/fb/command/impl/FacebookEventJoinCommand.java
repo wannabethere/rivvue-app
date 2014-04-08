@@ -24,6 +24,7 @@ import com.yatrix.activity.service.facebook.FacebookEventService;
 import com.yatrix.activity.store.mongo.domain.Comment;
 import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
+import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserSocialConnection;
@@ -89,8 +90,8 @@ public class FacebookEventJoinCommand extends HystrixCommand<HystrixSocialResult
 		comment.setCreatedTime(System.currentTimeMillis());
 		userActivity.addComment(comment);
 		eventsService.updateUserEvent(userActivity);
-		
-		if(participant.getUserType().equals("FB")){
+				
+		if(participant.getUserType().equals(TYPE.FB)){
 			String providerId = connectionFactoryLocator.getConnectionFactory(Facebook.class)
 					.getProviderId();
 			UserSocialConnection connection = userSocialConnectionService.getSocialConnection(participant.getUserId(), providerId);
@@ -103,7 +104,7 @@ public class FacebookEventJoinCommand extends HystrixCommand<HystrixSocialResult
 			//Adding user
 			fbService.publishUserInvitationUpdate(userActivity, participant, addUser);
 			//Posting
-			userActivity=fbService.postComment(userActivity, comment);			
+			userActivity=fbService.postComment(userActivity, comment);	
 		}
 		
 		eventsService.updateUserEvent(userActivity);

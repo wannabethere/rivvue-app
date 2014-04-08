@@ -215,6 +215,8 @@ public class EventFBController {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all invited events for user" + userId);
 		UserAccount userAccount = userAccountRepository.getUserAccount(userId);
+		List<String> userIds = new ArrayList<String>();
+				
 		if(userAccount == null){
 			userAccount = userAccountRepository.getUserAccountByUserName(userId);
 			
@@ -222,11 +224,19 @@ public class EventFBController {
 				return "access/login";
 			}
 		}
-		List<UserEvent> events=eventsService.getInvitedActivities(userId);
+		
+		if(!StringUtils.isEmpty(userAccount.getFacebookId())){
+			userIds.add(userAccount.getFacebookId());
+		}
+		
+		userIds.add(userId);
+		
+		List<UserEvent> events=eventsService.getInvitedActivities(userIds);
 		List<EventDto> eventList=new ArrayList<EventDto>();
 		for(UserEvent event: events){
 			eventList.add(EventMapper.convertToEventDto(event));
 		}
+		
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", userId);
@@ -286,7 +296,7 @@ public class EventFBController {
 		
 		UserProfile pf = profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		Participant p = new Participant();
-		p.setUserId(userId);
+		p.setUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		p.setInviteeName(pf.getName());
 		p.setLupd(System.currentTimeMillis());
 		p.setStatus(RSVPSTATUS.ATTENDING);
@@ -319,7 +329,7 @@ public class EventFBController {
 		UserEvent event=eventsService.getActivity(eventId);
 		UserProfile pf = profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		Participant p = new Participant();
-		p.setUserId(userId);
+		p.setUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		p.setInviteeName(pf.getName());
 		p.setLupd(System.currentTimeMillis());
 		p.setStatus(RSVPSTATUS.DECLINED);
@@ -352,7 +362,7 @@ public class EventFBController {
 		UserEvent event=eventsService.getActivity(eventId);
 		UserProfile pf = profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		Participant p = new Participant();
-		p.setUserId(userId);
+		p.setUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		p.setInviteeName(pf.getName());
 		p.setLupd(System.currentTimeMillis());
 		p.setStatus(RSVPSTATUS.MAYBE);
@@ -386,7 +396,7 @@ public class EventFBController {
 		UserEvent event=eventsService.getActivity(eventId);
 		UserProfile pf = profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		Participant p = new Participant();
-		p.setUserId(userId);
+		p.setUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		p.setInviteeName(pf.getName());
 		p.setLupd(System.currentTimeMillis());
 		p.setStatus(RSVPSTATUS.ATTENDING);

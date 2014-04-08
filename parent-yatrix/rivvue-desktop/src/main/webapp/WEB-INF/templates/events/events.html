@@ -67,7 +67,7 @@
 						var createMessageDiv = '<div id="eventrec">' +
      					             '<div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>' +
      								'<div id="innerbox"> <div id="heading">' +
-          							'<div class="name" >' + messagePosted.from.name + '</div><div class="subname" >' + messagePosted.message + '</div>'+
+          							'<div class="name" >' + messagePosted.fromAuthorName + '</div><div class="subname" >' + messagePosted.message + '</div>'+
           							'<div class="daytime" >' + $.format.date(new Date(messagePosted.createdTime), 'ddd dd, MMMM yyyy') + '</div></div></div></div>';
 						
 						$('#formbox').before(createMessageDiv);

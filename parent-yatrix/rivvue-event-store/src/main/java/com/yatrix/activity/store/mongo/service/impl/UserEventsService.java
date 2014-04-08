@@ -1,8 +1,5 @@
 package com.yatrix.activity.store.mongo.service.impl;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,16 +10,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.Circle;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.yatrix.activity.store.exception.ActivityDBException;
 import com.yatrix.activity.store.mongo.domain.Comment;
-import com.yatrix.activity.store.mongo.domain.Participant;
-import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
+import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
+import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.repository.UserEventsRepository;
 
 @Service
@@ -179,6 +175,35 @@ public class UserEventsService {
 	}
 	
 	/**
+	 *  // the query object
+        Criteria findSeriesCriteria = Criteria.where("title").is(title);
+        // the field object
+        Criteria findSagaNumberCriteria = Criteria.where("books").elemMatch(Criteria.where("seriesNumber").is(seriesNumber));
+        BasicQuery query = new BasicQuery(findSeriesCriteria.getCriteriaObject(), findSagaNumberCriteria.getCriteriaObject());
+ 
+	 * @param userId
+	 * @return
+	 */
+	
+	public List<UserEvent> getInvitedActivities(List<String> userIds){
+		return this.getStatusActivitiesForUser(userIds,RSVPSTATUS.NOT_REPLIED,false);
+	}
+	
+	private List<UserEvent> getStatusActivitiesForUser(List<String> userIds, RSVPSTATUS status, boolean allEvents){
+		Criteria findUsersInvited;
+		//Criteria eventCriteria= Criteria.where("deleted").is(false);
+		if(!allEvents){
+			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").in(userIds).and("status").is(status.toString())).and("deleted").is(false);
+		}
+		else{
+			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").in(userIds)).and("deleted").is(false);
+		}
+		BasicQuery query = new BasicQuery( findUsersInvited.getCriteriaObject());
+		List<UserEvent> allEventsList= mongoTemplate.find(query, UserEvent.class);
+		return allEventsList;
+	}
+	
+	/**
 	 * Get all the Events that I need to show on my calendar.
 	 * @param userId
 	 * @return
@@ -188,7 +213,9 @@ public class UserEventsService {
 		
 		List<UserEvent> allEvents= getStatusActivitiesForUser(userId, null,true);
 		List<UserEvent> myCreatedEvents= userEventRepository.findByoriginatorUserId(userId);
+		
 		if(myCreatedEvents!=null && myCreatedEvents.size()>0){
+			allEvents.removeAll(myCreatedEvents);
 			allEvents.addAll(myCreatedEvents);
 		}
 		
