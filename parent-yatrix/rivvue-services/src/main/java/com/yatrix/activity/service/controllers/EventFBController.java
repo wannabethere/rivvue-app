@@ -35,6 +35,7 @@ import com.yatrix.activity.service.utils.UserMapper;
 import com.yatrix.activity.store.exception.ActivityDBException;
 import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.mongo.domain.Comment;
+import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
@@ -94,8 +95,8 @@ public class EventFBController {
 		}
 		UserEvent event = eventsService.getActivity(useractivityId);
 		List<Comment> appCommentsNotPosted = new ArrayList<Comment>();
+		boolean displayDeleteButton=false;
 		
-		boolean displayJoinButton = true;
 		boolean isInviteeToEvent = false;
 
 		if (event == null) {
@@ -107,6 +108,7 @@ public class EventFBController {
 			UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(acct.getFacebookId())?acct.getUserId():acct.getFacebookId()); 
 			event.setDisplayName(acct.getUserId());
 			event.setAuthorName(pf.getFirstName() + " " + pf.getLastName());
+			model.put("userType",pf.getSrcprofileType().toString() );
 			//Will fix the not synced comments later.
 			/*if(event.getAppComments() != null && event.getAppComments().size() > 0){
 				for(Comment comment : event.getAppComments()){
@@ -118,13 +120,15 @@ public class EventFBController {
 		} catch(Exception e) {
 			logger.error(e.getMessage());
 			event.setDisplayName(event.getOriginatorUserId()); 
+			model.put("userType","APP" );
 		}
-
-		if(event.getOriginatorUserId().equalsIgnoreCase(userid) ||alreadyInvited(userid, event)  
-				|| isJoinThruFacebook(userid, event)){
-			displayJoinButton = false;
+		if(event.getOriginatorUserId().equalsIgnoreCase(userid)  ){
+			displayDeleteButton = true;
+		}
+		if(!alreadyInvited(userid, event, model)){
 			isInviteeToEvent = true;
 		}
+		
 
 		ProfileListDto userListDto = new ProfileListDto();
 		List<UserDto> users = new ArrayList<UserDto>();
@@ -135,13 +139,13 @@ public class EventFBController {
 			users.addAll(UserMapper.mapUserProfile(friends));
 		}
 		userListDto.setProfiles(users);
+		
 		model.put("friends", userListDto);
-		model.addAttribute("displayJoin", displayJoinButton);
 		//model.addAttribute("isInviteeToEvent", isInviteeToEvent);
-		model.addAttribute("event", event);
+		model.addAttribute("event", EventMapper.convertToEventDto(event));
 		model.addAttribute("authname", authname);
 		model.addAttribute("comments", appCommentsNotPosted);
-
+		model.addAttribute("displayDelete",displayDeleteButton);
 		return isInviteeToEvent ? "events/events2" :"events/events";
 	}
 	
@@ -173,7 +177,7 @@ public class EventFBController {
 				createCommand.setEventsService(eventsService);
 				createCommand.setUserSocialConnectionService(userSocialConnectionService);
 				createCommand.executeFacebookEventFeed();
-			}
+			}   
 			
 			model.addAttribute("activityId",event.getId());
 			model.addAttribute("status","Successully Created: ");
@@ -240,15 +244,18 @@ public class EventFBController {
 				return null;
 			}
 		}
+		UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		
 		UserEvent event=eventsService.getActivity(eventId);
 		Comment comment= new Comment();
 		comment.setFromId(userId);
 		comment.setMessage(message);
-		comment.setFromAuthorName(userAccount.getFirstName() + "" + userAccount.getLastName());
+		comment.setFromAuthorName(pf.getFirstName() + " " + pf.getLastName());
 		comment.setCreatedTime(System.currentTimeMillis());
 		event.addComment(comment);
-		FacebookEventFeedCommand fbPostCommand = new FacebookEventFeedCommand(event, userId, comment);
+		//Instead of passing the FB ID pass the Participant information.
+		
+		FacebookEventFeedCommand fbPostCommand = new FacebookEventFeedCommand(event, userId,userAccount.getFacebookId(), comment);
 		fbPostCommand.setConnectionFactoryLocator(connectionFactoryLocator);
 		fbPostCommand.setEventsService(eventsService);
 		fbPostCommand.setUserSocialConnectionService(userSocialConnectionService);
@@ -434,7 +441,7 @@ public class EventFBController {
 		return false;
 	}
 	
-	private boolean alreadyInvited(String userId, UserEvent event){
+	private boolean alreadyInvited(String userId, UserEvent event,ModelMap model){
 		//event.getAcceptedIds().contains(userid)
 		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
 
@@ -444,18 +451,36 @@ public class EventFBController {
 
 		System.out.println("User Account: " + userAccount);
 		System.out.println("Event: " + event);
-
-		if(userAccount.getFacebookId() == null || event.getAcceptedIds() == null){
-			return false;
-		}
-
-		
+		String checkUserId = StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getFacebookId():userId;
 		for(Participant facebookAccepted : event.getInvitedIds()){
-			if(userAccount.getFacebookId().equalsIgnoreCase(facebookAccepted.getUserId())){
+			if(checkUserId.equalsIgnoreCase(facebookAccepted.getUserId())){
+				if(facebookAccepted.getStatus().equals(RSVPSTATUS.ATTENDING)){
+					model.addAttribute("eventStatusMessage","You are attending");
+				}
+				else if(facebookAccepted.getStatus().equals(RSVPSTATUS.MAYBE)){
+					model.addAttribute("eventStatusMessage","You might be attending");
+				}
+				else if(facebookAccepted.getStatus().equals(RSVPSTATUS.DECLINED)){
+					model.addAttribute("eventStatusMessage","You are not attending");
+				}
+				else{
+					model.addAttribute("eventStatusMessage","You have not yet replied");
+				}
+				
+				
 				return true;
 			}
 		}
-		return true;
+		
+		if(event.getVisibility().equals(VISIBILITY.PUBLIC)){
+			model.addAttribute("eventStatusMessage","You are not part of the invited guests do you want to join?");
+			model.addAttribute("displayJoin", true);
+			return false;
+		}
+		else{
+			model.addAttribute("displayJoin", false);
+			return true;
+		}
 	}
 	
 }

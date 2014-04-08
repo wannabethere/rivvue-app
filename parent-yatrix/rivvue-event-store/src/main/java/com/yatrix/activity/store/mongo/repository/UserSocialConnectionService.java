@@ -348,7 +348,9 @@ public class UserSocialConnectionService
 		  String providerId) {
 	  Query q = query(where("providerId").is(providerId).and("providerUserId").is(providerUserId));
 	  UserSocialConnection mc=mongoTemplate.findOne(q, UserSocialConnection.class);
-	  mc.setAccessToken(converter.decryptAccessToken(mc.getAccessToken()));
+	  if(mc!=null){
+		  mc.setAccessToken(converter.decryptAccessToken(mc.getAccessToken()));
+	  }
 	  return mc;
   }
 }

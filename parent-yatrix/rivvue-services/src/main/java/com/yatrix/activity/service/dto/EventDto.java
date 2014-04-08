@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.yatrix.activity.store.fb.domain.FacebookInvitee;
+import com.yatrix.activity.store.mongo.domain.Comment;
 
 public class EventDto {
 	private String id;
@@ -35,10 +36,11 @@ public class EventDto {
 	private String totime;
 	private String authorFullName;
 	
-	private List<com.yatrix.activity.service.dto.Invitees> RsvpStatusses = new ArrayList<com.yatrix.activity.service.dto.Invitees>();
+	private List<Invitees> RsvpStatusses = new ArrayList<Invitees>();
 	
 	private List<FacebookInvitee> facebookAccepted = new ArrayList<FacebookInvitee>();
-	
+	//TODO Convert this to CommentDTO to seperate the backend.
+	private List<Comment> appComments= new ArrayList<Comment>();
 	
 	public String getAccess() {
 		return access;
@@ -281,6 +283,12 @@ public class EventDto {
 		builder.append(facebookAccepted);
 		builder.append("]");
 		return builder.toString();
+	}
+	public void setAppComments(List<Comment> appComments) {
+		this.appComments = appComments;
+	}
+	public List<Comment> getAppComments() {
+		return appComments;
 	}
 	
 	

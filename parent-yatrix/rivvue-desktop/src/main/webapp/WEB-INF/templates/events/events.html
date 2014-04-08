@@ -41,8 +41,9 @@
 		
 
 		function joinEvent(){
+			var param = {"userType":$('#userType').val()};
 			$.ajax({
-				url : "/wannabethere/myactivities/" + $('#username').val() + "/" + $('#eventId').val() + "/joinEvent",
+				url : "/wannabethere/myactivities/" + $('#username').val() + "/" + $('#eventId').val() + "/joinEvent?userType="+$('#userType').val(),
 				dataType : "json",
 				success : function(messagePosted) {
 					alert("Join successful." );
@@ -110,8 +111,8 @@
      <div id="innerbox">
       
           <div id="heading">
-          <h1 th:text="${event.messageposted.message}">WATCH MOVIE GRAVITY</h1>    <input th:if="${displayJoin == true}" type="button" id="join" name="join" value="join"/> 
-          <input type="button" id="Delete" name="Delete" value="Delete"/>
+          <h1 th:text="${event.title}">WATCH MOVIE GRAVITY</h1>    <input th:if="${displayJoin == true}" type="button" id="join" name="join" value="join"/> 
+          <input th:if="${displayDelete == true}" type="button" id="Delete" name="Delete" value="Delete"/>
           <div id="rightbox">    8 yorum
             <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
@@ -123,51 +124,56 @@
                  
           </div>
           <!-- We do not have the description in our App yet. -->
-<p th:text="${event.description}">In product Help provides access to all documentation and instructional content available at the time the software ships. It is available through the Help menu in your Adobe software.</p>
-<p>Created By: <span th:text="${event.authorName}"></span></p>
-        <div class="style1" th:text="${#dates.format(event.startTime, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
-      <div class="style2"><span th:text="${#dates.format(event.startTime, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endTime, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
+				<p th:text="${event.description}">In product Help.</p>
+				<p>Created By: <span th:text="${event.authorFullName}"></span></p>
+        		<div class="style1" th:text="${#dates.format(event.startDate, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
+      			<div class="style2">
+      				<span th:text="${#dates.format(event.startDate, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; 
+      				<span th:text="${#dates.format(event.endDate, 'HH:mm a')}">8:30am</span> 
+      					<span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span>
+      				</div>
       <!-- <div class="style1">7:00pm  &rarr; 8:00pm (PST) </div> -->
          <h2><span class="subhead" th:text="${event.formattedAddress}">Ponderosa Park, Sunnyvale,CA  </span><a href="#">(View Map)</a></h2>
     </div>
 
     </div>
  
-   <div id="eventrec" th:each="u : ${event.facebookPosts}">
+   <div id="eventrec" th:each="u : ${event.appComments}">
      <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <div class="name" th:text="${u.from.name}">Katie Milburn</div>
-<div class="subname" th:text="${u.message}">I’m Game</div>
-<div class="daytime" th:text="${#dates.format(u.createdTime, 'EEEE dd, MMMM yyyy')}">Friday at 4:31pm</div>
+          		<div class="name" th:text="${u.fromAuthorName}">Katie Milburn</div>
+				<div class="subname" th:text="${u.message}">I’m Game</div>
+				<!--<div class="daytime" th:text="${#dates.format(u.createdTime, 'EEEE dd, MMMM yyyy')}">Friday at 4:31pm</div>-->
           </div>
     
      <!--end heading -->
     </div>
 
     </div>
-  <div id="eventrec" th:each="appPosts : ${comments}">
+  <!--<div id="eventrec" th:each="appPosts : ${comments}">
      <div id="image"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" /></div>
   
      <div id="innerbox">
-          <!--start heading -->
+    
           <div id="heading">
           <div class="name" th:text="${appPosts.from.name}">Katie Milburn</div>
 <div class="subname" th:text="${appPosts.message}">I’m Game</div>
 <div class="daytime" th:text="${#dates.format(appPosts.createdTime, 'EEEE dd, MMMM yyyy')}">Friday at 4:31pm</div>
           </div>
     
-     <!--end heading -->
+    
     </div>
 
-    </div>
+    </div>-->
         
   <div id="formbox">
      
   <form id="event_details" action="" method="get">
   <input type="hidden" name="username" id="username"  th:value="${authname}"  />
+  <input type="hidden" name="userType" id="userType"  th:value="${userType}"  />
    <input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
  <div class="inner_form1">
 					<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>

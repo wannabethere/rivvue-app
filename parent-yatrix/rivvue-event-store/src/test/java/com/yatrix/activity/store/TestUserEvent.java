@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.yatrix.activity.store.config.MongoConfig;
 import com.yatrix.activity.store.exception.ActivityDBException;
 import com.yatrix.activity.store.mongo.domain.Comment;
+import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Venue;
 import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
@@ -50,7 +51,7 @@ public class TestUserEvent {
 	public void setUp() throws Exception {
 		//ApplicationContext context = new ClassPathXmlApplicationContext("spring-data.xml");
 		//MongoTemplate test=(MongoTemplate)context.getBean("mongoTemplate");
-		mongoTemplate.dropCollection("UserEvents2");
+		
 		
 	}
 
@@ -60,7 +61,7 @@ public class TestUserEvent {
 	 */
 	@Test
 	public void testCreateEvent() throws ActivityDBException {
-		
+		mongoTemplate.dropCollection("UserEvents2");
 		UserEvent eventCreated=service.createUserEvent(this.createEvent(0));
 		System.out.println(eventCreated);
 	}
@@ -105,6 +106,7 @@ public class TestUserEvent {
 		p.setInviteeName("Sameer");
 		p.setUserId("12121");
 		p.setLupd(System.currentTimeMillis());
+		
 		eventCreated=service.updateUserEventMessage(p, eventCreated.getId(), "I am testing pushing Messages");
 		System.out.println("Event Message: "+ eventCreated.getAppComments());
 		System.out.println("Event Message: " + eventCreated);	
@@ -126,8 +128,24 @@ public class TestUserEvent {
 		System.out.println("TIS Event Message: " + eventCreated1);
 		System.out.println("Invited Activities" + service.getInvitedActivities("12121"));
 		
+	}
+	
+	
+	@Test
+	public void testMyActivities() throws ActivityDBException{
+		UserEvent eventCreated=service.createUserEvent(this.createEvent(0));
+		System.out.println("TIS Event Message: " + eventCreated.getInvitedIds());
+		eventCreated=service.updateUserEventStatus(this.createParticipant("12121", "Sameer 2", "", "FB"), eventCreated.getId());
+		System.out.println("TIS Event Message: "+ eventCreated.getInvitedIds());
+		System.out.println("TIS Event Message: " + eventCreated);
 		
+		UserEvent eventCreated1=service.createUserEvent(this.createEvent(1));
+		System.out.println("TIS Event Message: " + eventCreated1.getInvitedIds());
+		eventCreated1=service.updateUserEventStatus(this.createParticipant("12121", "Sameer 2", "", "FB"), eventCreated1.getId());
 		
+		System.out.println("TIS Event Message: "+ eventCreated1.getInvitedIds());
+		System.out.println("TIS Event Message: " + eventCreated1);
+		System.out.println("All My  Activities invited and originated" + service.getMyActivities("12121"));
 		
 	}
 	
@@ -146,6 +164,22 @@ public class TestUserEvent {
 	
 	
 	@Test
+	public void testPublicActivities() throws ActivityDBException{
+		UserEvent eventCreated=service.createUserEvent(this.createEvent(0));
+		System.out.println("TIS Event Message: " + eventCreated.getInvitedIds());
+		eventCreated=service.updateUserEventStatus(this.createParticipant("12121", "Sameer 2", "", "FB"), eventCreated.getId());
+		System.out.println("Invited Activities: " + service.getInvitedActivities("12121"));
+		System.out.println("Invited Activities: " + service.getInvitedActivities("12121").size());
+		eventCreated=service.updateUserEventStatus(this.createParticipant("12121", "Sameer 2", "DECLINED", "FB"), eventCreated.getId());
+		System.out.println("Invited Activities: " + service.getInvitedActivities("12121"));
+		System.out.println("Invited Activities: " + service.getInvitedActivities("12121").size());
+		System.out.println("Test Public Activities");
+		System.out.println(service.getActivitiesByState("CA"));
+		
+	}
+	
+	
+	@Test
 	public void testDeclineActivity() throws ActivityDBException{
 		UserEvent eventCreated=service.createUserEvent(this.createEvent(0));
 		System.out.println("TIS Event Message: " + eventCreated.getInvitedIds());
@@ -156,6 +190,9 @@ public class TestUserEvent {
 		System.out.println("Invited Activities: " + service.getInvitedActivities("12121"));
 		System.out.println("Invited Activities: " + service.getInvitedActivities("12121").size());
 	}
+	
+	
+	
 	
 	
 	
@@ -225,8 +262,8 @@ public class TestUserEvent {
 	}
 	
 	private Venue createLocation(String formattedAddress,String location, String place, double[] latlng){
-		Venue loc= new Venue(place,formattedAddress, latlng);
-		loc.setLocation(location);
+		Venue loc= new Venue(place+" CA",formattedAddress+ " CA", latlng);
+		loc.setLocation(location+ " CA");
 		loc.setTags(Arrays.asList(new String[]{"dum1","dum2"}));
 		return loc;
 	}
@@ -268,6 +305,8 @@ public class TestUserEvent {
 		userEvent.addComment(this.createComment(p, p.getStatus().getMessage()));
 		userEvent.setOriginatorUserId("2123123123");
 		userEvent.setLupd(System.currentTimeMillis());
+		userEvent.setVisibility(VISIBILITY.PUBLIC);
+		
 		System.out.println(userEvent);
 		return userEvent;
 	}

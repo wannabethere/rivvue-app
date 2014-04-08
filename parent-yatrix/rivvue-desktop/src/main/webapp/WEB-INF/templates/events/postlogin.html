@@ -26,7 +26,7 @@
    <div class="event1">
    <div class="createevent"><a href="#" th:href="@{/calendarevent/}"><img src="./../../resources/images/createevent.png" th:src="@{/resources/images/createevent.png}"  alt="" /></a></div>
      <div class="myevent"><a href="#" th:href="@{'/myactivities/'+${authname} + '/invitedevents'}">Invited Events</a></div>
-   <div class="allevent"><a th:href="@{'/calendarevents/publicevents?state=CA'}"><img src="./../../resources/images/allevent.png" th:src="@{/resources/images/allevent.png}"  alt="" /></a></div>
+   <div class="allevent"><a th:href="@{'/myactivities/publicevents?state=CA'}"><img src="./../../resources/images/allevent.png" th:src="@{/resources/images/allevent.png}"  alt="" /></a></div>
  
    </div>
    <div class=" clear"></div>
@@ -39,7 +39,7 @@
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
-          <a th:href="@{'/app/' + ${authname} + '/event/' + ${event.id}}"><h1 th:text="${event.message}">RUNNING</h1></a>
+          <a th:href="@{'/myactivities/' + ${authname} + '/event/' + ${event.id}}"><h1 th:text="${event.message}">RUNNING</h1></a>
           <div id="rightbox"><span class="imdb">IMDB RATING 8.6</span>
           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />

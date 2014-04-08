@@ -144,6 +144,7 @@ public class UserEventsService {
 		if(existingEvent==null){
 			throw new ActivityDBException("Failed to find the original event so nothing to update");
 		}
+		
 		existingEvent.addComment(this.createComment(p, message));
 		return userEventRepository.save(existingEvent);
 	}
@@ -165,14 +166,14 @@ public class UserEventsService {
 	
 	private List<UserEvent> getStatusActivitiesForUser(String userId, RSVPSTATUS status, boolean allEvents){
 		Criteria findUsersInvited;
-		Criteria eventCriteria= Criteria.where("deleted").is(false);
+		//Criteria eventCriteria= Criteria.where("deleted").is(false);
 		if(!allEvents){
-			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").is(userId).and("status").is(status.toString()));
+			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").is(userId).and("status").is(status.toString())).and("deleted").is(false);
 		}
 		else{
-			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").is(userId));
+			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").is(userId)).and("deleted").is(false);
 		}
-		BasicQuery query = new BasicQuery( eventCriteria.getCriteriaObject(),findUsersInvited.getCriteriaObject());
+		BasicQuery query = new BasicQuery( findUsersInvited.getCriteriaObject());
 		List<UserEvent> allEventsList= mongoTemplate.find(query, UserEvent.class);
 		return allEventsList;
 	}
@@ -190,13 +191,8 @@ public class UserEventsService {
 		if(myCreatedEvents!=null && myCreatedEvents.size()>0){
 			allEvents.addAll(myCreatedEvents);
 		}
-		List<UserEvent> activeEvents= new ArrayList<UserEvent>();
-		for(UserEvent event:allEvents){
-			if(!event.isDeleted()){
-				activeEvents.add(event);
-			}
-		}
-		return activeEvents;
+		
+		return allEvents;
 	}
 	
 	
@@ -278,8 +274,11 @@ public class UserEventsService {
 	}
 	
 	public List<UserEvent> getActivitiesByState(String state){
-		Query q = query(where("location.location").regex(", " + state + ",").and("visibility").is(VISIBILITY.PUBLIC.toString()).and("deleted").is(false));
-		return mongoTemplate.find(q, UserEvent.class);	
+		//Criteria eventCriteria=Criteria.where("visibility").is(VISIBILITY.PUBLIC.toString()).and("deleted").is(false);
+		Criteria locationCriteria = Criteria.where("location.location").regex(state).and("visibility").is(VISIBILITY.PUBLIC.toString()).and("deleted").is(false);
+		BasicQuery query = new BasicQuery(locationCriteria.getCriteriaObject());
+		List<UserEvent> events =mongoTemplate.find(query, UserEvent.class);
+		return events;	
 	}
 	
 	/**
@@ -328,22 +327,29 @@ public class UserEventsService {
 	
 	
 	private Comment createComment(Participant p, String message){
-		
-		String messageForEvent = "";
-		if(p.getStatus().equals(RSVPSTATUS.ATTENDING)){
-			messageForEvent=p.getInviteeName()  + " is joining you.";
-		}
-		else if(p.getStatus().equals(RSVPSTATUS.DECLINED)){
-			messageForEvent=p.getInviteeName()  + " is going to miss the event.";
-		}
-		else if(p.getStatus().equals(RSVPSTATUS.MAYBE)){
-			messageForEvent=p.getInviteeName()  + " is not sure about coming to the event.";
+		String messageForEvent = "Dummy Message";
+		if(p.getStatus()!=null){
+			if(p.getStatus().equals(RSVPSTATUS.ATTENDING)){
+				messageForEvent=p.getInviteeName()  + " is joining you.";
+			}
+			else if(p.getStatus().equals(RSVPSTATUS.DECLINED)){
+				messageForEvent=p.getInviteeName()  + " is going to miss the event.";
+			}
+			else if(p.getStatus().equals(RSVPSTATUS.MAYBE)){
+				messageForEvent=p.getInviteeName()  + " is not sure about coming to the event.";
+			}
+			else{
+				messageForEvent=p.getInviteeName()  + " has been invited.";
+			}
+			if(!StringUtils.isEmpty(message)){
+				messageForEvent=message;
+			}
 		}
 		else{
-			messageForEvent=p.getInviteeName()  + " has been invited.";
-		}
-		if(!StringUtils.isEmpty(message)){
-			messageForEvent=message;
+			if(!StringUtils.isEmpty(message)){
+				messageForEvent=message;
+			}
+			
 		}
 		Comment comment=new Comment(messageForEvent, System.currentTimeMillis(), p);
 		return comment;

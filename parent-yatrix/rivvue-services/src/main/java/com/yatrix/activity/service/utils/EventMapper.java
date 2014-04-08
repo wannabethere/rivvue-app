@@ -204,7 +204,8 @@ public class EventMapper {
 		userActivity.setEndTime(endTime.getTime());
 		Comment comment= new Comment();
 		comment.setFromId(event.getFrom());
-		comment.setFromAuthorName(profileService.getByUserId(event.getFrom()).getName());
+		UserProfile pf=profileService.getByUserId(event.getFrom());
+		comment.setFromAuthorName(pf.getFirstName() + " "+ pf.getLastName());
 		comment.setMessage(event.getMessage());
 		//TODO MAKE IT MORE ROBUST
 		//comment.addCommentSync("appCommentID1", COMMENTTYPE.APP,System.currentTimeMillis());
@@ -307,9 +308,12 @@ public class EventMapper {
 			invitees.add(new Invitees(s.getUserId(), s.getInviteeName(), s.getStatus().toString(), s.getUserType().toString()));
 			index++;
 		}
+		 
 		dto.setFacebookAccepted(facebookInvitees);
 		dto.setRsvpStatusses(invitees);
 		dto.setTo(temp.toString());
+		dto.setAppComments(event.getAppComments());
+		
 		return dto;
 	}
 	

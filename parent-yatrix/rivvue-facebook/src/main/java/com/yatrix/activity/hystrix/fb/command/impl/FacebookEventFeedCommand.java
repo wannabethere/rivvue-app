@@ -11,6 +11,7 @@ import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
@@ -43,9 +44,10 @@ public class FacebookEventFeedCommand extends HystrixCommand<HystrixSocialResult
 	UserEvent userEvent;
 	String username;
 	Comment comment;
+	String fbId;
 
 
-	public FacebookEventFeedCommand(String pEventId, String pUserId,Comment pComment) {
+	public FacebookEventFeedCommand(String pEventId, String pUserId,String fbUserId,Comment pComment) {
 		// Set to one minute
 		super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("com.yatrix.activity"))
 				.andCommandKey(HystrixCommandKey.Factory.asKey("FacebookCommand"))
@@ -58,10 +60,11 @@ public class FacebookEventFeedCommand extends HystrixCommand<HystrixSocialResult
 		userActivityId = pEventId;
 		username = pUserId;
 		comment=pComment;
+		fbId=fbUserId;
 		
 	}
 	
-	public FacebookEventFeedCommand(UserEvent pUserActivity, String pUserId,Comment pComment) {
+	public FacebookEventFeedCommand(UserEvent pUserActivity, String pUserId,String fbUserId,Comment pComment) {
 		// Set to one minute
 		super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("com.yatrix.activity"))
 				.andCommandKey(HystrixCommandKey.Factory.asKey("FacebookCommand"))
@@ -74,7 +77,7 @@ public class FacebookEventFeedCommand extends HystrixCommand<HystrixSocialResult
 		userEvent = pUserActivity;
 		username = pUserId;
 		comment=pComment;
-		
+		fbId=fbUserId;
 	}
 	
 	public void setUserSocialConnectionService(
@@ -102,18 +105,19 @@ public class FacebookEventFeedCommand extends HystrixCommand<HystrixSocialResult
 			userEvent = eventsService.getActivity(userActivityId);
 		}
 
-		String providerId = connectionFactoryLocator.getConnectionFactory(Facebook.class)
-				.getProviderId();
-		UserSocialConnection connection = userSocialConnectionService.getSocialConnection(username, providerId);
-		//String userName = userActivity.getOriginatorUserId();
-		if(connection == null){
-			// User does not have facebook connection.
-			return new HystrixSocialResult(Boolean.FALSE, null, "User does not have facebook connection!");
+		if(!StringUtils.isEmpty(fbId)){
+			//If Facebook Id is found. Then make a call.
+			String providerId = connectionFactoryLocator.getConnectionFactory(Facebook.class)
+			.getProviderId();
+			UserSocialConnection connection = userSocialConnectionService.getSocialConnection(fbId, providerId);
+			//String userName = userActivity.getOriginatorUserId();
+			if(connection == null){
+				// User does not have facebook connection.
+				return new HystrixSocialResult(Boolean.FALSE, null, "User does not have facebook connection!");
+			}
+			FacebookEventService fbService=new FacebookEventService(connection.getAccessToken());
+			userEvent = fbService.postComment(userEvent, comment);
 		}
-		FacebookEventService fbService=new FacebookEventService(connection.getAccessToken());
-		//getFeed(userActivity.getFacebookEventId())
-		
-		userEvent = fbService.postComment(userEvent, comment);
 		//Saving the update back to db.
 		eventsService.updateUserEvent(userEvent);
 		return new HystrixSocialResult(Boolean.TRUE, userEvent.getFacebookFeedId(), "Event feed post successful!");
