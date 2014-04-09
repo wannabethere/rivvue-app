@@ -196,17 +196,17 @@ public class FacebookEventService {
 		switch(p.getStatus()){
 		case ATTENDING:{
 				url="attending";
-				parameter=Parameter.with("","");
+				parameter=Parameter.with("NULLPARAM","");
 				break;
 			}
 		case DECLINED:{
 				url="declined";
-				parameter=Parameter.with("","");
+				parameter=Parameter.with("NULLPARAM","");
 				break;
 			}
 		case MAYBE:{
 				url="maybe";
-				parameter=Parameter.with("","");
+				parameter=Parameter.with("NULLPARAM","");
 				break;
 			}
 		default:{
