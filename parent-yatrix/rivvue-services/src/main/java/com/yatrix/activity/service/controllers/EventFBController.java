@@ -122,10 +122,12 @@ public class EventFBController {
 			event.setDisplayName(event.getOriginatorUserId()); 
 			model.put("userType","APP" );
 		}
+		
+		// Current User is owner of the event? If Yes, display delete button.
 		if(event.getOriginatorUserId().equalsIgnoreCase(userid)  ){
 			displayDeleteButton = true;
-		}
-		if(!alreadyInvited(userid, event, model)){
+		} else if(alreadyInvited(userid, event, model)){
+			// Current user is invited to event. So display Accept, Reject and May be event.
 			isInviteeToEvent = true;
 		}
 		
@@ -463,6 +465,7 @@ public class EventFBController {
 		System.out.println("Event: " + event);
 		String checkUserId = StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getFacebookId():userId;
 		for(Participant facebookAccepted : event.getInvitedIds()){
+			System.out.println(facebookAccepted.getUserId() + " : " + checkUserId);
 			if(checkUserId.equalsIgnoreCase(facebookAccepted.getUserId())){
 				if(facebookAccepted.getStatus().equals(RSVPSTATUS.ATTENDING)){
 					model.addAttribute("eventStatusMessage","You are attending");
