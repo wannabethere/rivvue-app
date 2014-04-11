@@ -1,16 +1,17 @@
 package com.yatrix.activity.ext.domain.facebook;
 
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserEvent;
 
 
 
 public class FacebookSyncupSocialResult {
 	
 	private Boolean success;
-	private UserActivity event;
+	private UserEvent event;
 	private String message;
 	
-	public FacebookSyncupSocialResult(Boolean success, UserActivity event, String message) {
+	public FacebookSyncupSocialResult(Boolean success, UserEvent event, String message) {
 		this.success = success;
 		this.event = event;
 		this.message = message;
@@ -24,11 +25,11 @@ public class FacebookSyncupSocialResult {
 		this.success = success;
 	}
 	
-	public UserActivity getEvent() {
+	public UserEvent getEvent() {
 		return event;
 	}
 	
-	public void setEvent(UserActivity event) {
+	public void setEvent(UserEvent event) {
 		this.event = event;
 	}
 	

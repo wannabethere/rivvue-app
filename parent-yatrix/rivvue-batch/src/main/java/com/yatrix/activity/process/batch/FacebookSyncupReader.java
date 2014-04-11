@@ -7,16 +7,18 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.yatrix.activity.store.mongo.domain.UserActivity;
-import com.yatrix.activity.store.mongo.domain.UserActivity.EVENT_STATUS;
-import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
+import com.yatrix.activity.store.mongo.domain.UserEvent;
+import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 
 @Service(value="facebookSyncupReader")
-public class FacebookSyncupReader extends AbstractPagingItemReader<UserActivity> 
+public class FacebookSyncupReader extends AbstractPagingItemReader<UserEvent> 
 implements InitializingBean {
 
+//	@Autowired
+//	private IUserActivityCatalogService userActivityCatalogService;
+	
 	@Autowired
-	private IUserActivityCatalogService userActivityCatalogService;
+	private UserEventsService eventService;
 	
 	public FacebookSyncupReader(){
 		super();
@@ -26,14 +28,14 @@ implements InitializingBean {
 	@Override
 	protected void doReadPage() {
 		if (results == null) {
-			results = new CopyOnWriteArrayList<UserActivity>();
+			results = new CopyOnWriteArrayList<UserEvent>();
 		}
 		else {
 			results.clear();
 		}
 		System.out.println("Records From: " + ((getPage() * getPageSize())+ 1 ));
 
-		results.addAll(userActivityCatalogService.findActivies(EVENT_STATUS.INVITED, (getPage() * getPageSize()), getPageSize()));
+		results.addAll(eventService.getUserEvents((getPage() * getPageSize()), getPageSize()));
 
 		
 	}

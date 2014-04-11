@@ -9,16 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+
 import com.yatrix.activity.ext.domain.facebook.FacebookSyncupSocialResult;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
+import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 
 @Service("facebookSyncupWriter")
 public  class FacebookSyncupWriter implements ItemWriter<FacebookSyncupSocialResult> {
 
 	private static final Log log = LogFactory.getLog(FacebookSyncupWriter.class);
 	
+//	@Autowired
+//	IUserActivityCatalogService catalogService;
+	
 	@Autowired
-	IUserActivityCatalogService catalogService;
+	UserEventsService eventService;
 	
 	/**
 	 * @see ItemWriter#write(java.util.List)
@@ -27,7 +32,7 @@ public  class FacebookSyncupWriter implements ItemWriter<FacebookSyncupSocialRes
 		log.debug(data);
 		for(FacebookSyncupSocialResult socialResult : data){
 			if(socialResult.isSuccess()){
-				catalogService.updateActivity(socialResult.getEvent());
+				eventService.updateUserEvent(socialResult.getEvent());
 			}
 		}
 	}

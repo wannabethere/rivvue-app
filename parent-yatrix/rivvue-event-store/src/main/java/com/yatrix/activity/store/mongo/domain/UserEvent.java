@@ -1,15 +1,10 @@
 package com.yatrix.activity.store.mongo.domain;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.yatrix.activity.store.fb.domain.FacebookInvitee;
-import com.yatrix.activity.store.fb.domain.FacebookPost;
 import com.yatrix.activity.store.mongo.domain.Message.STATUS;
 import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;

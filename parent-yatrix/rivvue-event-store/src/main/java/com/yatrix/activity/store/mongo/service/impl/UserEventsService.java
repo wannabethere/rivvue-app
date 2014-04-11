@@ -347,6 +347,23 @@ public class UserEventsService {
 		return null;
 	}
 	
+	/**
+	 * Paged list to be used by syncup command.
+	 * @return
+	 */
+	public List<UserEvent> getUserEvents(int skip, int limit){
+		
+		Criteria eventCriteria = Criteria.where("deleted").is(false);
+		
+		
+		BasicQuery query = new BasicQuery( eventCriteria.getCriteriaObject());
+		query.skip(skip);
+		query.limit(limit);
+		
+		return mongoTemplate.find(query, UserEvent.class);
+	}
+
+	
 	
 	private void mergeEvents(UserEvent oldEvent, UserEvent newEvent){
 		

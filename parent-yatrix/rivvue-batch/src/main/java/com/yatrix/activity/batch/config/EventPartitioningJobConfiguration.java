@@ -28,9 +28,9 @@ import com.yatrix.activity.process.batch.UserActivityProcessor;
 import com.yatrix.activity.batch.listener.LogProcessListener;
 import com.yatrix.activity.batch.listener.ProtocolListener;
 import com.yatrix.activity.ext.domain.facebook.FacebookSyncupSocialResult;
-
 import com.yatrix.activity.store.mongo.domain.ActivityAndUserToEvents;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 
 /**
@@ -71,7 +71,7 @@ public class EventPartitioningJobConfiguration {
 	
 	@Autowired
 	@Qualifier(value="facebookSyncupReader")
-	private ItemReader<UserActivity> facebookSyncupReader;
+	private ItemReader<UserEvent> facebookSyncupReader;
 	
 	@Autowired
 	@Qualifier("facebookSyncupWriter")
@@ -125,7 +125,7 @@ public class EventPartitioningJobConfiguration {
 	@Bean
 	public Step facebookSyncupStep(){
 		return stepBuilders.get("facebookSyncupStep")
-				.<UserActivity, FacebookSyncupSocialResult>chunk(1)
+				.<UserEvent, FacebookSyncupSocialResult>chunk(1)
 				.reader(facebookSyncupReader)
 				.processor(facebookSyncupProcessor())
 				.writer(facebookSyncupWriter)
@@ -139,7 +139,7 @@ public class EventPartitioningJobConfiguration {
 	}
 	
 	@Bean
-	public ItemProcessor<UserActivity, FacebookSyncupSocialResult> facebookSyncupProcessor(){
+	public ItemProcessor<UserEvent, FacebookSyncupSocialResult> facebookSyncupProcessor(){
 		return new FacebookSyncupProcessor();
 	}
 	

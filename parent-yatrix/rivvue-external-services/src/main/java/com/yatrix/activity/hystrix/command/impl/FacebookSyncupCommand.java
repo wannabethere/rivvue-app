@@ -31,8 +31,10 @@ import com.yatrix.activity.store.fb.domain.FacebookReference;
 import com.yatrix.activity.store.fb.domain.FacebookInvitee.FacebookRsvpStatus;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.repository.ConnectionService;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
+import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 
 @Service
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.INTERFACES)
@@ -43,9 +45,12 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 	@Autowired
 	ConnectionService userSocialConnectionService;
 
-	@Autowired
-	IUserActivityCatalogService userActivityCatalogService;
+//	@Autowired
+//	IUserActivityCatalogService userActivityCatalogService;
 
+	@Autowired
+	UserEventsService eventService;
+	
 	@Autowired
 	ConnectionFactoryLocator connectionFactoryLocator;
 
@@ -68,10 +73,10 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 		.info("* * * * * * * * * * * * * * * * * Running Facebook Command * * * * * * * * * * * * * * * * *");
 
 		if(userActivity == null){
-			userActivity = userActivityCatalogService.findActivity(userActivityId);
+			userActivity = eventService.getActivity(userActivityId);
 		}
 
-		logger.info("Syncing up: " + userActivity.getMessageposted().getMessage());
+		logger.info("Syncing up: " + userActivity.getTitle());
 
 		String providerId = connectionFactoryLocator.getConnectionFactory(Facebook.class)
 				.getProviderId();
@@ -87,12 +92,12 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 
 		PagedList<Post> comments = facebook.feedOperations().getFeed(userActivity.getFacebookEventId());
 
-		userActivity.setFacebookAccepted(processUsers(attending, FacebookInvitee.FacebookRsvpStatus.ATTENDING));
-		userActivity.setFacebookRejected(processUsers(declined, FacebookInvitee.FacebookRsvpStatus.DECLINED));
-		userActivity.setFacebookUnsure(processUsers(maybeAttending, FacebookInvitee.FacebookRsvpStatus.UNSURE));
-
-		userActivity.setFacebookPosts(processFeeds(comments));
-
+//		userActivity.setFacebookAccepted(processUsers(attending, FacebookInvitee.FacebookRsvpStatus.ATTENDING));
+//		userActivity.setFacebookRejected(processUsers(declined, FacebookInvitee.FacebookRsvpStatus.DECLINED));
+//		userActivity.setFacebookUnsure(processUsers(maybeAttending, FacebookInvitee.FacebookRsvpStatus.UNSURE));
+//
+//		userActivity.setFacebookPosts(processFeeds(comments));
+//
 		return new FacebookSyncupSocialResult(Boolean.TRUE, userActivity, "Event Synced up successfully!");
 	}
 
@@ -157,7 +162,7 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 
 	@Override
 	public Future<FacebookSyncupSocialResult> executeFacebookSyncupCommand(
-			UserActivity pUserActivity) {
+			UserEvent pUserActivity) {
 		userActivity = pUserActivity;
 
 		return this.queue();
@@ -178,7 +183,7 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 
 	Facebook facebook;
 
-	UserActivity userActivity;
+	UserEvent userActivity;
 
 
 }

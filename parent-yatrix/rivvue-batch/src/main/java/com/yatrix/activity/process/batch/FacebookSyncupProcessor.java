@@ -7,19 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 
+
 import com.yatrix.activity.ext.domain.facebook.FacebookSyncupSocialResult;
 import com.yatrix.activity.hystrix.command.IFacebookSyncupCommand;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserEvent;
 
 
-public class FacebookSyncupProcessor implements ItemProcessor<UserActivity, FacebookSyncupSocialResult> {
+public class FacebookSyncupProcessor implements ItemProcessor<UserEvent, FacebookSyncupSocialResult> {
 
 	private static final Log log = LogFactory.getLog(FacebookSyncupProcessor.class);
 	
 	@Autowired
 	private IFacebookSyncupCommand facebookSyncupCommand;
 	
-	public FacebookSyncupSocialResult process(UserActivity item) throws Exception {
+	public FacebookSyncupSocialResult process(UserEvent item) throws Exception {
 
 		log.info(item);
 		System.out.println("Processing Item: " + item);
