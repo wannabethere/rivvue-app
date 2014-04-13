@@ -48,10 +48,10 @@ import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
 import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 @Controller
 @RequestMapping("/rest/myactivities")
-public class RestfEventFBController {
+public class RestEventFBController {
 
 
-	private static final Logger logger = LoggerFactory.getLogger(RestfEventFBController.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestEventFBController.class);
 	// Create an instance of SimpleDateFormat used for formatting 
 	// the string representation of date (month/day/year)
 	private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
