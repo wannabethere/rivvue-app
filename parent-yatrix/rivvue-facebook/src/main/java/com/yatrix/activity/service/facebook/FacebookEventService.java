@@ -23,7 +23,6 @@ import com.yatrix.activity.store.mongo.domain.Comment;
 import com.yatrix.activity.store.mongo.domain.Comment.COMMENTTYPE;
 import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant;
-import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 
@@ -104,7 +103,9 @@ public class FacebookEventService {
 	    		}
 	    		if(!fbAlreadySynced){
 	    			
-	    			FacebookType publishUpdateCommentRespone=facebookClient.publish("/"+event.getFacebookEventId()+"/feed", FacebookType.class, 
+	    			//TODO: All comments will be published to FB on sameuser with the FacebookEventService is created.
+	    			// Create a facebookClient from the  Comment.getUserId().
+	    			FacebookType publishUpdateCommentRespone = facebookClient.publish("/"+event.getFacebookEventId()+"/feed", FacebookType.class, 
 	    					Parameter.with("message", comment.getMessage()));
 	    			comment.addCommentSync(publishUpdateCommentRespone.getId(), COMMENTTYPE.FB, System.currentTimeMillis());
 	    			event.updateComment(originalComment, comment);

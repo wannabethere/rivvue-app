@@ -1,13 +1,15 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header">
 <meta charset='utf-8' />
-<link href='./resources/css/fullcalendar.css' th:href="@{./../resources/css/fullcalendar.css}" rel='stylesheet' />
-<link href='./resources/css/fullcalendar.print.css'  th:href="@{./../resources/css/fullcalendar.print.css}" rel='stylesheet' media='print' />
-<link href="./resources/css/stylesheet.css" rel="stylesheet" type="text/css" th:href="@{./../resources/css/stylesheet.css}"/>
-<script type="text/javascript"  th:src ="@{./../resources/lib/jquery.min.js}" th:href="@{./../resources/js/jquery.min.js}"></script>
-<script type="text/javascript"  th:src ="@{./../resources/lib/moment.min.js}" th:href="@{./../resources/lib/moment.min.js}"></script>
-<script type="text/javascript"  th:src ="@{./../resources/lib/jquery-ui.custom.min.js}" th:href="@{./../resources/lib/jquery-ui.custom.min.js}"></script>
-<script type="text/javascript"  th:src ="@{./../resources/js/fullcalendar.min.js}" th:href="@{./../resources/js/fullcalendar.min.js}"></script>
+<link href='./resources/css/fullcalendar.css' th:href="@{/resources/css/fullcalendar.css}" rel='stylesheet' />
+<link href='./resources/css/fullcalendar.print.css' th:href="@{/resources/css/fullcalendar.print.css}" rel='stylesheet'	media='print' />
+<link href="./resources/css/stylesheet.css" rel="stylesheet" type="text/css" th:href="@{/resources/css/stylesheet.css}" />
+<script type="text/javascript" th:src="@{/resources/lib/jquery.min.js}" th:href="@{/resources/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/lib/moment.min.js}"	th:href="@{/resources/lib/moment.min.js}"></script>
+<script type="text/javascript"	th:src="@{/resources/lib/jquery-ui.custom.min.js}" th:href="@{/resources/lib/jquery-ui.custom.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/js/fullcalendar.min.js}" th:href="@{/resources/js/fullcalendar.min.js}"></script>
 <script>
 
 	$(document).ready(function() {
@@ -25,7 +27,7 @@
 			};
 			
 			// store the Event Object in the DOM element so we can get to it later
-			$(this).data('eventObject', eventObject);
+			$(this).data('eventObject', 'events: [{id:40,title:"test four",services:"Reflexology (40), foot-soak",start:"Mon Apr 21 2014 13:00:00",end:"Mon Apr 21 2014 13:40:00",color:"#e56b15",customerId:21,phone:"555-0404",email:"test4",notes:"test two of update. this sentence added at update.",seat:"Side Couch 9",vip:"yes",confirmed:"yes",knows_policies:"yes",customer_here:0,allDay:false},{id:41,title:"test four",services:"Foot-Soak, ",start:"Wed Mar 27 2013 19:00:00",end:"Wed Mar 27 2013 19:15:00",color:"#e56b15",customerId:21,phone:"555-0404",email:"test4",notes:"test of addslashes. what\'s going to happen?",seat:"Front Chair 2",vip:"yes",confirmed:"yes",knows_policies:"yes",customer_here:0,allDay:false}]');
 			
 			// make the event draggable using jQuery UI
 			$(this).draggable({
@@ -98,81 +100,61 @@
 	}
 </script>
 <style>
+#wrap {
+	width: 1000px;
+	margin: 0 auto;
+}
 
-	
-		
-	#wrap {
-		width: 1100px;
-		margin: 0 auto;
-	}
-		
-	#external-events {
-		float: left;
-		width: 150px;
-		padding: 0 10px;
-		border: 1px solid #ccc;
-		background: #eee;
-		text-align: left;
-	}
-		
-	#external-events h4 {
-		font-size: 16px;
-		margin-top: 0;
-		padding-top: 1em;
-	}
-		
-	.external-event { /* try to mimick the look of a real event */
-		margin: 10px 0;
-		padding: 2px 4px;
-		background: #3366CC;
-		color: #fff;
-		font-size: .85em;
-		cursor: pointer;
-	}
-		
-	#external-events p {
-		margin: 1.5em 0;
-		font-size: 11px;
-		color: #666;
-	}
-		
-	#external-events p input {
-		margin: 0;
-		vertical-align: middle;
-	}
+#external-events {
+	float: left;
+	width: 150px;
+	padding: 0 10px;
+	border: 1px solid #ccc;
+	background: #eee;
+	text-align: left;
+}
 
-	#calendar {
-		float: right;
-		width: 900px;
-	}
+#external-events h4 {
+	font-size: 16px;
+	margin-top: 0;
+	padding-top: 1em;
+}
 
+.external-event { /* try to mimick the look of a real event */
+	margin: 10px 0;
+	padding: 2px 4px;
+	background: #3366CC;
+	color: #fff;
+	font-size: .85em;
+	cursor: pointer;
+}
+
+#external-events p {
+	margin: 1.5em 0;
+	font-size: 11px;
+	color: #666;
+}
+
+#external-events p input {
+	margin: 0;
+	vertical-align: middle;
+}
+
+#calendar {
+	float: right;
+	width: 900px;
+}
 </style>
 </head>
 <body>
-	<header th:include="include :: header">
-	</header>
-	<div class="topmenu" th:include="include :: topmenu"></div>
-	<div id='wrap'>
-		
-		<div id='external-events'>
-			<h4>Draggable Events</h4>
-			<div class='external-event'>My Event 1</div>
-			<div class='external-event'>My Event 2</div>
-			<div class='external-event'>My Event 3</div>
-			<div class='external-event'>My Event 4</div>
-			<div class='external-event'>My Event 5</div>
-			<p>
-				<input type='checkbox' id='drop-remove' />
-				<label for='drop-remove'>remove after drop</label>
-			</p>
-		</div>
-
+	<header th:include="include :: signedHeader"> </header>
+	<div id="content1">
+		<!--topmenu start-->
+		<div class="topmenu" th:include="include :: topmenu"></div>
+	
 		<div id='calendar'></div>
-
-		<div style='clear:both'></div>
-
+		
 	</div>
-	<footer th:include="include :: footer">
-   </footer>
+	<footer th:include="include :: footer"> </footer>
 </body>
 </html>
