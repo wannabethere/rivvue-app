@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
-import com.yatrix.activity.hystrix.fb.command.IFacebookJoinEventCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventCreateCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventFeedCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventJoinCommand;
@@ -33,17 +31,14 @@ import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.EventMapper;
 import com.yatrix.activity.service.utils.UserMapper;
 import com.yatrix.activity.store.exception.ActivityDBException;
-import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.mongo.domain.Comment;
 import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant;
+import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
-import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
-import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
-import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
 import com.yatrix.activity.store.mongo.repository.ConnectionService;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
