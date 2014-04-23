@@ -10,34 +10,13 @@
 <script type="text/javascript" th:src="@{/resources/lib/moment.min.js}"	th:href="@{/resources/lib/moment.min.js}"></script>
 <script type="text/javascript"	th:src="@{/resources/lib/jquery-ui.custom.min.js}" th:href="@{/resources/lib/jquery-ui.custom.min.js}"></script>
 <script type="text/javascript" th:src="@{/resources/js/fullcalendar.min.js}" th:href="@{/resources/js/fullcalendar.min.js}"></script>
-<script>
+<script type="text/javascript" th:inline="javascript" >
+//<![CDATA[
+var myEventsUrl  =  /*[[@{'/rest/myactivities/' + ${authname} }]]*/"/wannabethere/rest/myactivities/user137";
+var eventDetailUrl = /*[[@{'/myactivities/' + ${authname} + '/event/'}]]*/"/wannabethere/myactivities/user138/event/f96c9b43e2d64c3db51b3d0cab0ab738";
+//alert(myEventsUrl);
 
 	$(document).ready(function() {
-	
-	
-		/* initialize the external events
-		-----------------------------------------------------------------*/
-	
-		$('#external-events div.external-event').each(function() {
-		
-			// create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
-			// it doesn't need to have a start or end
-			var eventObject = {
-				title: $.trim($(this).text()) // use the element's text as the event title
-			};
-			
-			// store the Event Object in the DOM element so we can get to it later
-			$(this).data('eventObject', 'events: [{id:40,title:"test four",services:"Reflexology (40), foot-soak",start:"Mon Apr 21 2014 13:00:00",end:"Mon Apr 21 2014 13:40:00",color:"#e56b15",customerId:21,phone:"555-0404",email:"test4",notes:"test two of update. this sentence added at update.",seat:"Side Couch 9",vip:"yes",confirmed:"yes",knows_policies:"yes",customer_here:0,allDay:false},{id:41,title:"test four",services:"Foot-Soak, ",start:"Wed Mar 27 2013 19:00:00",end:"Wed Mar 27 2013 19:15:00",color:"#e56b15",customerId:21,phone:"555-0404",email:"test4",notes:"test of addslashes. what\'s going to happen?",seat:"Front Chair 2",vip:"yes",confirmed:"yes",knows_policies:"yes",customer_here:0,allDay:false}]');
-			
-			// make the event draggable using jQuery UI
-			$(this).draggable({
-				zIndex: 999,
-				revert: true,      // will cause the event to go back to its
-				revertDuration: 0  //  original position after the drag
-			});
-			
-		});
-	
 	
 		/* initialize the calendar
 		-----------------------------------------------------------------*/
@@ -52,8 +31,6 @@
 	var d = date.getDate();
 	var m = date.getMonth();
 	var y = date.getFullYear();
-	
-	alert("Date Format: " + new Date(y, m, d-2));
 	
 	/*
 		Initialize fullCalendar and store into variable.
@@ -110,7 +87,7 @@
 						title: title,
 						start: start,
 						end: end,
-						allDay: allDay
+						allDay: allDay,
 					},
 					true // make the event "stick"
 				);
@@ -128,7 +105,7 @@
 		 events: {
 			 events: function(start, end, timezone, callback) {
 			        $.ajax({
-			            url: '/wannabethere/rest/myactivities/user137',
+			            url: myEventsUrl,
 			            dataType: 'json',
 			           
 			            success: function(eventdata) {
@@ -138,7 +115,8 @@
 			                        title: $(this).attr('title'),
 			                        start: $(this).attr('startDate'), // will be parsed
 			                        end: $(this).attr('endDate'),
-			                        allDay: false
+			                        allDay: false,
+			                        url: eventDetailUrl + $(this).attr('id')
 			                    });
 			                });
 			                callback(events);
@@ -150,7 +128,7 @@
 		
 		
 	});
-
+	//]]>
 </script>
 <script type="text/javascript">
 	function addFriendFn(friendId, srcProfileType) {

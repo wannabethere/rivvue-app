@@ -133,8 +133,10 @@ public class AccessController {
 
 	@RequestMapping("/calendar/{username}")
 	public String calendarView(@PathVariable String username, ModelMap model) {
+		
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
-		model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
+		model.addAttribute("authname", authname);
+		
 		return "calendar";
 	}
 
