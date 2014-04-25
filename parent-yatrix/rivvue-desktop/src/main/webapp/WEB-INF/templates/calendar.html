@@ -104,10 +104,15 @@ var eventDetailUrl = /*[[@{'/myactivities/' + ${authname} + '/event/'}]]*/"/wann
 		*/
 		 events: {
 			 events: function(start, end, timezone, callback) {
+				 //alert(start.unix());
 			        $.ajax({
 			            url: myEventsUrl,
 			            dataType: 'json',
-			           
+			            data: {
+			                // our hypothetical feed requires UNIX timestamps
+			                start: start.unix() * 1000,
+			                end: end.unix() * 1000
+			            },
 			            success: function(eventdata) {
 			                var events = [];
 			                $(eventdata.events).each(function() {

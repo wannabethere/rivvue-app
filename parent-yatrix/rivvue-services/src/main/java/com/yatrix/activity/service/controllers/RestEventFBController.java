@@ -132,13 +132,13 @@ public class RestEventFBController {
 	}
 	
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
-	public @ResponseBody EventsResponse getAllEvents(@PathVariable String userId) {
+	public @ResponseBody EventsResponse getAllEvents(@PathVariable String userId, @RequestParam Long start, @RequestParam Long end) {
 		
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all events for user"+userId);
 		
 		EventsResponse eventsResponse = new EventsResponse();
-		List<UserEvent> events =  eventsService.getMyActivities(userId);
+		List<UserEvent> events =  eventsService.getMyActivities(userId, start, end);
 		List<EventDto> eventList=new ArrayList<EventDto>();
 		
 		for(UserEvent event: events){

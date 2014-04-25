@@ -1,6 +1,7 @@
 package com.yatrix.activity.store.mongo.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.yatrix.activity.store.mongo.domain.Comment;
 import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
+import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.repository.UserEventsRepository;
 
@@ -32,6 +34,9 @@ public class UserEventsService {
 	private ProfileService userProfileService;
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private UserAccountService userAccountService;
 	
 	
 	public UserEvent createUserEvent(UserEvent activity){
@@ -222,9 +227,70 @@ public class UserEventsService {
 		return allEvents;
 	}
 	
+	/**
+	 * Get all the Events that I need to show on my calendar for a month.
+	 * @param userId
+	 * @return
+	 */
+	public List<UserEvent> getMyActivities(String userId, Long start, Long end){
+		List<String> userIds = new ArrayList<String>();
+		userIds.add(userId);
+		
+		// Get invited to FB id even.
+		UserAccount userAccount = userAccountService.getUserAccount(userId);
+		
+		if(userAccount != null && !StringUtils.isEmpty(userAccount.getFacebookId())){
+			userIds.add(userAccount.getFacebookId());
+		}
+		
+		List<UserEvent> allEvents= getStatusActivitiesForUser(userIds, start, end, null,true);
+		List<UserEvent> myCreatedEvents= findByoriginatorUserId(userId, start, end);
+		
+		if(myCreatedEvents!=null && myCreatedEvents.size()>0){
+			allEvents.removeAll(myCreatedEvents);
+			allEvents.addAll(myCreatedEvents);
+		}
+		
+		return allEvents;
+	}
 	
 	
-	
+	private List<UserEvent> findByoriginatorUserId(String userId, Long start,
+			Long end) {
+		
+		Criteria eventCriteria;
+		if(end==null){
+			eventCriteria= Criteria.where("originatorUserId").is(userId).and("startTime").gte(start).and("deleted").is(false);
+		}
+		else{
+			eventCriteria= Criteria.where("originatorUserId").is(userId).and("startTime").gte(start).and("endTime").lte(end).and("deleted").is(false);
+		}
+		BasicQuery query = new BasicQuery( eventCriteria.getCriteriaObject());
+		List<UserEvent> allEventsList= mongoTemplate.find(query, UserEvent.class);
+		
+		return allEventsList;
+	}
+
+
+	private List<UserEvent> getStatusActivitiesForUser(List<String> userIds,
+			Long start, Long end, Object status, boolean allEvents) {
+		
+		Criteria findUsersInvited;
+		//Criteria eventCriteria= Criteria.where("deleted").is(false);
+		if(!allEvents){
+			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").in(userIds).and("status").and("startTime").gte(start).and("endTime").lte(end).is(status.toString())).and("deleted").is(false);
+		}
+		else{
+			findUsersInvited=Criteria.where("invitedIds").elemMatch(Criteria.where("userId").in(userIds)).and("startTime").gte(start).and("endTime").lte(end).and("deleted").is(false);
+		}
+		BasicQuery query = new BasicQuery( findUsersInvited.getCriteriaObject());
+		List<UserEvent> allEventsList= mongoTemplate.find(query, UserEvent.class);
+		
+		return allEventsList;
+		
+	}
+
+
 	public List<UserEvent> getActivitiesCreatedByMe(String userId){
 		List<UserEvent> allEvents= userEventRepository.findByoriginatorUserId(userId);
 		List<UserEvent> activeEvents= new ArrayList<UserEvent>();
