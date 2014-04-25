@@ -232,6 +232,7 @@ public class EventMapper {
 		dto.setAuthorFullName(event.getAuthorName());
 		dto.setDescription(event.getDescription());
 		dto.setSubCategoryId(event.getSubCategory());
+		dto.setTitle(event.getTitle());
 		dto.setStartDate(event.getStartTime());
 		dto.setEndDate(event.getEndTime());
 		dto.setLocation(event.getLocation()); 
@@ -275,6 +276,7 @@ public class EventMapper {
 		dto.setDescription(event.getDescription());
 		dto.setSubCategoryId(event.getSubCategory());
 		dto.setStartDate(new Date(event.getStartTime()));
+		dto.setTitle(event.getTitle());
 		dto.setEndDate(new Date(event.getEndTime()));
 		dto.setLocation(event.getLocation().getLocation()); 
 		dto.setFormattedAddress(event.getLocation().getFormattedAddress());
