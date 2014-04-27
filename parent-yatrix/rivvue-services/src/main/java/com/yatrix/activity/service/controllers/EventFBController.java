@@ -231,7 +231,7 @@ public class EventFBController {
 			
 			model.addAttribute("activityId",event.getId());
 			model.addAttribute("status","Successully Created: ");
-			return "redirect:/calendarevents/"+userid;
+			return "redirect:/myactivities/"+userid;
 	}
 	
 	
