@@ -71,7 +71,7 @@ public class TestUserEvent {
 		fbService.deleteEvent(eventCreated);
 	}
 	
-	@Test
+	
 	public void testCreateEventWithAddUsers() throws ActivityDBException {
 		UserEvent eventCreated=service.createUserEvent(this.createEvent(0));
 		fbService.publishEvent(eventCreated);
@@ -170,7 +170,7 @@ public class TestUserEvent {
 	}
 	
 	
-	@Test
+	
 	public void testAcceptActivity() throws ActivityDBException{
 		UserEvent eventCreated=service.createUserEvent(this.createEvent(0));
 		fbService.publishEvent(eventCreated);

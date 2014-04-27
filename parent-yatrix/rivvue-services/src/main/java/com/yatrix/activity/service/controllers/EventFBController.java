@@ -26,6 +26,7 @@ import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventFeedCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventJoinCommand;
 import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDto;
+import com.yatrix.activity.service.dto.Invitees;
 import com.yatrix.activity.service.dto.ProfileListDto;
 import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.EventMapper;
@@ -75,9 +76,7 @@ public class EventFBController {
 	 * Given useractvityId, search the db and return
 	 * @Param
 	 */
-	@RequestMapping(
-			value = "{userid}/event/{useractivityId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "{userid}/event/{useractivityId}",method = RequestMethod.GET)
 	public String getUserActivity(@PathVariable String userid, @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		Log.info("Auth Name: "+ authname);
@@ -146,6 +145,59 @@ public class EventFBController {
 		return isInviteeToEvent ? "events/events2" :"events/events";
 	}
 	
+	
+	/*
+	 * Given useractvityId, search the db and return
+	 * @Param
+	 */
+	@RequestMapping(value = "{userid}/eventinvitees/{useractivityId}",method = RequestMethod.GET)
+	public @ResponseBody List<Invitees>  getUserEventInvitees(@PathVariable String userid, @PathVariable String useractivityId) throws ActivityDBException {
+		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		Log.info("Auth Name: "+ authname);
+		UserAccount acct=userAccountRepository.getUserAccount(userid);
+		if(acct==null){
+			acct = userAccountService.getUserAccount(authname);
+			if(acct==null){
+				throw new ActivityDBException("Authentication failed");
+			}
+		}
+		UserEvent event = eventsService.getActivity(useractivityId);
+		if (event == null) {
+			ActivityDBException noactivity = new ActivityDBException("no user event found ");
+			throw noactivity;
+		}
+		UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(acct.getFacebookId())?acct.getUserId():acct.getFacebookId());
+		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
+		
+		return EventMapper.getEventInvitees(event, acct, pf, friends);
+	}
+	
+	
+	/*
+	 * Returns the USER ID for Public Search Pages.
+	 * Need to figure what to display.
+	 * @Param
+	 */
+	@RequestMapping(value = "/event/{useractivityId}",method = RequestMethod.GET)
+	public String getPublicUserActivity( @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
+		
+		UserEvent event = eventsService.getActivity(useractivityId);
+		if (event == null) {
+			ActivityDBException noactivity = new ActivityDBException("no user event found ");
+			throw noactivity;
+		}
+		//This is the facebook Id only check. Later we have
+		//model.addAttribute("isInviteeToEvent", isInviteeToEvent);
+		model.addAttribute("event", EventMapper.convertToEventDto(event));
+		return  "events/events2" ;
+	}
+	
+	
+	
+	
+	
+	
+	
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
 	public String  getAllEvents(@PathVariable String userId,ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
@@ -167,6 +219,7 @@ public class EventFBController {
 			Log.info("Auth Name: "+ authname);
 			UserAccount acct=userAccountRepository.getUserAccount(userid);
 			UserEvent event=EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB");
+			
 			event=eventsService.createUserEvent(event);
 			if(!StringUtils.isEmpty(acct.getFacebookId())){
 				FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
@@ -448,6 +501,8 @@ public class EventFBController {
 		return false;
 	}
 	
+	
+	
 	private boolean alreadyInvited(String userId, UserEvent event,ModelMap model){
 		//event.getAcceptedIds().contains(userid)
 		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
@@ -456,11 +511,11 @@ public class EventFBController {
 			userAccount = userAccountService.getUserAccount(userId);
 		}
 
-		System.out.println("User Account: " + userAccount);
-		System.out.println("Event: " + event);
+		logger.debug("User Account: " + userAccount);
+		logger.debug("Event: " + event);
 		String checkUserId = StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getFacebookId():userId;
 		for(Participant facebookAccepted : event.getInvitedIds()){
-			System.out.println(facebookAccepted.getUserId() + " : " + checkUserId);
+			logger.debug(facebookAccepted.getUserId() + " : " + checkUserId);
 			if(checkUserId.equalsIgnoreCase(facebookAccepted.getUserId())){
 				if(facebookAccepted.getStatus().equals(RSVPSTATUS.ATTENDING)){
 					model.addAttribute("eventStatusMessage","You are attending");
@@ -490,5 +545,7 @@ public class EventFBController {
 			return true;
 		}
 	}
+	
+	
 	
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDetailsResponse;
 import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.dto.EventsResponse;
+import com.yatrix.activity.service.dto.Invitees;
 import com.yatrix.activity.service.dto.ProfileListDto;
 import com.yatrix.activity.service.dto.UserDto;
 import com.yatrix.activity.service.utils.EventMapper;
@@ -129,6 +131,58 @@ public class RestEventFBController {
 		eventDetailsResponse.setComments(appCommentsNotPosted);
 		
 		return eventDetailsResponse;
+	}
+	
+	/*
+	 * Returns the USER ID for Public Search Pages.
+	 * Need to figure what to display.
+	 * @Param
+	 */
+	@RequestMapping(value = "/event/{useractivityId}",method = RequestMethod.GET)
+	public @ResponseBody EventDetailsResponse getPublicUserActivity( @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
+		
+		UserEvent event = eventsService.getActivity(useractivityId);
+		if (event == null) {
+			ActivityDBException noactivity = new ActivityDBException("no user event found ");
+			throw noactivity;
+		}
+		List<Comment> appCommentsNotPosted = new ArrayList<Comment>();
+		//This is the facebook Id only check. Later we have
+		//model.addAttribute("isInviteeToEvent", isInviteeToEvent);
+		ProfileListDto userListDto = new ProfileListDto();
+		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+		eventDetailsResponse.setStatus(200);
+		eventDetailsResponse.setFriendsList(userListDto);
+		eventDetailsResponse.setEventDto(EventMapper.convertToEventDto(event));
+		eventDetailsResponse.setComments(appCommentsNotPosted);
+		
+		return eventDetailsResponse;
+	}
+	
+	/*
+	 * Given useractvityId, search the db and return
+	 * @Param
+	 */
+	@RequestMapping(value = "{userid}/eventinvitees/{useractivityId}",method = RequestMethod.GET)
+	public @ResponseBody List<Invitees>  getUserEventInvitees(@PathVariable String userid, @PathVariable String useractivityId) throws ActivityDBException {
+		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		Log.info("Auth Name: "+ authname);
+		UserAccount acct=userAccountRepository.getUserAccount(userid);
+		if(acct==null){
+			acct = userAccountService.getUserAccount(authname);
+			if(acct==null){
+				throw new ActivityDBException("Authentication failed");
+			}
+		}
+		UserEvent event = eventsService.getActivity(useractivityId);
+		if (event == null) {
+			ActivityDBException noactivity = new ActivityDBException("no user event found ");
+			throw noactivity;
+		}
+		UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(acct.getFacebookId())?acct.getUserId():acct.getFacebookId());
+		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
+		
+		return EventMapper.getEventInvitees(event, acct, pf, friends);
 	}
 	
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)

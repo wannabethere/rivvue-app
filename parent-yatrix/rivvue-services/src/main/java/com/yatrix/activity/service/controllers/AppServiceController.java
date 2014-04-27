@@ -387,7 +387,7 @@ public class AppServiceController {
 		// authenticated USERS.
 		// May be we can use a cookie. However we need to make sure the cookie and path are set.
 		StringBuilder gquery = new StringBuilder(activity.toLowerCase());
-		gquery.append(" IN ");
+		gquery.append(" ");
 		gquery.append(query.toLowerCase());
 		PlacesRequest request = new PlacesRequest(gquery.toString());
 		return googlePlacesAPI.findActivityPlace(request);

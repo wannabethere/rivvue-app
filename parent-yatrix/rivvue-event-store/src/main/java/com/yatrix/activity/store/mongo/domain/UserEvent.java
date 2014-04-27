@@ -46,6 +46,7 @@ public class UserEvent extends Item{
 	private Long duration;
 	
 	private String originatorUserId;
+	private String originatorProfileUserId;
 	private long createdTimeStamp;
 	private long lupd;
 	//Change to something else if we want to update 
@@ -450,6 +451,14 @@ public class UserEvent extends Item{
 			this.fromUserType=TYPE.APP;
 		}
 		
+	}
+
+	public String getOriginatorProfileUserId() {
+		return originatorProfileUserId;
+	}
+
+	public void setOriginatorProfileUserId(String originatorProfileUserId) {
+		this.originatorProfileUserId = originatorProfileUserId;
 	}
 	
 	

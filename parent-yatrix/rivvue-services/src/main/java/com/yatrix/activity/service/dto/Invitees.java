@@ -16,7 +16,7 @@ public class Invitees implements Serializable {
 	private String name;
 	private String rsvpStatus;
 	private String inviteeType;
-	
+	private boolean isConnectedToViewer;
 	
 	
 	public Invitees(){
@@ -27,7 +27,6 @@ public class Invitees implements Serializable {
 		this.id = id;
 		this.name = name;
 		this.rsvpStatus = rsvpStatus;
-		
 		this.inviteeType=inviteeType;
 	}
 
@@ -61,5 +60,17 @@ public class Invitees implements Serializable {
 
 	public void setInviteeType(String inviteeType) {
 		this.inviteeType = inviteeType;
+	}
+
+	/**
+	 * to show if the user needs to connect to the user.
+	 * @param isConnectedToViewer
+	 */
+	public void setConnectedToViewer(boolean isConnectedToViewer) {
+		this.isConnectedToViewer = isConnectedToViewer;
+	}
+
+	public boolean isConnectedToViewer() {
+		return isConnectedToViewer;
 	}	
 }

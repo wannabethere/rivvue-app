@@ -6,12 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.social.twitter.api.Entities;
 import org.springframework.util.StringUtils;
 
 import com.yatrix.activity.service.dto.EventDto;
@@ -25,6 +29,7 @@ import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.PostMessage;
+import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
@@ -205,6 +210,8 @@ public class EventMapper {
 		Comment comment= new Comment();
 		comment.setFromId(event.getFrom());
 		UserProfile pf=profileService.getByUserId(event.getFrom());
+		//TODO: Fix first Name and Last Name. By Setting the FromId from Profile instead of acct when creating
+		//The Event.
 		comment.setFromAuthorName(pf.getFirstName() + " "+ pf.getLastName());
 		comment.setMessage(event.getMessage());
 		//TODO MAKE IT MORE ROBUST
@@ -290,6 +297,7 @@ public class EventMapper {
 		List<Invitees> invitees= new ArrayList<Invitees>();
 		List<Participant> participants = event.getInvitedIds();
 		StringBuffer temp= new StringBuffer("");
+		int maybe=0,accepted=0,rejected=0, notreplied=0;
 		int index=0;
 		for(Participant s :participants) {
 			String pName = s.getInviteeName();
@@ -301,6 +309,18 @@ public class EventMapper {
 				}
 				temp.append(pName);
 				
+			}
+			if(s.getStatus().equals(RSVPSTATUS.ATTENDING)){
+				accepted++;
+			}
+			else if(s.getStatus().equals(RSVPSTATUS.MAYBE)){
+				maybe++;
+			}
+			else if(s.getStatus().equals(RSVPSTATUS.DECLINED)){
+				rejected++;
+			}
+			else{
+				notreplied++;
 			}
 			
 			//TODO: Remove the invocation.
@@ -315,7 +335,10 @@ public class EventMapper {
 		dto.setRsvpStatusses(invitees);
 		dto.setTo(temp.toString());
 		dto.setAppComments(event.getAppComments());
-		
+		dto.setAccepted(accepted);
+		dto.setRejected(rejected);
+		dto.setMaybe(maybe);
+		dto.setNotReplied(notreplied);
 		return dto;
 	}
 	
@@ -359,4 +382,47 @@ public class EventMapper {
 		}
 		return true;
 	}
+	
+	public static List<Invitees> getEventInvitees(UserEvent event,UserAccount viewerAcct,UserProfile viewer, List<UserProfile> viewerFriends){
+		List<Participant> participants = new ArrayList<Participant>();
+		List<Invitees> invitees = new ArrayList<Invitees>();
+		Map<String, Invitees> invitedList= new HashMap<String,Invitees>();
+		for(Participant s :participants) {
+			Invitees invited=new Invitees(s.getUserId(), s.getInviteeName(), s.getStatus().toString(), s.getUserType().toString());
+			//Skip if the current User is one of the invited Users.
+			if(!viewer.getUserId().equals(s.getUserId())){
+				invitedList.put(invited.getId(), invited);
+			}
+		}
+		
+		
+		/**
+		 * 
+		 */
+		if(viewerFriends!=null){
+			for(UserProfile pf: viewerFriends ){
+				if(invitedList.containsKey(pf.getUserId())){
+					Invitees invited=invitedList.get(pf.getUserId());
+					invited.setConnectedToViewer(true);
+					//Adding all the friends.
+					invitees.add(invited);
+					//Removing the processed users.
+					invitedList.remove(pf.getUserId());
+				}
+			}
+		}
+		for(Entry<String, Invitees> notconnected :invitedList.entrySet()){
+			invitees.add(notconnected.getValue());
+		}
+		
+		//TODO: Add the Originator to the connect list.
+		//Add the source creator if not connected.
+		/**if(!event.getOriginatorUserId().equals(viewerAcct.getUserId()) && !event.getOriginatorUserId().equals(viewer.getUserId())){
+			invitees.add(viewer.getUserId(), viewer.getFirstName()+ " "+ viewer.getLastName(), RSVPSTATUS.ATTENDING.toString(), viewer.getSrcprofileType().toString());
+		}**/
+		return invitees;
+	}
+	
+	
+	
 }

@@ -35,6 +35,10 @@ public class EventDto {
 	private String todate;
 	private String totime;
 	private String authorFullName;
+	private int accepted;
+	private int rejected;
+	private int maybe;
+	private int notreplied;
 	
 	private List<Invitees> RsvpStatusses = new ArrayList<Invitees>();
 	
@@ -290,7 +294,31 @@ public class EventDto {
 	public List<Comment> getAppComments() {
 		return appComments;
 	}
+	public void setAccepted(int accepted) {
+		this.accepted = accepted;
+	}
+	public int getAccepted() {
+		return accepted;
+	}
+	public void setRejected(int rejected) {
+		this.rejected = rejected;
+	}
+	public int getRejected() {
+		return rejected;
+	}
+	public void setMaybe(int maybe) {
+		this.maybe = maybe;
+	}
+	public int getMaybe() {
+		return maybe;
+	}
 	
+	public void setNotReplied(int notreplied) {
+		this.notreplied = notreplied;
+	}
+	public int getNotReplied() {
+		return notreplied;
+	}
 	
 	
 }
