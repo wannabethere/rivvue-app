@@ -150,8 +150,9 @@ public class EventMapper {
 		userActivity.setOriginatorUserId(event.getFrom());
 		userActivity.setDescription(event.getDescription());
 		Venue location = new Venue();
-		location.setFormattedAddress(event.getLocation());
+		location.setFormattedAddress(event.getFormattedAddress());
 		location.setLocation(event.getLocation());
+		System.out.println("Place: " + event.getPlace());
 		location.setPlace(event.getPlace());
 		location.setLatlng(new double[]{Double.valueOf(event.getLocationLat()),Double.valueOf(event.getLocationLng()) });
 		if(!StringUtils.isEmpty(tags)){
