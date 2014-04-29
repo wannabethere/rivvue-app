@@ -120,12 +120,14 @@ public class RestProfileController {
 		ProfileListDto userListDto = new ProfileListDto();
 		UserAccount user = userRepository.getUserAccount(userId);
 		
+		userListDto.setStatus(200);
+		
 		if(user!=null){
 			userListDto.setProfiles(UserMapper.mapUserProfile(service.getMyContacts((!StringUtils.isEmpty(user.getFacebookId()))?user.getFacebookId():user.getUserId())));
 			return userListDto;
 		}
 		
-		return null;
+		return userListDto;
 	}
 
 	@RequestMapping(value = "/searchByUserId/{userId}", method = RequestMethod.GET, produces = "application/json" )
@@ -161,6 +163,8 @@ public class RestProfileController {
 		users = UserMapper.mapUserProfile(userProfiles);
 		users.addAll(UserMapper.map(userAccounts));
 		userListDto.setProfiles(users);
+		
+		userListDto.setStatus(200);
 		
 		return userListDto;
 	}
