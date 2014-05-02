@@ -368,7 +368,7 @@ public class UserEventsService {
 	
 	public List<UserEvent> getActivitiesByState(String state){
 		//Criteria eventCriteria=Criteria.where("visibility").is(VISIBILITY.PUBLIC.toString()).and("deleted").is(false);
-		Criteria locationCriteria = Criteria.where("location.location").regex(state).and("visibility").is(VISIBILITY.PUBLIC.toString()).and("deleted").is(false);
+		Criteria locationCriteria = Criteria.where("location.place").regex(state).and("visibility").is(VISIBILITY.PUBLIC.toString()).and("deleted").is(false);
 		BasicQuery query = new BasicQuery(locationCriteria.getCriteriaObject());
 		List<UserEvent> events =mongoTemplate.find(query, UserEvent.class);
 		return events;	

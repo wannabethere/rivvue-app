@@ -429,81 +429,76 @@ function isChecked(obj, val, name, profileType) {
 </footer>
 <!--footer close-->
 </div>
-<!--content close-->
-<div style='display:none'>
+	<!--content close-->
+		<div style='display:none'>
 			<div id='inline_content' style='padding:10px; background:#fff;'>
-            <div  class="headingpop">Invite</div>
-            <div class="socialiconpopup">
-            <ul>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image27','','./resources/images/normalfacebook.png',1)"><img th:src="@{/resources/images/overfacebook.png}" name="Image27" width="139" height="115" border="0" id="Image27" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image28','','./resources/images/overtwitter.png',1)"><img th:src="@{/resources/images/normaltwitter.png}" name="Image28" width="139" height="115" border="0" id="Image28" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image29','','./resources/images/overgoogleplus.png',1)"><img th:src="@{/resources/images/normalgoogle.png}" name="Image29" width="139" height="115" border="0" id="Image29" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image30','','./resources/images/overphone.png',1)"><img th:src="@{/resources/images/phonecontact.png}" name="Image30" width="139" height="116" border="0" id="Image30" /></a></li>
-            <li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image31','','./resources/images/searchover.png',1)"><img th:src="@{/resources/images/searchnor.png}" name="Image31" width="139" height="115" border="0" id="Image31" /></a></li>
-            </ul>
-            
-            
-            
-            </div>
-            
-            
-            
-			<div id="invitefriend"  th:each="friend : ${friends.profiles}">
-     <div id="image"><input type="checkbox" th:name="${friend.username == null ? '' : friend.username}" th:id="${friend.id}" th:value="${friend.id}" th:onclick="'javascript:isChecked(this, this.name, this.value, \'' + ${friend.srcProfileType} + '\');'" /></div>
-  
-     <div id="innerbox">
-          <!--start heading -->
+            	<div  class="headingpop">Invite</div>
+            	<div class="socialiconpopup">
+            		<ul>
+            			<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image27','','./resources/images/normalfacebook.png',1)"><img th:src="@{/resources/images/overfacebook.png}" name="Image27" width="139" height="115" border="0" id="Image27" /></a></li>
+            			<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image28','','./resources/images/overtwitter.png',1)"><img th:src="@{/resources/images/normaltwitter.png}" name="Image28" width="139" height="115" border="0" id="Image28" /></a></li>
+            			<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image29','','./resources/images/overgoogleplus.png',1)"><img th:src="@{/resources/images/normalgoogle.png}" name="Image29" width="139" height="115" border="0" id="Image29" /></a></li>
+            			<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image30','','./resources/images/overphone.png',1)"><img th:src="@{/resources/images/phonecontact.png}" name="Image30" width="139" height="116" border="0" id="Image30" /></a></li>
+            			<li><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image31','','./resources/images/searchover.png',1)"><img th:src="@{/resources/images/searchnor.png}" name="Image31" width="139" height="115" border="0" id="Image31" /></a></li>
+            		</ul>
+            	</div>
+              <div id="invitefriend"  th:each="friend : ${friends.profiles}">
+     			<div id="image">
+     					<input type="checkbox" th:name="${friend.username == null ? '' : friend.username}" th:id="${friend.id}" th:value="${friend.id}" th:onclick="'javascript:isChecked(this, this.name, this.value, \'' + ${friend.srcProfileType} + '\');'" />
+     			</div>
+     			<div id="innerbox">
+          		<!--start heading -->
+          			<div class="name"><span th:text="${friend.lastName}" >Jack</span>, <span th:text="${friend.firstName}" >Mcleish </span>
+          				<div class="correctround">
+          					<a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)">
+          						<img th:src="@{/resources/images/correctgray.png}" name="Image19" width="55" height="54" border="0" id="Image19" />
+          					</a>
+          				</div>
+        			</div>
         
-          <div class="name"><span th:text="${friend.lastName}" >Jack</span>, <span th:text="${friend.firstName}" >Mcleish </span>
-          	<div class="correctround">
-          		<a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image19','','./resources/images/correctred.png',1)">
-          			<img th:src="@{/resources/images/correctgray.png}" name="Image19" width="55" height="54" border="0" id="Image19" />
-          		</a>
-          	</div>
-        </div>
-    </div>
-</div>	
-
-  </div>
+    			</div>
+			  </div>	
+  			</div>
 		</div>
-        
         <div style='display:none'>
 			<div id='inline_content1' style='padding:10px; background:#fff;'>
-           
-            <div class="headingpop">Looking For &amp; Viewable</div>
-            <div  class="mheading"><ul><li>Viewable By</li> <li>Open To</li> </ul></div>
-        <table width="100%" cellpadding="0" border="0" cellspacing="0"  class="tab1">
-  <tbody><tr>
-    <td width="50" class="tab1"><img alt="" th:src="@{/resources/images/gloabe.png}"/></td>
-    <td width="448" class="publictxt tab1">Public</td>
-    <td class="borderrig tab1" width="50" ><input type="checkbox" value="PUBLIC" name="PUBLIC" id="PUBLIC" onclick="setAccess(this)"/></td>
-   <!-- <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td> --> 
-  </tr>
-<tr>
-    <td width="50" class="tab2"><img th:src="@{/resources/images/friends.png}" alt="" /></td>
-    <td width="448" class="publictxt tab2">Friends</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="FRIENDSONLY" name="FRIENDSONLY" id="FRIENDSONLY" onclick="setAccess(this)"/></td>
-    <!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
-  </tr>
-  <tr>
-    <td width="50" class="tab2"><img th:src="@{/resources/images/invites.png}" alt="" /></td>
-    <td width="448" class="publictxt tab2">Invitees</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="PRIVATE" name="PRIVATE" id="PRIVATE" onclick="setAccess(this)"/></td>
-    <!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
-  </tr>
-   <tr>
-    <td width="50" class="tab2"><img th:src="@{/resources/images/notonly.png}" alt="" /></td>
-    <td width="448" class="publictxt tab2">Only Me</td>
-    <td class="borderrig tab2" width="50" ><input type="checkbox" value="ME" name="ME" id="ME" onclick="setAccess(this)"/></td>
-    <!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
-  </tr>
-</tbody></table>
-<div class="contenttxtpop">Using the audience selector right where you post events. This Control 
-remebers your selection so future posts will be shared with the same
-audiences unless you change it</div>
-
+        	    <div class="headingpop">Looking For &amp; Viewable</div>
+            	<div  class="mheading">
+            		<ul><li>Viewable By</li> <li>Open To</li> </ul>
+            	</div>
+        		<table width="100%" cellpadding="0" border="0" cellspacing="0"  class="tab1">
+  				<tbody>
+  					<tr>
+    					<td width="50" class="tab1"><img alt="" th:src="@{/resources/images/gloabe.png}"/></td>
+    					<td width="448" class="publictxt tab1">Public</td>
+    					<td class="borderrig tab1" width="50" ><input type="checkbox" value="PUBLIC" name="PUBLIC" id="PUBLIC" onclick="setAccess(this)"/></td>
+   						<!-- <td class="borderrig tab1">&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td> --> 
+  					</tr>
+					<tr>
+    					<td width="50" class="tab2"><img th:src="@{/resources/images/friends.png}" alt="" /></td>
+    					<td width="448" class="publictxt tab2">Friends</td>
+    					<td class="borderrig tab2" width="50" ><input type="checkbox" value="FRIENDSONLY" name="FRIENDSONLY" id="FRIENDSONLY" onclick="setAccess(this)"/></td>
+    					<!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
+  					</tr>
+  					<tr>
+    					<td width="50" class="tab2"><img th:src="@{/resources/images/invites.png}" alt="" /></td>
+    					<td width="448" class="publictxt tab2">Invitees</td>
+    					<td class="borderrig tab2" width="50" ><input type="checkbox" value="PRIVATE" name="PRIVATE" id="PRIVATE" onclick="setAccess(this)"/></td>
+    					<!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
+  					</tr>
+   					<tr>
+    					<td width="50" class="tab2"><img th:src="@{/resources/images/notonly.png}" alt="" /></td>
+    					<td width="448" class="publictxt tab2">Only Me</td>
+    					<td class="borderrig tab2" width="50" ><input type="checkbox" value="ME" name="ME" id="ME" onclick="setAccess(this)"/></td>
+    					<!-- <td class="borderrig tab2" >&nbsp;&nbsp;<input type="checkbox" value="" name="" /></td>--> 
+  					</tr>
+				</tbody>
+				</table>
+				<div class="contenttxtpop">Using the audience selector right where you post events. This Control 
+						remebers your selection so future posts will be shared with the same
+						audiences unless you change it
+				</div>
 			</div>
-			
 		</div>
 </body>
 </html>
