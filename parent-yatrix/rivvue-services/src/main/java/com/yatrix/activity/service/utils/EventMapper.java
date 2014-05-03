@@ -384,10 +384,12 @@ public class EventMapper {
 	}
 	
 	public static List<Invitees> getEventInvitees(UserEvent event,UserAccount viewerAcct,UserProfile viewer, List<UserProfile> viewerFriends){
-		List<Participant> participants = new ArrayList<Participant>();
+		logger.info(event.toString());
+		
 		List<Invitees> invitees = new ArrayList<Invitees>();
 		Map<String, Invitees> invitedList= new HashMap<String,Invitees>();
-		for(Participant s :participants) {
+		for(Participant s :event.getInvitedIds()) {
+			logger.info(s.toString());
 			Invitees invited=new Invitees(s.getUserId(), s.getInviteeName(), s.getStatus().toString(), s.getUserType().toString());
 			//Skip if the current User is one of the invited Users.
 			if(!viewer.getUserId().equals(s.getUserId())){
@@ -420,6 +422,9 @@ public class EventMapper {
 		/**if(!event.getOriginatorUserId().equals(viewerAcct.getUserId()) && !event.getOriginatorUserId().equals(viewer.getUserId())){
 			invitees.add(viewer.getUserId(), viewer.getFirstName()+ " "+ viewer.getLastName(), RSVPSTATUS.ATTENDING.toString(), viewer.getSrcprofileType().toString());
 		}**/
+		
+		//TODO: Remove the userid as he is a friend of himself we dont need to send it.
+		
 		return invitees;
 	}
 	
