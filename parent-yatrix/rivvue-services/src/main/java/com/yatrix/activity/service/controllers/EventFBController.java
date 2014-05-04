@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import org.mortbay.log.Log;
@@ -145,6 +146,40 @@ public class EventFBController {
 		return isInviteeToEvent ? "events/events2" :"events/events";
 	}
 	
+	
+	/*
+	 * Given useractvityId, search the db and return
+	 * @Param
+	 */
+	@RequestMapping(value = "{userid}/eventinviteesandcount/{useractivityId}",method = RequestMethod.GET)
+	public  String getUserEvent2Invitees(@PathVariable String userid, @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
+		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		Log.info("Auth Name: "+ authname);
+		UserAccount acct=userAccountRepository.getUserAccount(userid);
+		if(acct==null){
+			acct = userAccountService.getUserAccount(authname);
+			if(acct==null){
+				throw new ActivityDBException("Authentication failed");
+			}
+		}
+		UserEvent event = eventsService.getActivity(useractivityId);
+		if (event == null) {
+			ActivityDBException noactivity = new ActivityDBException("no user event found ");
+			throw noactivity;
+		}
+		UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(acct.getFacebookId())?acct.getUserId():acct.getFacebookId());
+		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
+		
+		//TODO: send friends for getEventInvitees to remove friends.
+		model.put("friends", EventMapper.getEventInvitees(event, acct, pf, null));
+		
+		//TODO: place holders.
+		model.put("accepted", new Random().nextInt(100));
+		model.put("declined", new Random().nextInt(100));
+		model.put("maybe", new Random().nextInt(100));
+		
+		return "events/invitees";
+	}
 	
 	/*
 	 * Given useractvityId, search the db and return

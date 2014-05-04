@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -32,7 +33,11 @@ import com.yatrix.activity.service.dto.EventDto;
 import com.yatrix.activity.service.dto.EventsResponse;
 import com.yatrix.activity.service.dto.Invitees;
 import com.yatrix.activity.service.dto.ProfileListDto;
+import com.yatrix.activity.service.dto.RatingDetails;
+import com.yatrix.activity.service.dto.RatingResponse;
 import com.yatrix.activity.service.dto.UserDto;
+import com.yatrix.activity.service.dto.WeatherDetails;
+import com.yatrix.activity.service.dto.WeatherResponse;
 import com.yatrix.activity.service.utils.EventMapper;
 import com.yatrix.activity.service.utils.UserMapper;
 import com.yatrix.activity.store.exception.ActivityDBException;
@@ -183,6 +188,68 @@ public class RestEventFBController {
 		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
 		
 		return EventMapper.getEventInvitees(event, acct, pf, friends);
+	}
+	
+	/**
+	 * Returns Weather details
+	 * @param userid
+	 * @param useractivityId
+	 * @return
+	 * @throws ActivityDBException
+	 */
+	@RequestMapping(value = "{userid}/weather",method = RequestMethod.GET)
+	public @ResponseBody WeatherResponse  getWeatherDetails(@PathVariable String userid, @RequestParam List<String> events) throws ActivityDBException {
+		
+		WeatherResponse weatherResponse = new WeatherResponse();
+		WeatherDetails weatherDetails;
+		
+		//TODO: Place holders. Replace with original values
+		weatherResponse.setStatus(200);
+		
+		if(events != null){
+			for(String eventId : events){
+				weatherDetails = new WeatherDetails();
+				
+				weatherDetails.setEventId(eventId);
+				weatherDetails.setWeather(new Random().nextInt(50) + ".25*F");
+				
+				weatherResponse.addWeatherDetails(weatherDetails);
+			}
+		}
+		
+		
+		return weatherResponse;
+	}
+	
+	/**
+	 * Returns Weather details
+	 * @param userid
+	 * @param useractivityId
+	 * @return
+	 * @throws ActivityDBException
+	 */
+	@RequestMapping(value = "{userid}/rating",method = RequestMethod.GET)
+	public @ResponseBody RatingResponse  getRatings(@PathVariable String userid, @RequestParam List<String> events) throws ActivityDBException {
+		
+		RatingResponse ratingResponse = new RatingResponse();
+		RatingDetails ratingDetails;
+		
+		//TODO: Place holders. Replace with original values
+		ratingResponse.setStatus(200);
+		
+		if(events != null){
+			for(String eventId : events){
+				ratingDetails = new RatingDetails();
+				
+				ratingDetails.setEventId(eventId);
+				ratingDetails.setRating("IMDB Rating " + new Random().nextInt(10) );
+				
+				ratingResponse.addRatingDetails(ratingDetails);
+			}
+		}
+		
+		
+		return ratingResponse;
 	}
 	
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)

@@ -7,6 +7,55 @@
 	<title th:text="#{app.name}" >RIVVUE</title>
 	<link href="http://fonts.googleapis.com/css?family=Oswald"  rel="stylesheet" type="text/css"  />
 	<link href="./../../../resources/css/stylesheet.css"  rel="stylesheet" type="text/css"  th:href="@{/resources/css/stylesheet.css}"/>
+	<script type="text/javascript" th:src="@{/resources/js/jQuery.js}" th:href="@{/resources/js/jQuery.js}"></script>
+	
+	 <script type="text/javascript" th:inline="javascript" >
+		//<![CDATA[
+		     var eventArray = new Array();
+		     
+		     $(document).ready(function(){
+		    	 $("input[id*='eventid']").each(function(){
+		    		//alert("Values" + $(this).val());
+		    		 eventArray.push($(this).val());
+		    	});
+		    	 
+		    	populateWeather();
+		    	populateRating();
+		     });
+		     
+		     function populateWeather(){
+		    	 //alert(eventArray);
+		    	 $.ajax({
+						url : "/wannabethere/rest/myactivities/" + $('#username').val() + "/weather"  ,
+						dataType : "json",
+						data:"events=" + eventArray,
+						success : function(response) {
+							$.each(response.weatherDetails, function(index){
+								//alert("Weather: " + response.weatherDetails[index].weather);
+								//alert($('temperature_' + response.weatherDetails[index].eventId).name());
+								$('#temperature_' + response.weatherDetails[index].eventId).html(response.weatherDetails[index].weather);
+							});
+						}
+					});	
+		     }
+		     
+		     function populateRating(){
+		    	 //alert(eventArray);
+		    	 $.ajax({
+						url : "/wannabethere/rest/myactivities/" + $('#username').val() + "/rating"  ,
+						dataType : "json",
+						data:"events=" + eventArray,
+						success : function(response) {
+							$.each(response.ratings, function(index){
+								//alert("Weather: " + response.weatherDetails[index].weather);
+								//alert($('temperature_' + response.weatherDetails[index].eventId).name());
+								$('#imdbrating_' + response.ratings[index].eventId).html(response.ratings[index].rating);
+							});
+						}
+					});	
+		     }
+		//]]>
+</script>
 </head>
 
 <body>
@@ -39,8 +88,9 @@
      <div id="innerbox">
           <!--start heading -->
           <div id="heading">
+          <input type="hidden" id="eventid" name="eventid" th:value="${event.id}" />
           <a th:href="@{'/myactivities/' + ${authname} + '/event/' + ${event.id}}"><h1 th:text="${event.message}">RUNNING</h1></a>
-          <div id="rightbox"><span class="imdb">IMDB RATING 8.6</span>
+          <div id="rightbox"><span class="imdb" th:id="'imdbrating_' + ${event.id}"></span>
           <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
            <img src="./resources/images/yellowstar.png" th:src="@{/resources/images/yellowstar.png}" width="14" height="14" />
@@ -52,7 +102,7 @@
            <!--start subheading -->
            <div id="subheading">
              <h2 th:text="${event.formattedAddress}">Ponderosa Park, Sunnyvale,CA <a href="#">(View Map)</a></h2>
-             <div class="nighttemp">17*
+             <div class="nighttemp" th:id="'temperature_' + ${event.id}">
              </div>
           </div>
                <!--end subheading -->

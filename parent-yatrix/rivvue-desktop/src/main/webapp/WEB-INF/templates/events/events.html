@@ -30,7 +30,21 @@
 			$("#Delete").on("click", function(e){
 				deleteEvent();
 			});
+			
+			populateParticipantCount();
 		});
+		
+		function populateParticipantCount(){
+			//alert("Getting invited list");
+			$.ajax({
+				url : "/wannabethere/myactivities/" + $('#username').val() + "/eventinviteesandcount/" + $('#eventId').val() ,
+				//dataType : "json",
+				success : function(response) {
+					//alert("Response got");
+					$('#watch').before(response);
+				}
+			});
+		}
 		
 		function deleteEvent(){
 			var deleteUrl =  "/wannabethere/myactivities/" + $('#username').val() + "/" + $('#eventId').val() + "/deleteEvent";
@@ -196,58 +210,7 @@
   <!--aside start--> 
   <aside>
       
-    
-    <div class= "attending">
-    <ul>
-    <li><img th:src="@{/resources/images/participants.png}" alt="" /></li>
-    <li><a href="#">Attending (4)</a></li>
-    <li class="decline">Declined (2)</li>
-    <li class="decline">Maybe (2)</li>
-    </ul>
-    
-     </div>
-       <div id = "topparticipats">
-       <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
-       </div>
-       <div class="topparticipatsname">Barbara Tisiot
-       </div>
-       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
-       </div>
-       </div>
-       
-       <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
-       </div>
-       <div class="topparticipatsname">Katie Milburn
-       </div>
-       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
-       </div>
-       </div>
-       
-       <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
-       </div>
-       <div class="topparticipatsname">Josh Kripura
-       </div>
-       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
-       </div>
-       </div>
-       
-       <div id = "topparticipatsbox">
-       <div class="topparticipatsimg"><img th:src="@{/resources/images/topparticipant.jpg}" width="40" height="40" />
-       </div>
-       <div class="topparticipatsname">David
-       </div>
-       <div class="topparticipatscomment"><img th:src="@{/resources/images/connect.png}" width="80" height="20" />
-       </div>
-       </div>
-       
-       
-       </div>
-       
-      
-       <div class="watch"><a href="#">Watch (12)</a></div>
+       <div id="watch" class="watch"><a href="#">Watch (12)</a></div>
        <div id="topparticipatsbox">
        <div class="topparticipatsimg1"><img th:src="@{/resources/images/eventicon.png}" alt=""  width="28" height="22"/>
        </div>

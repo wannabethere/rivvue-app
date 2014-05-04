@@ -1,0 +1,23 @@
+
+<div id="participant-tabs" class="attending">
+	<ul>
+		<li><img th:src="@{/resources/images/participants.png}" alt="" /></li>
+		<li id="attending-count"><a href="#" th:text="${'Attending(' + accepted + ')'}">Attending (4)</a></li>
+		<li id="declined-count" class="decline" th:text="${'Declined(' + declined + ')'}">Declined (2)</li>
+		<li id="maybe-count" class="decline" th:text="${'Maybe(' + maybe + ')'}">Maybe (2)</li>
+	</ul>
+
+</div>
+<div id="topparticipats">
+	<div id="topparticipatsbox" th:each="friend : ${friends}">
+		<div class="topparticipatsimg">
+			<img th:src="@{/resources/images/topparticipant.jpg}" width="40"
+				height="40" />
+		</div>
+		<div class="topparticipatsname" th:text="${friend.name}">Barbara Tisiot</div>
+		<div class="topparticipatscomment">
+			<img th:src="@{/resources/images/connect.png}" width="80" height="20" />
+		</div>
+	</div>
+
+</div>
