@@ -174,9 +174,9 @@ public class EventFBController {
 		model.put("friends", EventMapper.getEventInvitees(event, acct, pf, null));
 		
 		//TODO: place holders.
-		model.put("accepted", new Random().nextInt(100));
-		model.put("declined", new Random().nextInt(100));
-		model.put("maybe", new Random().nextInt(100));
+		model.put("accepted", event.getAcceptedIds().size());
+		model.put("declined", event.getDeclinedIds().size());
+		model.put("maybe", event.getMayBeIds().size());
 		
 		return "events/invitees";
 	}
