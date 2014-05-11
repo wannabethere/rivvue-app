@@ -1,9 +1,5 @@
 package com.yatrix.activity.service.facebook;
 
-
-
-
-
 import static java.lang.System.out;
 
 import java.util.ArrayList;

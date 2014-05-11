@@ -1,6 +1,5 @@
 package com.yatrix.activity.ext.domain.facebook;
 
-import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 
 

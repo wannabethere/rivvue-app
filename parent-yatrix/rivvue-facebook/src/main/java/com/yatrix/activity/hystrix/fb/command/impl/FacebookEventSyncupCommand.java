@@ -1,5 +1,7 @@
-package com.yatrix.activity.hystrix.command.impl;
+package com.yatrix.activity.hystrix.fb.command.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -7,8 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.social.facebook.api.Comment;
+import org.springframework.social.facebook.api.EventInvitee;
 import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.PagedList;
+import org.springframework.social.facebook.api.Post;
 import org.springframework.stereotype.Service;
 
 import com.netflix.hystrix.HystrixCommand;
@@ -16,30 +23,42 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolKey;
-import com.yatrix.activity.ext.domain.facebook.FacebookSyncupSocialResult;
-import com.yatrix.activity.hystrix.command.IFacebookSyncupCommand;
+import com.yatrix.activity.hystrix.fb.command.FacebookSyncupSocialResult;
+import com.yatrix.activity.hystrix.fb.command.IFacebookSyncupCommand;
 import com.yatrix.activity.service.facebook.FacebookEventService;
+import com.yatrix.activity.store.fb.domain.FacebookInvitee;
+import com.yatrix.activity.store.fb.domain.FacebookPost;
+import com.yatrix.activity.store.fb.domain.FacebookReference;
+import com.yatrix.activity.store.fb.domain.FacebookInvitee.FacebookRsvpStatus;
+import com.yatrix.activity.store.mongo.domain.ActivityComment;
+import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
-import com.yatrix.activity.store.mongo.domain.UserSocialConnection;
 import com.yatrix.activity.store.mongo.repository.ConnectionService;
+import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 
 @Service
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.INTERFACES)
-public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialResult> implements IFacebookSyncupCommand{
+public class FacebookEventSyncupCommand extends HystrixCommand<FacebookSyncupSocialResult> implements IFacebookSyncupCommand{
 	
-	private static final Logger logger = LoggerFactory.getLogger(FacebookSyncupCommand.class);
+	private static final Logger logger = LoggerFactory.getLogger(FacebookEventSyncupCommand.class);
 
 	@Autowired
 	ConnectionService userSocialConnectionService;
 
+//	@Autowired
+//	IUserActivityCatalogService userActivityCatalogService;
+
 	@Autowired
 	UserEventsService eventService;
-
+	
+	@Autowired
+	FacebookEventService facebookService;
+	
 	@Autowired
 	ConnectionFactoryLocator connectionFactoryLocator;
 
-	public FacebookSyncupCommand() {
+	public FacebookEventSyncupCommand() {
 		// Set to one minute
 		super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("com.yatrix.activity"))
 				.andCommandKey(HystrixCommandKey.Factory.asKey("FacebookCommand"))
@@ -62,22 +81,12 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 		}
 
 		logger.info("Syncing up: " + userActivity.getTitle());
-		
-		String providerId = connectionFactoryLocator.getConnectionFactory(Facebook.class)
-				.getProviderId();
-		UserSocialConnection connection = userSocialConnectionService.getSocialConnection(userActivity.getOriginatorUserId(), providerId);
 
-		if(connection == null){
-			// User does not have facebook connection.
-			return new FacebookSyncupSocialResult(Boolean.FALSE, null, "User does not have facebook connection!");
-		}
-		
-		FacebookEventService fbService = new FacebookEventService(connection.getAccessToken());
-
-		fbService.publishCommentsAndSyncFB(userActivity);
+		facebookService.publishCommentsAndSyncFB(userActivity);
 		
 		return new FacebookSyncupSocialResult(Boolean.TRUE, userActivity, "Event Synced up successfully!");
 	}
+
 
 	@Override
 	public Future<FacebookSyncupSocialResult> executeFacebookSyncupCommand(String pUserActivityId) {
@@ -85,13 +94,7 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 		return this.queue();
 	}
 
-	@Override
-	public Future<FacebookSyncupSocialResult> executeFacebookSyncupCommand(
-			UserEvent pUserActivity) {
-		userActivity = pUserActivity;
-
-		return this.queue();
-	}
+	
 
 	@Override
 	protected FacebookSyncupSocialResult getFallback() {
@@ -109,6 +112,13 @@ public class FacebookSyncupCommand extends HystrixCommand<FacebookSyncupSocialRe
 	Facebook facebook;
 
 	UserEvent userActivity;
+
+	@Override
+	public Future<FacebookSyncupSocialResult> executeFacebookSyncupCommand(
+			UserActivity pUserActivity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 }

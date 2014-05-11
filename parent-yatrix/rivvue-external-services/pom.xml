@@ -142,6 +142,11 @@
 			<artifactId>rivvue-event-store</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.yatrix.activity.facebook</groupId>
+			<artifactId>rivvue-facebook</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
   
   

@@ -24,7 +24,7 @@ public class ProcessEventScheduler {
 	@Qualifier("facebookSyncupPartitioningJob")
 	private Job facebookSyncupPartitioningJob;
 	
-	@Scheduled(initialDelay=60000, fixedDelay=300000)
+	//@Scheduled(initialDelay=60000, fixedDelay=300000)
 	protected void processPendingEvents(){
 		System.out.println("++++++++++++++++++++++++++++++++++++++++++Running job...");
 		Map<String, JobParameter> jobParams = new LinkedHashMap<String, JobParameter>();
