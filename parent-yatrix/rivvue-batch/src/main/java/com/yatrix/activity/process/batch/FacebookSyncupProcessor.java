@@ -5,12 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-
-
 import com.yatrix.activity.ext.domain.facebook.FacebookSyncupSocialResult;
 import com.yatrix.activity.hystrix.command.IFacebookSyncupCommand;
-import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 
 

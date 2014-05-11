@@ -212,7 +212,7 @@ public class EventMapper {
 		UserProfile pf=profileService.getByUserId(event.getFrom());
 		//TODO: Fix first Name and Last Name. By Setting the FromId from Profile instead of acct when creating
 		//The Event.
-		comment.setFromAuthorName(pf.getFirstName() + " "+ pf.getLastName());
+		comment.setFromAuthorName(pf.getName());
 		comment.setMessage(event.getMessage());
 		//TODO MAKE IT MORE ROBUST
 		//comment.addCommentSync("appCommentID1", COMMENTTYPE.APP,System.currentTimeMillis());
