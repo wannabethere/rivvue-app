@@ -4,13 +4,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.stereotype.Controller;
@@ -50,6 +50,8 @@ import com.yatrix.activity.store.mongo.service.impl.UserEventsService;
 @RequestMapping("/myactivities")
 public class EventFBController {
 
+	@Autowired
+	Environment env;
 
 	private static final Logger logger = LoggerFactory.getLogger(EventFBController.class);
 	// Create an instance of SimpleDateFormat used for formatting 
@@ -253,9 +255,29 @@ public class EventFBController {
 			String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 			Log.info("Auth Name: "+ authname);
 			UserAccount acct=userAccountRepository.getUserAccount(userid);
-			UserEvent event=EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB");
+			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
+			UserEvent event=EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB",
+					author);
 			
-			event=eventsService.createUserEvent(event);
+			event = eventsService.createUserEvent(event);
+			
+			// Add a message with URL to our app.
+			
+			Comment comment= new Comment();
+			UserProfile pf=profileService.getByUserId(author);
+
+			comment.setFromId(dto.getFrom());
+			comment.setFromAuthorName(pf.getName());
+			comment.setMessage("For details on the event: " + env.getProperty("application.url") + "/activities/" + userid + "/" + event.getId());
+			
+			event.addComment(comment);
+			
+			try{
+				eventsService.updateUserEvent(event);
+			}catch(ActivityDBException ade){
+				logger.error("Error updating comment with URL: " +  ade.getMessage());
+			}
+			
 			if(!StringUtils.isEmpty(acct.getFacebookId())){
 				FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
 				createCommand.setConnectionFactoryLocator(connectionFactoryLocator);

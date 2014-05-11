@@ -339,6 +339,16 @@ function isChecked(obj, val, name, profileType) {
 						<input type="text" id = "totime" name="totime" th:field="*{totime}" class="timeinput watchbox" />
 					</div>
   </div>
+     <div class="inner_form1">
+    	<label>Publish Events To :</label>
+   					<div class="text_field">
+					
+						<input type="radio" id="sex" value="FB" th:field="*{publishTo}" />Facebook
+						<input type="radio" id="sex" value="TWT" th:field="*{publishTo}" />Twitter
+						<input type="radio" id="sex" value="GMAIL" th:field="*{publishTo}" /> Gmail
+						<input type="radio" id="sex" value="EMAIL" th:field="*{publishTo}" /> Email
+					</div>
+  </div>
   <div class="inner_form_button1">
 				<a class='inline' href="#inline_content"><input type="submit" value="" class="invitefriend_button" name="button" /></a>
                 <a class='inline' href="#inline_content1"><input type="submit" value="" class="looking_button" name="button" /></a>

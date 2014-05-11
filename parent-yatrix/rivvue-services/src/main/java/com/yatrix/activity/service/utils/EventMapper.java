@@ -128,7 +128,7 @@ public class EventMapper {
 	}
 	
 	
-	public static UserEvent toCreateUserEventObject(EventDto event, ProfileService profileService, String fromUserType){
+	public static UserEvent toCreateUserEventObject(EventDto event, ProfileService profileService, String fromUserType, String author){
 		isvalidEvent(event);
 		UserEvent userActivity= new UserEvent();
 		
@@ -163,6 +163,7 @@ public class EventMapper {
 			location.setTags(Arrays.asList(tags.split(TAG_SEPERATOR)));
 		}
 		userActivity.setLocation(location);
+		userActivity.setPublishTo(event.getPublishTo());
 		userActivity.setCategoryId(event.getCategoryId());
 		userActivity.setSubCategory(event.getSubCategoryId());
 		// split the invitee list
@@ -209,7 +210,7 @@ public class EventMapper {
 		userActivity.setEndTime(endTime.getTime());
 		Comment comment= new Comment();
 		comment.setFromId(event.getFrom());
-		UserProfile pf=profileService.getByUserId(event.getFrom());
+		UserProfile pf=profileService.getByUserId(author);
 		//TODO: Fix first Name and Last Name. By Setting the FromId from Profile instead of acct when creating
 		//The Event.
 		comment.setFromAuthorName(pf.getName());

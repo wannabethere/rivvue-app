@@ -39,6 +39,7 @@ public class EventDto {
 	private int rejected;
 	private int maybe;
 	private int notreplied;
+	private String publishTo;
 	
 	private List<Invitees> RsvpStatusses = new ArrayList<Invitees>();
 	
@@ -224,6 +225,14 @@ public class EventDto {
 			List<com.yatrix.activity.service.dto.Invitees> rsvpStatusses) {
 		RsvpStatusses = rsvpStatusses;
 	}
+	
+	public String getPublishTo() {
+		return publishTo;
+	}
+	public void setPublishTo(String publishTo) {
+		this.publishTo = publishTo;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

@@ -279,7 +279,8 @@ public class RestEventFBController {
 	public @ResponseBody EventDetailsResponse createUserEvent(@PathVariable String userid, EventDto dto) throws InterruptedException, ExecutionException {
 			
 			UserAccount acct = userAccountRepository.getUserAccount(userid);
-			UserEvent event = EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB");
+			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
+			UserEvent event = EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB", author);
 			event = eventsService.createUserEvent(event);
 			
 			if(!StringUtils.isEmpty(acct.getFacebookId())){

@@ -31,7 +31,7 @@ public class UserEvent extends Item{
 	private long endTime;
 	//Move the below to a class Object
 	private Venue location;
-	
+	private String publishTo;
 
 	private STATUS processedStatus;
 	private VISIBILITY visibility;
@@ -329,6 +329,14 @@ public class UserEvent extends Item{
 
 	public void setCreatedTimeStamp(long createdTimeStamp) {
 		this.createdTimeStamp = createdTimeStamp;
+	}
+	
+	public String getPublishTo() {
+		return publishTo;
+	}
+
+	public void setPublishTo(String publishTo) {
+		this.publishTo = publishTo;
 	}
 
 	@Override
