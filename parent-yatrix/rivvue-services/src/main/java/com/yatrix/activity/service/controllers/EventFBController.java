@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventCreateCommand;
 import com.yatrix.activity.hystrix.fb.command.impl.FacebookEventFeedCommand;
@@ -252,7 +253,8 @@ public class EventFBController {
 	}
 	
 	@RequestMapping(value = "/{userid}", produces = "application/json",method = RequestMethod.POST)
-	public String createUserEvent(@PathVariable String userid, EventDto dto, ModelMap model) throws InterruptedException, ExecutionException {
+	public String createUserEvent(@PathVariable String userid, EventDto dto, ModelMap model,
+			final RedirectAttributes redirectAttributes) throws InterruptedException, ExecutionException {
 			String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 			Log.info("Auth Name: "+ authname);
 			UserAccount acct=userAccountRepository.getUserAccount(userid);
@@ -287,8 +289,9 @@ public class EventFBController {
 //				createCommand.executeFacebookEventFeed();
 //			}   
 			
-			model.addAttribute("activityId",event.getId());
+			model.addAttribute("eventDraftId",event.getId());
 			model.addAttribute("status","Successully Created: ");
+			redirectAttributes.addFlashAttribute("eventDraftId", event.getId());
 			//return "redirect:/myactivities/"+userid;
 			return "redirect:/friends/" + userid;
 	}

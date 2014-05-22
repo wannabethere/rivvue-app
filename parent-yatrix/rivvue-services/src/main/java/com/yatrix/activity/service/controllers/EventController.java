@@ -3,7 +3,6 @@ package com.yatrix.activity.service.controllers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
 import java.util.Date;
 import java.util.List;
 
@@ -26,19 +25,17 @@ import com.yatrix.activity.hystrix.command.IFacebookJoinEventCommand;
 import com.yatrix.activity.hystrix.command.IFacebookPostEventFeedCommand;
 import com.yatrix.activity.service.dto.AjaxResponse;
 import com.yatrix.activity.service.dto.EventDto;
-import com.yatrix.activity.service.facebook.FacebookEventService;
 import com.yatrix.activity.store.fb.domain.FacebookReference;
 import com.yatrix.activity.store.mongo.domain.ActivityComment;
 import com.yatrix.activity.store.mongo.domain.Category;
 import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
-
 import com.yatrix.activity.store.mongo.domain.UserProfile;
+import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 import com.yatrix.activity.store.mongo.service.impl.ActivityCatalogService;
 import com.yatrix.activity.store.mongo.service.impl.ProfileService;
 import com.yatrix.activity.store.mongo.service.impl.UserAccountService;
-import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 @Controller
 @RequestMapping("/calendarevents")
 public class EventController {

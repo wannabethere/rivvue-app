@@ -93,10 +93,8 @@
 
 <body>
 	<header th:include="include :: signedHeader"> </header>
-
 	
-		<input type="hidden" name="loggedInUser" id="loggedInUser"
-			th:value="${authname}" />
+		<input type="hidden" name="loggedInUser" id="loggedInUser"	th:value="${authname}" />
 		<div id="content1">
 		<form action="#" th:action="@{'/profile/search/' + ${authname}}" method="get">
 			<div class="newarticle">

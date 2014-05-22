@@ -48,7 +48,6 @@ public class UserDraftEvent extends Item{
 	
 	
 	//Handling participants.
-	private List<Participant> invitedIds = new ArrayList<Participant>();
 	private List<PostMessage> postedMessage = new ArrayList<PostMessage>();
 	private List<Comment> appComments = new ArrayList<Comment>();
 	
@@ -193,72 +192,6 @@ public class UserDraftEvent extends Item{
 		return authorName;
 	}
 
-	
-	public List< Participant> getInvitedIds() {
-		return invitedIds;
-	}
-	
-	public List<Participant> getAcceptedIds(){
-		List<Participant> accepted=new ArrayList<Participant>();
-		for(Participant p: this.invitedIds){
-			if(p.getStatus().equals(RSVPSTATUS.ATTENDING)){
-				accepted.add(p);
-			}
-		}
-		return accepted;
-	}
-	public List<Participant> getDeclinedIds(){
-		List<Participant> declined=new ArrayList<Participant>();
-		for(Participant p: this.invitedIds){
-			if(p.getStatus().equals(RSVPSTATUS.DECLINED)){
-				declined.add(p);
-			}
-		}
-		return declined;
-	}
-	public List<Participant> getMayBeIds(){
-		List<Participant> maybe=new ArrayList<Participant>();
-		for(Participant p: this.invitedIds){
-			if(p.getStatus().equals(RSVPSTATUS.MAYBE)){
-				maybe.add(p);
-			}
-		}
-		return maybe;
-	}
-	
-	public List<Participant> getNotRepliedIds(){
-		List<Participant> notReplied=new ArrayList<Participant>();
-		for(Participant p: this.invitedIds){
-			if(p.getStatus().equals(RSVPSTATUS.NOT_REPLIED)){
-				notReplied.add(p);
-			}
-		}
-		return notReplied;
-	}
-	
-	public void setInvitedIds(List< Participant> invitedIds) {
-		this.invitedIds = invitedIds;
-	}
-	
-	//Checks for the existence of the Id and removes it. Simulating an Update.
-	//This is not scalable for large number of people in an invite. 
-	//We will not be doing this for public events.
-	//Incase of public events. We will launch something like social circles.
-	public void addInvitedId(Participant p){
-		for(Participant curP: this.invitedIds){
-			if(curP.getUserId().equalsIgnoreCase(p.getUserId())){
-				//then replace the current.
-				this.invitedIds.remove(curP);
-				break;
-			}
-		}
-		this.invitedIds.add(p);
-	}
-	
-	public void removedInvited(Participant p){
-		this.invitedIds.remove(p);
-	}
-	
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -349,8 +282,7 @@ public class UserDraftEvent extends Item{
 				+ processedStatus + ", visibility=" + visibility
 				+ ", status=" + status + ", deleted=" + deleted + ", duration="
 				+ duration + ", originatorUserId=" + originatorUserId
-				+ ", invitedIds=" + invitedIds + ", postedMessage="
-				+ postedMessage + ", appComments=" + appComments + "]";
+				+ ", postedMessage=" + postedMessage + ", appComments=" + appComments + "]";
 	}
 
 	public TYPE getFromUserType() {

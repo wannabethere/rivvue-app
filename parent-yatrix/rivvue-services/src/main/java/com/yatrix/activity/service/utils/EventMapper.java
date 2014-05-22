@@ -252,7 +252,7 @@ public class EventMapper {
 			userActivity.setTitle(event.getMessage());
 		}
 		String tags=event.getTags();
-		userActivity.setStatus(UserEvent.EVENT_STATUS.PENDING);
+		userActivity.setStatus(UserEvent.EVENT_STATUS.DRAFT);
 		userActivity.setOriginatorUserId(event.getFrom());
 		userActivity.setDescription(event.getDescription());
 		Venue location = new Venue();
@@ -267,36 +267,7 @@ public class EventMapper {
 		userActivity.setPublishTo(event.getPublishTo());
 		userActivity.setCategoryId(event.getCategoryId());
 		userActivity.setSubCategory(event.getSubCategoryId());
-		// split the invitee list
-		List<String> participants = new ArrayList<String>();
-		participants = Arrays.asList(event.getTo().split(TAG_SEPERATOR));
-		List<Participant> actParts= new ArrayList<Participant>();
-		for(String participantId: participants ){
-			Participant p = new Participant();
-			p.setStatus(RSVPSTATUS.NOT_REPLIED);
-			p.setUserType(TYPE.FB);
-			if(!StringUtils.isEmpty(participantId)){
-				p.setInviteeName(profileService.getByUserId(participantId).getName());
-			}
-			p.setUserId(participantId);
-			actParts.add(p);
-			userActivity.addInvitedId(p);
-		}
-		List<String> appParticipants = new ArrayList<String>();
-		if(!StringUtils.isEmpty(event.getToAppUsers())){
-			appParticipants = Arrays.asList(event.getToAppUsers().split(TAG_SEPERATOR));
-			for(String participantId: appParticipants ){
-				Participant p = new Participant();
-				p.setStatus(RSVPSTATUS.NOT_REPLIED);
-				p.setUserType(TYPE.APP);
-				if(!StringUtils.isEmpty(participantId)){
-					p.setInviteeName(profileService.getByUserId(participantId).getName());
-				}
-				p.setUserId(participantId);
-				actParts.add(p);
-				userActivity.addInvitedId(p);
-			}
-		}
+		
 		Date startTime = null;
 		Date endTime = null;
 		try {

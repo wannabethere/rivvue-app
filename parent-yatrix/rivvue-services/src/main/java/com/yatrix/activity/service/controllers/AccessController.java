@@ -128,6 +128,8 @@ public class AccessController {
 		}
 		userListDto.setProfiles(users);
 		model.put("friends", userListDto);
+		
+		
 		return "events/createEvent";
 	}
 
@@ -143,7 +145,8 @@ public class AccessController {
 	@RequestMapping(value="/friends/{userId}")
 	public String getProfileUsersPage(@PathVariable String userId, ModelMap model) {
 		//String authname = SecurityContextHolder.getContext().getAuthentication().getName();
-		log.info("Retrieving profile friends for " + userId);;
+		log.info("Retrieving profile friends for " + userId);
+		log.info("eventdraftid:" + model.get("eventDraftId"));;
 		UserAccount user = userRepository.getUserAccount(userId);
 		if(user == null){
 			user = userRepository.getUserAccountByUserName(userId);
@@ -160,7 +163,10 @@ public class AccessController {
 		userListDto.setProfiles(users);
 		model.addAttribute("users", userListDto);
 		model.addAttribute("authname", userId);
-		return "profileusers";
+		
+		log.info("Model: " + model);
+		
+		return model.containsKey("eventDraftId") ? "events/invitefriend" :"profileusers";
 	}
 
 	@RequestMapping("/calendarevents")

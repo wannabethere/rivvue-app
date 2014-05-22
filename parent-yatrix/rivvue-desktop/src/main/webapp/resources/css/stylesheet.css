@@ -559,7 +559,7 @@ overflow: hidden;
 	padding-left: 10px;
 	height:80px;
 }
-.text_field_search{ margin:0px auto; width:90%;}
+.text_field_search{ margin:0px auto; width:90%; padding: 20px 0px 20px 0px;}
 .text_field_search input[type="formtext"] { border: 1px solid #338bd5; color: #999; float: left; font-family: "District Pro", Arial ; height: 30px;    padding:0px 0 0 5px; width: 100%; font-size:14px; margin-bottom: 20px; background:url(../images/search_smll_verz.gif) 99% center no-repeat;}
 
 .text_field1 {float: left;  width: 87%; }
