@@ -14,6 +14,14 @@ p{
 	font-family:"District Pro", Arial ;
 }
 
+fieldset {
+	border:none;
+	}
+	
+	button {
+		border:none;
+		}
+
 header {
 	height: 80px;
 	width: 1000px;
@@ -62,17 +70,6 @@ header nav ul li a:hover{
 	box-shadow: 0px 6px 10px rgba(56, 56, 56, 1);
 	margin-bottom: 40px;
 }
-
-#content1 {
-	background-color: #FFF;
-	overflow: hidden;
-	width: 1000px;
-	margin-right: auto;
-	margin-left: auto;
-	box-shadow: 0px 6px 10px rgba(56, 56, 56, 1);
-	margin-bottom: 40px;
-}
-
 #banner {
  background: url("../images/banner.jpg") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
     float: left;
@@ -117,13 +114,6 @@ article {
 	float: left;
 	margin-bottom: 30px;
 }
-
-.article2 {
-	height: auto;
-	width: 70%;
-	float: left;
-	margin-bottom: 30px;
-}
 section {
 	width: 100%;
 	padding: 10px;
@@ -154,14 +144,15 @@ section h2 {
 	
 }
 #box {
-	overflow: hidden;
+	/*overflow: hidden;*/
 	border-bottom-width: thin;
 	border-bottom-style: solid;
 	border-bottom-color: #CCC;
 	padding-top: 10px;
 	padding-bottom: 10px;
 	padding-left: 10px;
-	height:200px;
+	height:auto;
+	min-height:160px;
 }
 #box a {
 	font-size: 15px;
@@ -185,25 +176,12 @@ section h2 {
 }
 #heading{
 	float: left;
+	clear: both;
 	width: 100%;
-	clear:both;
 	margin-top:5px;
+	
 	}
 	
-#heading2{
-float: left; width: 80%;}
-
-#deletebutton{float:right; padding:10px 30px 0 10px;}
-
-#small_decp {padding:0; margin:auto 0px; min-height:160px;}
-
-#join_btn {float:left; padding:5px 0 10px 0px; margin-left:-10px;}
-
-#dcline_btn {display:inline; clear:both;}
-
-#feed_twitter_icon { float:right; background-image:url(../images/twitter_feed_icon.png); width:20px; height:18px; }
-#feed_fb_icon { float:right; background-image:url(../images/FB_feed_icon.png); width:20px; height:18px; }
-
 .radius { float:none; padding:10px;}
 #rightbox {
 	float: right;
@@ -291,7 +269,6 @@ aside {
 	text-align: center;
 }
 .calenderbutton {
-padding-top:15px;
 	width: 220px;
 	margin-right: auto;
 	margin-left: auto;
@@ -386,12 +363,20 @@ footer a:hover{
 .event1{ float:left; width:98%;}
 .createevent{ float:left; margin-left:28px; }
 .allevent{ float: right;}
-.myevent { float:right; margin-left:20px;
-margin-top: 7px;}
-.myevent a{font-family:"District Pro", Arial ; font-size:18px; color:#4d4e53; text-decoration:underline; font-weight:bold;}
+.myevent { float:right; margin-left:20px; }
+.myevent a{font-family:"District Pro", Arial ; font-size:14px; color:#4d4e53; text-decoration:underline; font-weight:bold;}
 .searchbox1 {border: 1px solid #999; background: url(../images/search.jpg) no-repeat center left; padding: 5px 5px 5px 25px; color: #999;
 	margin-right: 20px;	margin-left:19px; 	width: 90%; clear:both;}
-
+#content1 {
+	background-color: #FFF;
+	overflow: hidden;
+	width: 1000px;
+	margin-right: auto;
+	margin-left: auto;
+	box-shadow: 0px 6px 10px rgba(56, 56, 56, 1);
+	margin-bottom: 40px;
+	padding-top:15px;
+}
 .inner_form { float: left; margin: 6px 0; width: 54%;}
 .inner_form label {font-family:"District Pro", Arial ; font-size:18px; color:#4d4e53; text-align: right;  width: 30%; margin-right:20px; float:left; font-weight:bold;}
 
@@ -411,7 +396,7 @@ textarea { border: 1px solid #bbb; float: left; font-family:"District Pro", Aria
 .pleasure_button{background:url(../images/pleasure.png) no-repeat scroll left center rgba(0, 0, 0, 0); border: medium none; height: 34px; 
 width:88px; margin-left:7px; cursor:pointer;}
 .text_field input[type="starttime"] { border: 1px solid #bbb; color: #000000; float: left; font-family: "District Pro", Arial ; height: 24px;    padding: 3px 0 0 10px;     width: 35%; font-size:14px;}
-.text_field select {border: 1px solid #bbb; color: #b2b2b2; float: left; font-family: "District Pro", Arial ; padding: 8px 5px; width: 93%; font-size:14px;}
+.text_field select {border: 1px solid #bbb; color: #000; float: left; font-family: "District Pro", Arial ; padding: 8px 5px; width: 93%; font-size:14px;}
 .invitefriend_button{background:url(../images/invitefriend.png) no-repeat scroll left center rgba(0, 0, 0, 0); border: medium none; height: 28px; 
 width:144px; cursor:pointer;}
 .looking_button{background:url(../images/looking.png) no-repeat scroll left center rgba(0, 0, 0, 0); border: medium none; height: 28px; 
@@ -449,7 +434,7 @@ width:108px;  cursor:pointer; color:#FFFFFF;}
 #breadcrumb1 ul{ float:left;}
 #breadcrumb1 ul li{ font-size:14px; color:#4d4e53; display:inline; text-transform:capitalize;}
 #breadcrumb1 ul li a{ font-size:14px; color:#4d4e53; text-decoration:underline; text-transform:capitalize;}
-#signin{ width: 434px; background-color:#edece8; margin: 0 auto; height:534px; }
+#signin{ width: 434px; background-color:#edece8; margin: 0 auto; height:auto; padding-bottom:10px; }
 #signin h1{ text-align:center; font-family:"District Pro", Arial; font-size:44px; color:#58595b; text-transform:capitalize; padding-top: 15px;}
 #signin .text_fieldlogin { margin: 0 auto; width:79%;}
 .text_fieldlogin input[type="text"] {border: 1px solid #bbb;color: #000000;float: left; font-family:"District Pro", Arial ; height: 30px; 
@@ -479,9 +464,9 @@ padding: 5px; width: 294px; height:58px; background-color:#FFFFFF; font-size: 18
 .signuplogin ul{ list-style:none; margin-left:-17px; }
 .signuplogin ul li{ display:inline; font-size:18px; color:#4e4f4d; text-align:center; margin-right:10px; font-family:Arial, Helvetica, sans-serif;}
 .signuplogin ul li.center{ float: left; line-height: 50px;}
-.inner_formlogin { float: left; margin: 6px 0; width: 54%;}
+.inner_formlogin { float: left; margin: 6px 0; width: 54%; outline:none;}
 .inner_formlogin label {font-family:"District Pro", Arial ; font-size:18px; color:#4d4e53; text-align: right;  width: 30%; margin-right:20px; float:left; font-weight:bold;}
-.form_center{width:418px; margin: 0 auto;}
+.form_center{ margin: 0 auto;}
 .text_field input[type="title"] { border: 1px solid #bbb; color: #000000; float: left; font-family: "District Pro", Arial ; height: 24px;    padding: 3px 0 0 10px; width: 70%; font-size:14px;}
 #watchmovie{
 overflow: hidden;
@@ -620,7 +605,7 @@ aside {width:100%;}
 .timeinput { width: 7% !important;}
 
 .inner_form {width:80%!important;}
-#box { min-height:400px!important; width:92%}
+#box { height:347px!important; width:92%}
 .searchbox1 { width:75%; margin-left:0px;}
 #eventrec { height:121px!important; width:96%}
 .text_field select { width:100%;}
@@ -761,7 +746,7 @@ aside {width:100%;}
 }
 .copyright { text-align: center!important;}
 .inner_form {width:80%!important;}
-#box { height:195px!important; width:96%}
+#box { height:172px!important; width:96%}
 #eventrec { height:90px!important; width:96%}
 #topparticipats {
     float: right;
@@ -807,7 +792,7 @@ aside {width:100%;}
 .topparticipatscomment1 {float: none;}
 .copyright { text-align: center!important;}
 .inner_form {width:80%!important;}
-#box { height:195px!important; width:96%}
+#box { height:172px!important; width:96%}
 #eventrec { height:90px!important; width:96%}
 
 #topparticipats {
@@ -833,15 +818,14 @@ aside {width:100%;}
 	.borderrig{ border-right:1px solid #f2f2f2;}
 	.contenttxtpop{ font-family:Arial; font-size:18px; color:#84848a; width:95%; margin-top:20px;}
 	#invitefriend {
-    border: thin solid #CCCCCC;
-    height: 50px;
-    margin: 0 auto;
     overflow: hidden;
+	border-top-width: thin;
+	border-top-style: solid;
+	border-top-color: #CCC;
+	padding-top: 20px;
     padding-bottom: 10px;
     padding-left: 10px;
-    padding-top: 20px;
-    text-align: center;
-    width: 90%;
+	height:50px;
 }
 #invitefriend a {
 	font-size: 15px;
@@ -855,37 +839,28 @@ aside {width:100%;}
 	color: #1061B0;
 	margin-left: 10px;
 }
-#invitefriend .namenew{color: #00000B; font-family: "District Pro",Arial; font-size: 20px; text-align:left;}
 .correctround{ float:right;}
 .socialiconpopup { margin: 0 auto;text-align: center; width: 100%;}
 .socialiconpopup ul{ list-style:none; margin-left:-40px;}
-.socialiconpopup ul li{ display:inline; margin-left:-6px;  }
-li .img12 {
-    border: 1px solid #E2E2E2;
-    text-align: center;
-    padding: 5px 44px 5px 42px;
-    background-color: #fafafa;}
-	
+.socialiconpopup ul li{ display:inline;  }
+.socialiconpopup ul li .img12{border: 2px solid #e2e2e2;}
 .lookingview{ width:95%; margin-left:10px;}
 
+.autocomplete-suggestions {
+	background-color:#FFF!important;
+	border:1px solid #666!important;
+	width:369px!important;
+	font-family:'District pro', sans-serif;
+	font-weight:normal;
+	padding:10px 0 10px 10px;}
 
-#addbtn_contacts {
-	margin:0px auto;
-	float:right;
-	padding:40px 10px 40px 0px;
+.autocomplete-suggestion {
+	background-color:#CCC;
+	cursor:pointer;}
 	
-	}
-#cncbtn_contacts	{
+	#calendar {
+	float: none;
+    width: 900px;
 	margin:0px auto;
-	font-family: "District Pro",Arial;
-	float:right;
-	vertical-align:middle;
-	display:table-cell;
-	padding:40px 40px 40px 0px;
-	color:#474747;
-	font-size:16px;
-	}
-	
-	#cncbtn_contacts a{
-	color:#474747;
+    padding: 0;
 	}
