@@ -20,6 +20,7 @@ import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
+import com.yatrix.activity.store.mongo.domain.UserDraftEvent;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.repository.UserEventsRepository;
 
@@ -463,6 +464,22 @@ public class UserEventsService {
 		}
 		Comment comment=new Comment(messageForEvent, System.currentTimeMillis(), p);
 		return comment;
+	}
+
+
+	public UserDraftEvent createUserDraftEvent(UserDraftEvent event) {
+		//Add logic to store in the database
+		mongoTemplate.insert(event);
+		//Notification Objects are created for Master worker spring patterns to process the data.
+		return event;
+
+	}
+
+
+	public UserDraftEvent updateUserDraftEvent(UserDraftEvent event) {
+		mongoTemplate.save(event);
+		return event;
+		
 	}
 	
 	

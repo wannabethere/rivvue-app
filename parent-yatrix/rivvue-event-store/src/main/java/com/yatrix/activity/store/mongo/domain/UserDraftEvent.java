@@ -9,18 +9,15 @@ import com.yatrix.activity.store.mongo.domain.Message.STATUS;
 import com.yatrix.activity.store.mongo.domain.Message.VISIBILITY;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
+import com.yatrix.activity.store.mongo.domain.UserEvent.EVENT_STATUS;
 
-@Document(collection = "UserEvents2")
-public class UserEvent extends Item{
+@Document(collection = "UserDraftEvents")
+public class UserDraftEvent extends Item{
 
 	/**
 	 * Serial Version UID.
 	 */
 	private static final long serialVersionUID = 2242068081611181292L;
-	//TODO: Move this out to a class
-	public static enum EVENT_STATUS {
-		DRAFT, PENDING, PROCESSING, INVITED,ME
-	}
 
 	private String title;
 	private String description;
@@ -38,9 +35,6 @@ public class UserEvent extends Item{
 	private VISIBILITY visibility;
 	//Move the below the above Object
 	
-	private String facebookEventId;
-	private String googleEventId;
-	private String facebookFeedId;
 	private EVENT_STATUS status;
 	private boolean deleted;
 	
@@ -48,10 +42,6 @@ public class UserEvent extends Item{
 	
 	private String originatorUserId;
 	private String originatorProfileUserId;
-	private long createdTimeStamp;
-	private long lupd;
-	//Change to something else if we want to update 
-	private long fbLupd;
 	
 	//Need to move TYPE to a UTIL class.
 	private TYPE fromUserType;
@@ -61,8 +51,6 @@ public class UserEvent extends Item{
 	private List<Participant> invitedIds = new ArrayList<Participant>();
 	private List<PostMessage> postedMessage = new ArrayList<PostMessage>();
 	private List<Comment> appComments = new ArrayList<Comment>();
-	private List<ActivityCalendarReference> replies = new ArrayList<ActivityCalendarReference>();
-
 	
 	public STATUS getProcessedStatus() {
 		return processedStatus;
@@ -103,14 +91,6 @@ public class UserEvent extends Item{
 		this.displayName = displayName;
 	}
 
-	public List<ActivityCalendarReference> getReplies() {
-		return replies;
-	}
-
-	public void setReplies(List<ActivityCalendarReference> replies) {
-		this.replies = replies;
-	}
-
 	public long getStartTime() {
 		return startTime;
 	}
@@ -140,27 +120,6 @@ public class UserEvent extends Item{
 		this.postedMessage.add(postedMessage);
 	}
 	
-	
-
-	public String getFacebookEventId() {
-		return facebookEventId;
-	}
-
-	public String getGoogleEventId() {
-		return googleEventId;
-	}
-
-	public void setFacebookEventId(String facebookEventId) {
-		this.facebookEventId = facebookEventId;
-	}
-
-	public void setGoogleEventId(String googleEventId) {
-		this.googleEventId = googleEventId;
-
-	}
-	
-	
-
 	public EVENT_STATUS getStatus() {
 		return status;
 	}
@@ -201,14 +160,6 @@ public class UserEvent extends Item{
 		this.appComments.add(newComment);
 	}
 
-
-	public void setFacebookFeedId(String facebookFeedId) {
-		this.facebookFeedId = facebookFeedId;
-	}
-
-	public String getFacebookFeedId() {
-		return facebookFeedId;
-	}
 	public String getTitle() {
 		return title;
 	}
@@ -316,22 +267,6 @@ public class UserEvent extends Item{
 		this.deleted = deleted;
 	}
 
-	public long getLupd() {
-		return lupd;
-	}
-
-	public void setLupd(long lupd) {
-		this.lupd = lupd;
-	}
-
-	public long getCreatedTimeStamp() {
-		return createdTimeStamp;
-	}
-
-	public void setCreatedTimeStamp(long createdTimeStamp) {
-		this.createdTimeStamp = createdTimeStamp;
-	}
-	
 	public String getPublishTo() {
 		return publishTo;
 	}
@@ -347,11 +282,8 @@ public class UserEvent extends Item{
 		result = prime * result + ((categoryId == null) ? 0 : categoryId.hashCode());
 		result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
 		
-		result = prime * result + ((facebookEventId == null) ? 0 : facebookEventId.hashCode());
-		result = prime * result + ((googleEventId == null) ? 0 : googleEventId.hashCode());
 		result = prime * result + ((location == null) ? 0 : location.hashCode());
 		result = prime * result + ((postedMessage == null) ? 0 : postedMessage.hashCode());
-		result = prime * result + ((replies == null) ? 0 : replies.hashCode());
 		
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		result = prime * result + ((subCategory == null) ? 0 : subCategory.hashCode());
@@ -366,7 +298,7 @@ public class UserEvent extends Item{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UserEvent other = (UserEvent)obj;
+		UserDraftEvent other = (UserDraftEvent)obj;
 		if (categoryId == null) {
 			if (other.categoryId != null)
 				return false;
@@ -378,16 +310,6 @@ public class UserEvent extends Item{
 		} else if (!displayName.equals(other.displayName))
 			return false;
 		
-		if (facebookEventId == null) {
-			if (other.facebookEventId != null)
-				return false;
-		} else if (!facebookEventId.equals(other.facebookEventId))
-			return false;
-		if (googleEventId == null) {
-			if (other.googleEventId != null)
-				return false;
-		} else if (!googleEventId.equals(other.googleEventId))
-			return false;
 		if (location == null) {
 			if (other.location != null)
 				return false;
@@ -397,11 +319,6 @@ public class UserEvent extends Item{
 			if (other.postedMessage != null)
 				return false;
 		} else if (!postedMessage.equals(other.postedMessage))
-			return false;
-		if (replies == null) {
-			if (other.replies != null)
-				return false;
-		} else if (!replies.equals(other.replies))
 			return false;
 		
 		if (status != other.status)
@@ -422,14 +339,6 @@ public class UserEvent extends Item{
 		this.originatorUserId = originatorUserId;
 	}
 
-	public long getFbLupd() {
-		return fbLupd;
-	}
-
-	public void setFbLupd(long fbLupd) {
-		this.fbLupd = fbLupd;
-	}
-
 	@Override
 	public String toString() {
 		return "UserEvent [title=" + title + ", description=" + description
@@ -438,14 +347,10 @@ public class UserEvent extends Item{
 				+ ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", location=" + location + ", processedStatus="
 				+ processedStatus + ", visibility=" + visibility
-				+ ", facebookEventId=" + facebookEventId + ", googleEventId="
-				+ googleEventId + ", facebookFeedId=" + facebookFeedId
 				+ ", status=" + status + ", deleted=" + deleted + ", duration="
 				+ duration + ", originatorUserId=" + originatorUserId
-				+ ", createdTimeStamp=" + createdTimeStamp + ", lupd=" + lupd
 				+ ", invitedIds=" + invitedIds + ", postedMessage="
-				+ postedMessage + ", appComments=" + appComments + ", replies="
-				+ replies + "]";
+				+ postedMessage + ", appComments=" + appComments + "]";
 	}
 
 	public TYPE getFromUserType() {

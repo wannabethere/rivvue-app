@@ -39,6 +39,7 @@ import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
+import com.yatrix.activity.store.mongo.domain.UserDraftEvent;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
@@ -256,10 +257,10 @@ public class EventFBController {
 			Log.info("Auth Name: "+ authname);
 			UserAccount acct=userAccountRepository.getUserAccount(userid);
 			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
-			UserEvent event=EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB",
+			UserDraftEvent event=EventMapper.toCreateUserDraftEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB",
 					author);
 			
-			event = eventsService.createUserEvent(event);
+			event = eventsService.createUserDraftEvent(event);
 			
 			// Add a message with URL to our app.
 			
@@ -272,23 +273,24 @@ public class EventFBController {
 			
 			event.addComment(comment);
 			
-			try{
-				eventsService.updateUserEvent(event);
-			}catch(ActivityDBException ade){
-				logger.error("Error updating comment with URL: " +  ade.getMessage());
-			}
+			//try{
+				eventsService.updateUserDraftEvent(event);
+//			}catch(ActivityDBException ade){
+//				logger.error("Error updating comment with URL: " +  ade.getMessage());
+//			}
 			
-			if(!StringUtils.isEmpty(acct.getFacebookId())){
-				FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
-				createCommand.setConnectionFactoryLocator(connectionFactoryLocator);
-				createCommand.setEventsService(eventsService);
-				createCommand.setUserSocialConnectionService(userSocialConnectionService);
-				createCommand.executeFacebookEventFeed();
-			}   
+//			if(!StringUtils.isEmpty(acct.getFacebookId())){
+//				FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
+//				createCommand.setConnectionFactoryLocator(connectionFactoryLocator);
+//				createCommand.setEventsService(eventsService);
+//				createCommand.setUserSocialConnectionService(userSocialConnectionService);
+//				createCommand.executeFacebookEventFeed();
+//			}   
 			
 			model.addAttribute("activityId",event.getId());
 			model.addAttribute("status","Successully Created: ");
-			return "redirect:/myactivities/"+userid;
+			//return "redirect:/myactivities/"+userid;
+			return "redirect:/friends/" + userid;
 	}
 	
 	

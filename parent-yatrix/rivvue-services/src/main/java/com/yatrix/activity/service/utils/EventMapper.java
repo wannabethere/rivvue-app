@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.social.twitter.api.Entities;
@@ -31,6 +32,7 @@ import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.PostMessage;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
+import com.yatrix.activity.store.mongo.domain.UserDraftEvent;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserActivity.EVENT_STATUS;
@@ -134,6 +136,105 @@ public class EventMapper {
 		
 		userActivity.setFromUserType(fromUserType);
 		userActivity.setCreatedTimeStamp(Calendar.getInstance().getTime().getTime());
+		if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
+			userActivity.setVisibility(Message.VISIBILITY.PRIVATE);
+		} else if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PUBLIC.toString())) {
+			userActivity.setVisibility(Message.VISIBILITY.PUBLIC);
+		} else if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.FRIENDSONLY.toString())) {
+			userActivity.setVisibility(Message.VISIBILITY.FRIENDSONLY);
+		}
+		else{
+			userActivity.setVisibility(Message.VISIBILITY.ME);
+		}
+		if(!StringUtils.isEmpty(event.getTitle())){
+			userActivity.setTitle(event.getTitle());
+		}
+		else{
+			userActivity.setTitle(event.getMessage());
+		}
+		String tags=event.getTags();
+		userActivity.setStatus(UserEvent.EVENT_STATUS.PENDING);
+		userActivity.setOriginatorUserId(event.getFrom());
+		userActivity.setDescription(event.getDescription());
+		Venue location = new Venue();
+		location.setFormattedAddress(event.getLocation());
+		location.setLocation(event.getLocation());
+		location.setPlace(event.getPlace());
+		location.setLatlng(new double[]{Double.valueOf(event.getLocationLat()),Double.valueOf(event.getLocationLng()) });
+		if(!StringUtils.isEmpty(tags)){
+			location.setTags(Arrays.asList(tags.split(TAG_SEPERATOR)));
+		}
+		userActivity.setLocation(location);
+		userActivity.setPublishTo(event.getPublishTo());
+		userActivity.setCategoryId(event.getCategoryId());
+		userActivity.setSubCategory(event.getSubCategoryId());
+		// split the invitee list
+		List<String> participants = new ArrayList<String>();
+		participants = Arrays.asList(event.getTo().split(TAG_SEPERATOR));
+		List<Participant> actParts= new ArrayList<Participant>();
+		for(String participantId: participants ){
+			Participant p = new Participant();
+			p.setStatus(RSVPSTATUS.NOT_REPLIED);
+			p.setUserType(TYPE.FB);
+			if(!StringUtils.isEmpty(participantId)){
+				p.setInviteeName(profileService.getByUserId(participantId).getName());
+			}
+			p.setUserId(participantId);
+			actParts.add(p);
+			userActivity.addInvitedId(p);
+		}
+		List<String> appParticipants = new ArrayList<String>();
+		if(!StringUtils.isEmpty(event.getToAppUsers())){
+			appParticipants = Arrays.asList(event.getToAppUsers().split(TAG_SEPERATOR));
+			for(String participantId: appParticipants ){
+				Participant p = new Participant();
+				p.setStatus(RSVPSTATUS.NOT_REPLIED);
+				p.setUserType(TYPE.APP);
+				if(!StringUtils.isEmpty(participantId)){
+					p.setInviteeName(profileService.getByUserId(participantId).getName());
+				}
+				p.setUserId(participantId);
+				actParts.add(p);
+				userActivity.addInvitedId(p);
+			}
+		}
+		Date startTime = null;
+		Date endTime = null;
+		try {
+			startTime = format.parse(event.getFromdate() + " " + event.getFromtime());
+			endTime = format.parse(event.getTodate() + " " + event.getTotime());
+		} catch (ParseException e) {
+			logger.error("Event start/end date format is incorrect");
+			throw new IllegalStateException("Activity start/end date format is incorrect", e);
+		}
+		//userActivity.setInvitedIds(actParts);
+		userActivity.setStartTime(startTime.getTime());
+		userActivity.setEndTime(endTime.getTime());
+		Comment comment= new Comment();
+		comment.setFromId(event.getFrom());
+		UserProfile pf=profileService.getByUserId(author);
+		//TODO: Fix first Name and Last Name. By Setting the FromId from Profile instead of acct when creating
+		//The Event.
+		comment.setFromAuthorName(pf.getName());
+		comment.setMessage(event.getMessage());
+		//TODO MAKE IT MORE ROBUST
+		//comment.addCommentSync("appCommentID1", COMMENTTYPE.APP,System.currentTimeMillis());
+		userActivity.addComment(comment);
+		PostMessage messageposted = new PostMessage();
+		messageposted.setAuthorId(event.getFrom());
+		messageposted.setAuthorFullName(event.getAuthorFullName());
+		messageposted.setMessage(event.getMessage());
+		userActivity.addPostedMessage(messageposted);
+		
+		return userActivity;
+	}
+	
+	public static UserDraftEvent toCreateUserDraftEventObject(EventDto event, ProfileService profileService, String fromUserType, String author){
+		isvalidEvent(event);
+		UserDraftEvent userActivity= new UserDraftEvent();
+		
+		userActivity.setFromUserType(fromUserType);
+
 		if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
 			userActivity.setVisibility(Message.VISIBILITY.PRIVATE);
 		} else if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PUBLIC.toString())) {
@@ -359,10 +460,7 @@ public class EventMapper {
 			logger.error("User name is empty " + event.toString());
 			throw new IllegalStateException("user.empty");
 		}
-		if ( StringUtils.isEmpty(event.getTo()) && StringUtils.isEmpty(event.getToAppUsers()) ) {
-			logger.error("Invitee user list is empty " + event.toString());
-			throw new IllegalStateException("invitee.empty");
-		}
+		
 		if (StringUtils.isEmpty(event.getLocation())) {
 			logger.error("Event location value is empty");
 			throw new IllegalStateException("location.empty");
