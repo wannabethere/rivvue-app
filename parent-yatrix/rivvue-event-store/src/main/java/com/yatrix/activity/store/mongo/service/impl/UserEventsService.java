@@ -481,6 +481,16 @@ public class UserEventsService {
 		return event;
 		
 	}
+
+
+	public UserDraftEvent getUserDraftEvent(String draftEventId) {
+		Criteria locationCriteria = Criteria.where("id").is(draftEventId);
+		BasicQuery query = new BasicQuery(locationCriteria.getCriteriaObject());
+		
+		List<UserDraftEvent> events = mongoTemplate.find(query, UserDraftEvent.class);
+		
+		return events.get(0);	
+	}
 	
 	
 }

@@ -229,6 +229,43 @@ public class EventMapper {
 		return userActivity;
 	}
 	
+	public static UserEvent addInviteesToEvent(ProfileService profileService, UserEvent userActivity, String fbUsers, String appUsers){
+		// split the invitee list
+		List<String> participants = new ArrayList<String>();
+		participants = Arrays.asList(fbUsers.split(TAG_SEPERATOR));
+		List<Participant> actParts= new ArrayList<Participant>();
+		if(!StringUtils.isEmpty(appUsers)){
+			for(String participantId: participants ){
+				Participant p = new Participant(); 
+				p.setStatus(RSVPSTATUS.NOT_REPLIED);
+				p.setUserType(TYPE.FB);
+				if(!StringUtils.isEmpty(participantId)){
+					p.setInviteeName(profileService.getByUserId(participantId).getName());
+				}
+				p.setUserId(participantId);
+				actParts.add(p);
+				userActivity.addInvitedId(p);
+			}
+		}
+		List<String> appParticipants = new ArrayList<String>();
+		if(!StringUtils.isEmpty(appUsers)){
+			appParticipants = Arrays.asList(appUsers.split(TAG_SEPERATOR));
+			for(String participantId: appParticipants ){
+				Participant p = new Participant();
+				p.setStatus(RSVPSTATUS.NOT_REPLIED);
+				p.setUserType(TYPE.APP);
+				if(!StringUtils.isEmpty(participantId)){
+					p.setInviteeName(profileService.getByUserId(participantId).getName());
+				}
+				p.setUserId(participantId);
+				actParts.add(p);
+				userActivity.addInvitedId(p);
+			}
+		}
+
+		return userActivity;
+	}
+	
 	public static UserDraftEvent toCreateUserDraftEventObject(EventDto event, ProfileService profileService, String fromUserType, String author){
 		isvalidEvent(event);
 		UserDraftEvent userActivity= new UserDraftEvent();

@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -231,12 +232,6 @@ public class EventFBController {
 		return  "events/events2" ;
 	}
 	
-	
-	
-	
-	
-	
-	
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
 	public String  getAllEvents(@PathVariable String userId,ModelMap model) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
@@ -253,7 +248,7 @@ public class EventFBController {
 	}
 	
 	@RequestMapping(value = "/{userid}", produces = "application/json",method = RequestMethod.POST)
-	public String createUserEvent(@PathVariable String userid, EventDto dto, ModelMap model,
+	public String createUserDraftEvent(@PathVariable String userid, EventDto dto, ModelMap model,
 			final RedirectAttributes redirectAttributes) throws InterruptedException, ExecutionException {
 			String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 			Log.info("Auth Name: "+ authname);
@@ -296,7 +291,38 @@ public class EventFBController {
 			return "redirect:/friends/" + userid;
 	}
 	
-	
+	@RequestMapping(value = "/createEventFromDraft/{draftEventId}/{userId}", method = RequestMethod.POST)
+	public String createUserEventFromDraft(@PathVariable String userId, @PathVariable String draftEventId, @RequestParam String toAppUsers,
+			@RequestParam String to, ModelMap model,
+			final RedirectAttributes redirectAttributes) throws InterruptedException, ExecutionException {
+			
+		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
+		UserAccount acct=userAccountRepository.getUserAccount(userId);
+		Log.info("Auth Name: "+ authname);
+		
+		UserDraftEvent draftEvent = eventsService.getUserDraftEvent(draftEventId);
+		UserEvent event = new UserEvent();
+		String[] ignoreProperties = {"id"};
+		
+		BeanUtils.copyProperties(draftEvent, event, ignoreProperties);
+		
+		event = EventMapper.addInviteesToEvent(profileService, event, to, toAppUsers);
+			
+		event = eventsService.createUserEvent(event);
+			
+		if(!StringUtils.isEmpty(acct.getFacebookId())){
+			FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
+			createCommand.setConnectionFactoryLocator(connectionFactoryLocator);
+			createCommand.setEventsService(eventsService);
+			createCommand.setUserSocialConnectionService(userSocialConnectionService);
+			createCommand.executeFacebookEventFeed();
+		}   
+			
+		model.addAttribute("eventDraftId",event.getId());
+		model.addAttribute("status","Successully Created: ");
+
+		return "redirect:/myactivities/" + userId;
+	}
 	
 
 	/**
