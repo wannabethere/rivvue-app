@@ -54,6 +54,28 @@
 						}
 					});	
 		     }
+		     
+		     function acceptEvent(eventId){
+		    	 $.ajax({
+						url : "/wannabethere/myactivities/" + $('#username').val() + "/" + eventId + "/acceptedEvent",
+						dataType : "json",
+						success : function(messagePosted) {
+							alert("Join successful." );
+							
+						}
+					});
+		     }
+		     
+		     function rejectEvent(eventId){
+		    	 $.ajax({
+						url : "/wannabethere/myactivities/" + $('#username').val() + "/" + eventId + "/rejectEvent",
+						dataType : "json",
+						success : function(messagePosted) {
+							alert("Reject successful." );
+							
+						}
+					});
+		     }
 		//]]>
 </script>
 </head>
@@ -73,6 +95,7 @@
 <!--topmenu end-->
    
    <div class="event1">
+   <input type="hidden" name="username" id="username"  th:value="${authname}"  />
    <div class="createevent"><a href="#" th:href="@{/calendarevent/}"><img src="./../../resources/images/createevent.png" th:src="@{/resources/images/createevent.png}"  alt="" /></a></div>
      <div class="myevent"><a href="#" th:href="@{'/myactivities/'+${authname} + '/invitedevents'}">Invited Events</a></div>
    <div class="allevent"><a th:href="@{'/myactivities/publicevents?state=CA'}"><img src="./../../resources/images/allevent.png" th:src="@{/resources/images/allevent.png}"  alt="" /></a></div>
@@ -109,6 +132,15 @@
 		<div class="style3"><img src="./resources/images/participants.png" width="25" height="21" /> <span th:text="${#lists.size(event.facebookAccepted)}">21 </span> Participants accepted this Event</div>
           <div class="style1" th:text="${#dates.format(event.startDate, 'EEEE dd, MMMM yyyy')}">Friday, 20 Decomber 2013   </div>
       <div class="style2" ><span th:text="${#dates.format(event.startDate, 'HH:mm a')}">8:30am</span> &nbsp;&nbsp; &rarr;&nbsp;&nbsp; <span th:text="${#dates.format(event.endDate, 'HH:mm a')}">8:30am</span> <span class="imdb" style="font-size:18px;">(<span th:text="${event.duration}">1</span>hour(s))</span></div>
+      
+      <!--start join-decline-button -->
+		<div id="join_btn" th:if="${showAcceptReject}">
+			<a href="javascript:void(0)" th:onclick="'javascript:acceptEvent(\'' + ${event.id} +  '\')'"><img th:src="@{/resources/images/join_button.png}" /></a> 
+		</div>
+		<div id="dcline_btn" th:if="${showAcceptReject}">
+			<a href="javascript:void(0)" th:onclick="'javascript:rejectEvent(\'' + ${event.id} + '\')'"><img th:src="@{/resources/images/decline_button.png}" /></a>	
+		</div>
+ <!--end join-decline-button -->
     </div>
     <!--end innerbox -->
     </div>     <!-- end box-->

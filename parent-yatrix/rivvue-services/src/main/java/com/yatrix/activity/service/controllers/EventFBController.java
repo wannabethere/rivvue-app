@@ -378,6 +378,8 @@ public class EventFBController {
 		logger.debug("number of events found :"+eventList.size());
 		model.addAttribute("events", eventList);
 		model.addAttribute("authname", userId);
+		model.addAttribute("showAcceptReject", Boolean.TRUE);
+		
 		return "events/postlogin";
 	}
 	

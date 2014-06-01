@@ -183,26 +183,20 @@
 
     </div>-->
         
-  <div id="formbox">
-     
-  <form id="event_details" action="" method="get">
-  <input type="hidden" name="username" id="username"  th:value="${authname}"  />
-  <input type="hidden" name="userType" id="userType"  th:value="${userType}"  />
-   <input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
- <div class="inner_form1">
-					<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>
-				<div class="post"><a href="javascript:postMessage()" id="post" name="post" >POST</a></div>
-</div>
-</form>
-     
+  		<div id="formbox">
+  			<form id="event_details" action="" method="get">
+  				<input type="hidden" name="username" id="username"  th:value="${authname}"  />
+  				<input type="hidden" name="userType" id="userType"  th:value="${userType}"  />
+   				<input type="hidden" name="eventId" id="eventId" th:value="${event.id}"  />
+ 				<div class="inner_form1">
+	  				<div class="text_field1"><input type="text" name="message" id="message" size="100" /></div>
+   	  				<div class="post"><a href="javascript:postMessage()" id="post" name="post" >POST</a></div>
+				</div>
+			</form>
+		</div>
+	</section>
     
-    
-    
-
-    </div>
-   </section>
-    
-   </article> 
+</article> 
    
    
    
