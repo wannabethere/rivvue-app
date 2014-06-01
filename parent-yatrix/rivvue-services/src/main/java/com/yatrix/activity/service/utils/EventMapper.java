@@ -234,7 +234,7 @@ public class EventMapper {
 		List<String> participants = new ArrayList<String>();
 		participants = Arrays.asList(fbUsers.split(TAG_SEPERATOR));
 		List<Participant> actParts= new ArrayList<Participant>();
-		if(!StringUtils.isEmpty(appUsers)){
+		if(!StringUtils.isEmpty(fbUsers)){
 			for(String participantId: participants ){
 				Participant p = new Participant(); 
 				p.setStatus(RSVPSTATUS.NOT_REPLIED);
