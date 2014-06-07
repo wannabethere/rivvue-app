@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yatrix.activity.store.fb.domain.FacebookInvitee;
 import com.yatrix.activity.store.mongo.domain.Comment;
 
@@ -29,6 +30,7 @@ public class EventDto {
 	private String formattedAddress;
 	private String locationLat;
 	private String locationLng;
+	@JsonIgnore
 	private long duration;
 	private String fromdate;
 	private String fromtime;

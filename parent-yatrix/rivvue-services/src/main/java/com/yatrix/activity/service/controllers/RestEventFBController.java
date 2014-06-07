@@ -12,12 +12,14 @@ import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +48,7 @@ import com.yatrix.activity.store.mongo.domain.Participant;
 import com.yatrix.activity.store.mongo.domain.Participant.RSVPSTATUS;
 import com.yatrix.activity.store.mongo.domain.Participant.TYPE;
 import com.yatrix.activity.store.mongo.domain.UserAccount;
+import com.yatrix.activity.store.mongo.domain.UserDraftEvent;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
 import com.yatrix.activity.store.mongo.domain.UserProfile;
 import com.yatrix.activity.store.mongo.domain.UserProfile.PROFILETYPE;
@@ -62,6 +65,9 @@ public class RestEventFBController {
 	// Create an instance of SimpleDateFormat used for formatting 
 	// the string representation of date (month/day/year)
 	private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+	
+	@Autowired
+	Environment env;
 
 	@Autowired
 	private UserAccountService userAccountRepository;
@@ -276,7 +282,7 @@ public class RestEventFBController {
 	}
 	
 	@RequestMapping(value = "/{userid}", produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody EventDetailsResponse createUserEvent(@PathVariable String userid, EventDto dto) throws InterruptedException, ExecutionException {
+	public @ResponseBody EventDetailsResponse createUserEvent(@PathVariable String userid, @RequestBody EventDto dto) throws InterruptedException, ExecutionException {
 			
 			UserAccount acct = userAccountRepository.getUserAccount(userid);
 			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
@@ -299,7 +305,39 @@ public class RestEventFBController {
 			return eventDetailsResponse;
 	}
 	
-	
+
+	@RequestMapping(value = "/createdraftevent/{userid}", produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody EventDetailsResponse createUserDraftEvent(@PathVariable String userid, @RequestBody EventDto dto) throws InterruptedException, ExecutionException {
+			
+			UserAccount acct = userAccountRepository.getUserAccount(userid);
+			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
+			
+			UserDraftEvent event=EventMapper.toCreateUserDraftEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB",
+					author);
+			
+			event = eventsService.createUserDraftEvent(event);
+			
+			// Add a message with URL to our app.
+			
+			Comment comment= new Comment();
+			UserProfile pf=profileService.getByUserId(author);
+
+			comment.setFromId(dto.getFrom());
+			comment.setFromAuthorName(pf.getName());
+			comment.setMessage("For details on the event: " + env.getProperty("application.url") + "/activities/" + userid + "/" + event.getId());
+			
+			event.addComment(comment);
+			
+			eventsService.updateUserDraftEvent(event);
+			
+			EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+			eventDetailsResponse.setStatus(200);
+			dto.setId(event.getId());
+			eventDetailsResponse.setEventDto(dto);
+			
+			return eventDetailsResponse;
+	}
+
 	
 
 	/**
