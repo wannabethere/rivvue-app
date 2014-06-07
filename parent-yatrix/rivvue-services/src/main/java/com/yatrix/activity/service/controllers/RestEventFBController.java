@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,13 +66,13 @@ public class RestEventFBController {
 	// Create an instance of SimpleDateFormat used for formatting 
 	// the string representation of date (month/day/year)
 	private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	
+
 	@Autowired
 	Environment env;
 
 	@Autowired
 	private UserAccountService userAccountRepository;
-	
+
 	@Autowired
 	private UserEventsService eventsService;
 
@@ -81,8 +82,8 @@ public class RestEventFBController {
 	private ConnectionService userSocialConnectionService;
 	@Autowired
 	private ConnectionFactoryLocator connectionFactoryLocator;
-	
-	
+
+
 	@Autowired
 	private UserAccountService userAccountService;
 
@@ -94,18 +95,18 @@ public class RestEventFBController {
 			value = "{userid}/event/{useractivityId}",
 			method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody EventDetailsResponse getUserActivity(@PathVariable String userid, @PathVariable String useractivityId) throws ActivityDBException {
-		
+
 		String authname = SecurityContextHolder.getContext().getAuthentication().getName();
 		Log.info("Auth Name: "+ authname);
 		UserAccount acct=userAccountRepository.getUserAccount(userid);
-		
+
 		if(acct==null){
 			acct = userAccountService.getUserAccount(authname);
 			if(acct==null){
 				return createNotLoggedInEventRespones();
 			}
 		}
-		
+
 		UserEvent event = eventsService.getActivity(useractivityId);
 		List<Comment> appCommentsNotPosted = new ArrayList<Comment>();
 
@@ -124,26 +125,26 @@ public class RestEventFBController {
 			event.setDisplayName(event.getOriginatorUserId()); 
 			//model.put("userType","APP" );
 		}
-		
+
 		ProfileListDto userListDto = new ProfileListDto();
 		List<UserDto> users = new ArrayList<UserDto>();
-		
+
 		//This is the facebook Id only check. Later we have
 		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
 		if(friends!=null){
 			users.addAll(UserMapper.mapUserProfile(friends));
 		}
 		userListDto.setProfiles(users);
-		
+
 		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
 		eventDetailsResponse.setStatus(200);
 		eventDetailsResponse.setFriendsList(userListDto);
 		eventDetailsResponse.setEventDto(EventMapper.convertToEventDto(event));
 		eventDetailsResponse.setComments(appCommentsNotPosted);
-		
+
 		return eventDetailsResponse;
 	}
-	
+
 	/*
 	 * Returns the USER ID for Public Search Pages.
 	 * Need to figure what to display.
@@ -151,7 +152,7 @@ public class RestEventFBController {
 	 */
 	@RequestMapping(value = "/event/{useractivityId}",method = RequestMethod.GET)
 	public @ResponseBody EventDetailsResponse getPublicUserActivity( @PathVariable String useractivityId, ModelMap model) throws ActivityDBException {
-		
+
 		UserEvent event = eventsService.getActivity(useractivityId);
 		if (event == null) {
 			ActivityDBException noactivity = new ActivityDBException("no user event found ");
@@ -166,10 +167,10 @@ public class RestEventFBController {
 		eventDetailsResponse.setFriendsList(userListDto);
 		eventDetailsResponse.setEventDto(EventMapper.convertToEventDto(event));
 		eventDetailsResponse.setComments(appCommentsNotPosted);
-		
+
 		return eventDetailsResponse;
 	}
-	
+
 	/*
 	 * Given useractvityId, search the db and return
 	 * @Param
@@ -192,10 +193,10 @@ public class RestEventFBController {
 		}
 		UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(acct.getFacebookId())?acct.getUserId():acct.getFacebookId());
 		List<UserProfile> friends=profileService.getMyContacts((!StringUtils.isEmpty(acct.getFacebookId()))?acct.getFacebookId():acct.getUserId());
-		
+
 		return EventMapper.getEventInvitees(event, acct, pf, friends);
 	}
-	
+
 	/**
 	 * Returns Weather details
 	 * @param userid
@@ -205,28 +206,28 @@ public class RestEventFBController {
 	 */
 	@RequestMapping(value = "{userid}/weather",method = RequestMethod.GET)
 	public @ResponseBody WeatherResponse  getWeatherDetails(@PathVariable String userid, @RequestParam List<String> events) throws ActivityDBException {
-		
+
 		WeatherResponse weatherResponse = new WeatherResponse();
 		WeatherDetails weatherDetails;
-		
+
 		//TODO: Place holders. Replace with original values
 		weatherResponse.setStatus(200);
-		
+
 		if(events != null){
 			for(String eventId : events){
 				weatherDetails = new WeatherDetails();
-				
+
 				weatherDetails.setEventId(eventId);
 				weatherDetails.setWeather(new Random().nextInt(50) + ".25*F");
-				
+
 				weatherResponse.addWeatherDetails(weatherDetails);
 			}
 		}
-		
-		
+
+
 		return weatherResponse;
 	}
-	
+
 	/**
 	 * Returns Weather details
 	 * @param userid
@@ -236,57 +237,164 @@ public class RestEventFBController {
 	 */
 	@RequestMapping(value = "{userid}/rating",method = RequestMethod.GET)
 	public @ResponseBody RatingResponse  getRatings(@PathVariable String userid, @RequestParam List<String> events) throws ActivityDBException {
-		
+
 		RatingResponse ratingResponse = new RatingResponse();
 		RatingDetails ratingDetails;
-		
+
 		//TODO: Place holders. Replace with original values
 		ratingResponse.setStatus(200);
-		
+
 		if(events != null){
 			for(String eventId : events){
 				ratingDetails = new RatingDetails();
-				
+
 				ratingDetails.setEventId(eventId);
 				ratingDetails.setRating("IMDB Rating " + new Random().nextInt(10) );
-				
+
 				ratingResponse.addRatingDetails(ratingDetails);
 			}
 		}
-		
-		
+
+
 		return ratingResponse;
 	}
-	
+
 	@RequestMapping(value="/{userId}", produces="application/json" ,method=RequestMethod.GET)
 	public @ResponseBody EventsResponse getAllEvents(@PathVariable String userId, @RequestParam Long start, @RequestParam Long end) {
-		
+
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all events for user"+userId);
-		
+
 		EventsResponse eventsResponse = new EventsResponse();
 		List<UserEvent> events =  eventsService.getMyActivities(userId, start, end);
 		List<EventDto> eventList=new ArrayList<EventDto>();
-		
+
 		for(UserEvent event: events){
 			//TODO: We might need to convert only few properties. check with mobile team.
 			eventList.add(EventMapper.convertToEventDto(event));
 		}
-		
+
 		logger.debug("number of events found :"+eventList.size());
-		
+
 		eventsResponse.setStatus(200);
 		eventsResponse.setEvents(eventList);
-		
+
 		return eventsResponse;
 	}
-	
+
 	@RequestMapping(value = "/{userid}", produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody EventDetailsResponse createUserEvent(@PathVariable String userid, @RequestBody EventDto dto) throws InterruptedException, ExecutionException {
+
+		UserAccount acct = userAccountRepository.getUserAccount(userid);
+		String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
+		UserEvent event = EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB", author);
+		event = eventsService.createUserEvent(event);
+
+		if(!StringUtils.isEmpty(acct.getFacebookId())){
+			FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
+			createCommand.setConnectionFactoryLocator(connectionFactoryLocator);
+			createCommand.setEventsService(eventsService);
+			createCommand.setUserSocialConnectionService(userSocialConnectionService);
+			createCommand.executeFacebookEventFeed();
+		}   
+
+		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+		eventDetailsResponse.setStatus(200);
+		dto.setId(event.getId());
+		eventDetailsResponse.setEventDto(dto);
+
+		return eventDetailsResponse;
+	}
+
+
+	@RequestMapping(value = "/createdraftevent/{userid}", produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody EventDetailsResponse createUserDraftEvent(@PathVariable String userid, @RequestBody EventDto dto) throws InterruptedException, ExecutionException {
+
+		UserAccount acct = userAccountRepository.getUserAccount(userid);
+		String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
+
+		UserDraftEvent event=EventMapper.toCreateUserDraftEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB",
+				author);
+
+		event = eventsService.createUserDraftEvent(event);
+
+		// Add a message with URL to our app.
+
+		Comment comment= new Comment();
+		UserProfile pf=profileService.getByUserId(author);
+
+		comment.setFromId(dto.getFrom());
+		comment.setFromAuthorName(pf.getName());
+		comment.setMessage("For details on the event: " + env.getProperty("application.url") + "/activities/" + userid + "/" + event.getId());
+
+		event.addComment(comment);
+
+		eventsService.updateUserDraftEvent(event);
+
+		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+		eventDetailsResponse.setStatus(200);
+		dto.setId(event.getId());
+		eventDetailsResponse.setEventDto(dto);
+
+		return eventDetailsResponse;
+	}
+
+	@RequestMapping(value = "/addInvitees/{draftEventId}/{userid}", produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody EventDetailsResponse addInvitees(@PathVariable String userid, @PathVariable String draftEventId, @RequestParam String toAppUsers,
+			@RequestParam String toFBUsers) throws InterruptedException, ExecutionException {
+
+		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+
+		UserDraftEvent draftEvent = eventsService.getUserDraftEvent(draftEventId);
+		
+		if(draftEvent == null){
+			eventDetailsResponse.setMessage("Draft event not found with id " + draftEventId);
+		} else {
+			draftEvent = EventMapper.addInviteesToDraftEvent(profileService, draftEvent, toFBUsers, toAppUsers);
+			eventsService.updateUserDraftEvent(draftEvent);
+			eventDetailsResponse.setMessage("Added invitees to draft event");
+			eventDetailsResponse.setStatus(200);
+		}
+
+		return eventDetailsResponse;
+	}
+	
+	@RequestMapping(value = "/lookingViewable/{draftEventId}/{userid}", produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody EventDetailsResponse addLookingViewable(@PathVariable String userid, @PathVariable String draftEventId, @RequestParam String lookingViewable) throws InterruptedException, ExecutionException {
+
+		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+
+		UserDraftEvent draftEvent = eventsService.getUserDraftEvent(draftEventId);
+		
+		if(draftEvent == null){
+			eventDetailsResponse.setMessage("Draft event not found with id " + draftEventId);
+		} else {
+			draftEvent = EventMapper.addLookingViewable(draftEvent, lookingViewable);
+			eventsService.updateUserDraftEvent(draftEvent);
+			eventDetailsResponse.setMessage("Looking viewable updated successfully");
+			eventDetailsResponse.setStatus(200);
+			//eventDetailsResponse.setEventDto(draftEvent);
+		}
+
+		return eventDetailsResponse;
+	}
+	
+	@RequestMapping(value = "/createEventFromDraft/{draftEventId}/{userid}", produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody EventDetailsResponse createEventFromDraft(@PathVariable String userid, @PathVariable String draftEventId) throws InterruptedException, ExecutionException {
+
+		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
+
+		UserAccount acct=userAccountRepository.getUserAccount(userid);
+		UserDraftEvent draftEvent = eventsService.getUserDraftEvent(draftEventId);
+		
+		if(draftEvent == null){
+			eventDetailsResponse.setMessage("Draft event not found with id " + draftEventId);
+		} else {
+			UserEvent event = new UserEvent();
+			String[] ignoreProperties = {"id"};
 			
-			UserAccount acct = userAccountRepository.getUserAccount(userid);
-			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
-			UserEvent event = EventMapper.toCreateUserEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB", author);
+			BeanUtils.copyProperties(draftEvent, event, ignoreProperties);
+			
 			event = eventsService.createUserEvent(event);
 			
 			if(!StringUtils.isEmpty(acct.getFacebookId())){
@@ -295,50 +403,16 @@ public class RestEventFBController {
 				createCommand.setEventsService(eventsService);
 				createCommand.setUserSocialConnectionService(userSocialConnectionService);
 				createCommand.executeFacebookEventFeed();
-			}   
+			} 
 			
-			EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
-			eventDetailsResponse.setStatus(200);
-			dto.setId(event.getId());
-			eventDetailsResponse.setEventDto(dto);
-			
-			return eventDetailsResponse;
-	}
-	
+			eventDetailsResponse.setMessage("User Event Successfully created.");
+			eventDetailsResponse.setEventDto(EventMapper.convertToEventDto(event));
 
-	@RequestMapping(value = "/createdraftevent/{userid}", produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody EventDetailsResponse createUserDraftEvent(@PathVariable String userid, @RequestBody EventDto dto) throws InterruptedException, ExecutionException {
-			
-			UserAccount acct = userAccountRepository.getUserAccount(userid);
-			String author = acct.getFacebookId() == null ? userid : acct.getFacebookId();
-			
-			UserDraftEvent event=EventMapper.toCreateUserDraftEventObject(dto, profileService, StringUtils.isEmpty(acct.getFacebookId())?"APP":"FB",
-					author);
-			
-			event = eventsService.createUserDraftEvent(event);
-			
-			// Add a message with URL to our app.
-			
-			Comment comment= new Comment();
-			UserProfile pf=profileService.getByUserId(author);
-
-			comment.setFromId(dto.getFrom());
-			comment.setFromAuthorName(pf.getName());
-			comment.setMessage("For details on the event: " + env.getProperty("application.url") + "/activities/" + userid + "/" + event.getId());
-			
-			event.addComment(comment);
-			
-			eventsService.updateUserDraftEvent(event);
-			
-			EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
-			eventDetailsResponse.setStatus(200);
-			dto.setId(event.getId());
-			eventDetailsResponse.setEventDto(dto);
-			
-			return eventDetailsResponse;
+		}
+		
+		return eventDetailsResponse;
 	}
 
-	
 
 	/**
 	 * http://localhost:8080/store/calendarevents/publicevents?state=CA
@@ -351,22 +425,22 @@ public class RestEventFBController {
 	public @ResponseBody EventsResponse  getAllPublicEvents(@RequestParam String state) {
 		//Autheniticated User sessionId in cache or cookie Id for tracking purpose. May be we can use cookie.
 		logger.debug("finding all public events for user" + state);
-		
+
 		List<UserEvent> events =  eventsService.getActivitiesByState(state);
 		List<EventDto> eventList = new ArrayList<EventDto>();
-		
+
 		for(UserEvent event: events){
 			eventList.add(EventMapper.convertToEventDto(event));
 		}
-		
+
 		logger.debug("number of events found :"+eventList.size());
-		
+
 		//model.addAttribute("events", eventList);
 		//model.addAttribute("authname", SecurityContextHolder.getContext().getAuthentication().getName());
 		EventsResponse eventsResponse = new EventsResponse();
 		eventsResponse.setStatus(200);
 		eventsResponse.setEvents(eventList);
-		
+
 		return eventsResponse;
 	}
 
@@ -376,39 +450,39 @@ public class RestEventFBController {
 		logger.debug("finding all invited events for user" + userId);
 		UserAccount userAccount = userAccountRepository.getUserAccount(userId);
 		List<String> userIds = new ArrayList<String>();
-				
+
 		if(userAccount == null){
 			userAccount = userAccountRepository.getUserAccountByUserName(userId);
-			
+
 			if(userAccount == null){
 				return createNotLoggedInEventsRespones();
 			}
 		}
-		
+
 		if(!StringUtils.isEmpty(userAccount.getFacebookId())){
 			userIds.add(userAccount.getFacebookId());
 		}
-		
+
 		userIds.add(userId);
-		
+
 		List<UserEvent> events=eventsService.getInvitedActivities(userIds);
 		List<EventDto> eventList=new ArrayList<EventDto>();
 		for(UserEvent event: events){
 			eventList.add(EventMapper.convertToEventDto(event));
 		}
-		
+
 		logger.debug("number of events found :"+eventList.size());
-		
+
 		EventsResponse eventsResponse = new EventsResponse();
 		eventsResponse.setStatus(200);
 		eventsResponse.setEvents(eventList);
-		
+
 		//model.addAttribute("events", eventList);
 		//model.addAttribute("authname", userId);
-		
+
 		return eventsResponse;
 	}
-	
+
 	@RequestMapping(value="/{userId}/{eventId}/postFBMessage", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody Comment postFeedToFacebook(@PathVariable String userId, @PathVariable String eventId, @RequestParam String message) throws Exception {
 		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
@@ -419,7 +493,7 @@ public class RestEventFBController {
 			}
 		}
 		UserProfile pf=profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
-		
+
 		UserEvent event=eventsService.getActivity(eventId);
 		Comment comment= new Comment();
 		comment.setFromId(userId);
@@ -428,16 +502,16 @@ public class RestEventFBController {
 		comment.setCreatedTime(System.currentTimeMillis());
 		event.addComment(comment);
 		//Instead of passing the FB ID pass the Participant information.
-		
+
 		FacebookEventFeedCommand fbPostCommand = new FacebookEventFeedCommand(event, userId,userAccount.getFacebookId(), comment);
 		fbPostCommand.setConnectionFactoryLocator(connectionFactoryLocator);
 		fbPostCommand.setEventsService(eventsService);
 		fbPostCommand.setUserSocialConnectionService(userSocialConnectionService);
 		fbPostCommand.executeFacebookEventFeed();
-		
+
 		return comment;
 	}
-	
+
 	/**
 	 * User is adding himself to a public event. THis means that user is added and then accepting as well.
 	 * @param userId
@@ -448,7 +522,7 @@ public class RestEventFBController {
 	 */
 	@RequestMapping(value="/{userId}/{eventId}/joinEvent", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse joinEvent(@PathVariable String userId, @PathVariable String eventId,@RequestParam String userType) throws Exception {
-		
+
 		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
 		if(userAccount == null){
 			userAccount = userAccountService.getUserAccount(userId);
@@ -457,7 +531,7 @@ public class RestEventFBController {
 			}
 		}
 		UserEvent event=eventsService.getActivity(eventId);
-		
+
 		UserProfile pf = profileService.getByUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
 		Participant p = new Participant();
 		p.setUserId(StringUtils.isEmpty(userAccount.getFacebookId())?userAccount.getUserId():userAccount.getFacebookId());
@@ -480,7 +554,7 @@ public class RestEventFBController {
 		//We will update the result later. 
 		return new AjaxResponse("User join request Successful");
 	}
-	
+
 	@RequestMapping(value="/{userId}/{eventId}/rejectEvent", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse rejectEvent(@PathVariable String userId, @PathVariable String eventId) throws Exception {
 		UserAccount userAccount = userAccountService.getUserAccountByUserName(userId);
@@ -514,7 +588,7 @@ public class RestEventFBController {
 		//We will update the result later. 
 		return new AjaxResponse("User reject Successful");
 	}
-	
+
 	@RequestMapping(value="/{userId}/{eventId}/maybeEvent", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse maybeEvent(@PathVariable String userId, @PathVariable String eventId) throws Exception {
 
@@ -547,8 +621,8 @@ public class RestEventFBController {
 		//We will update the result later. 
 		return new AjaxResponse("Tentatively accepted");
 	}
-	
-	
+
+
 	@RequestMapping(value="/{userId}/{eventId}/acceptedEvent", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse acceptedEvent(@PathVariable String userId, @PathVariable String eventId) throws Exception {
 
@@ -581,7 +655,7 @@ public class RestEventFBController {
 		//We will update the result later. 
 		return new AjaxResponse("Tentatively accepted");
 	}
-	
+
 	@RequestMapping(value="/{authname}/{eventId}/deleteEvent", produces="application/json", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse deleteEvent(@PathVariable String authname, @PathVariable String eventId) throws Exception {
 		try{
@@ -589,18 +663,18 @@ public class RestEventFBController {
 		}catch(Exception ex){
 			logger.error("Error while deleting event", ex);
 		}		
-		
+
 		AjaxResponse ajaxResponse = new AjaxResponse("Event Deleted Successfully.");
-		
+
 		return ajaxResponse;
 	}
-	
+
 	private EventDetailsResponse createNotLoggedInEventRespones() {
 		EventDetailsResponse eventDetailsResponse = new EventDetailsResponse();
-		
+
 		eventDetailsResponse.setStatus(404);
 		eventDetailsResponse.setMessage("User does not exists/logged in response");
-		
+
 		return eventDetailsResponse;
 	}
 
@@ -608,8 +682,8 @@ public class RestEventFBController {
 		EventsResponse eventsResponse = new EventsResponse();
 		eventsResponse.setStatus(403);
 		eventsResponse.setMessage("User not exists/not logged in.");
-		
+
 		return eventsResponse;
 	}
-	
+
 }

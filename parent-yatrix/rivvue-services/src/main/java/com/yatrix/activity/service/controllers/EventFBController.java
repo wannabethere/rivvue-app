@@ -270,24 +270,12 @@ public class EventFBController {
 			
 			event.addComment(comment);
 			
-			//try{
 				eventsService.updateUserDraftEvent(event);
-//			}catch(ActivityDBException ade){
-//				logger.error("Error updating comment with URL: " +  ade.getMessage());
-//			}
-			
-//			if(!StringUtils.isEmpty(acct.getFacebookId())){
-//				FacebookEventCreateCommand createCommand = new FacebookEventCreateCommand(event, acct.getFacebookId());
-//				createCommand.setConnectionFactoryLocator(connectionFactoryLocator);
-//				createCommand.setEventsService(eventsService);
-//				createCommand.setUserSocialConnectionService(userSocialConnectionService);
-//				createCommand.executeFacebookEventFeed();
-//			}   
 			
 			model.addAttribute("eventDraftId",event.getId());
 			model.addAttribute("status","Successully Created: ");
 			redirectAttributes.addFlashAttribute("eventDraftId", event.getId());
-			//return "redirect:/myactivities/"+userid;
+
 			return "redirect:/friends/" + userid;
 	}
 	

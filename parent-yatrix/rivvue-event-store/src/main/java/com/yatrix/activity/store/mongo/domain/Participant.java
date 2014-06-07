@@ -1,5 +1,8 @@
 package com.yatrix.activity.store.mongo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Participant {
 
 	public static enum TYPE{

@@ -48,6 +48,7 @@ public class UserDraftEvent extends Item{
 	
 	
 	//Handling participants.
+	private List<Participant> invitedIds = new ArrayList<Participant>();
 	private List<PostMessage> postedMessage = new ArrayList<PostMessage>();
 	private List<Comment> appComments = new ArrayList<Comment>();
 	
@@ -206,6 +207,29 @@ public class UserDraftEvent extends Item{
 
 	public void setPublishTo(String publishTo) {
 		this.publishTo = publishTo;
+	}
+	
+	public List< Participant> getInvitedIds() {
+		return invitedIds;
+	}
+	
+	public void setInvitedIds(List< Participant> invitedIds) {
+		this.invitedIds = invitedIds;
+	}
+	
+	//Checks for the existence of the Id and removes it. Simulating an Update.
+	//This is not scalable for large number of people in an invite. 
+	//We will not be doing this for public events.
+	//Incase of public events. We will launch something like social circles.
+	public void addInvitedId(Participant p){
+		for(Participant curP: this.invitedIds){
+			if(curP.getUserId().equalsIgnoreCase(p.getUserId())){
+				//then replace the current.
+				this.invitedIds.remove(curP);
+				break;
+			}
+		}
+		this.invitedIds.add(p);
 	}
 
 	@Override

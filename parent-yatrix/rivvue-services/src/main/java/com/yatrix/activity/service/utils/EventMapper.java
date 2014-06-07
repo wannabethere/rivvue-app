@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.social.twitter.api.Entities;
@@ -229,6 +230,7 @@ public class EventMapper {
 		return userActivity;
 	}
 	
+	//TODO: Remove this method after discussing with Sameer whether do we have a use case to add invitees to actual event.
 	public static UserEvent addInviteesToEvent(ProfileService profileService, UserEvent userActivity, String fbUsers, String appUsers){
 		// split the invitee list
 		List<String> participants = new ArrayList<String>();
@@ -266,17 +268,58 @@ public class EventMapper {
 		return userActivity;
 	}
 	
+	public static UserDraftEvent addInviteesToDraftEvent(ProfileService profileService, UserDraftEvent userActivity, String fbUsers, String appUsers){
+		// split the invitee list
+		List<String> participants = new ArrayList<String>();
+		
+		List<Participant> actParts= new ArrayList<Participant>();
+		if(!StringUtils.isEmpty(fbUsers)){
+			participants = Arrays.asList(fbUsers.split(TAG_SEPERATOR));
+			
+			for(String participantId: participants ){
+				Participant p = new Participant(); 
+				p.setStatus(RSVPSTATUS.NOT_REPLIED);
+				p.setUserType(TYPE.FB);
+				if(!StringUtils.isEmpty(participantId)){
+					p.setInviteeName(profileService.getByUserId(participantId).getName());
+				}
+				p.setUserId(participantId);
+				actParts.add(p);
+				userActivity.addInvitedId(p);
+			}
+		}
+		
+		List<String> appParticipants = new ArrayList<String>();
+		if(!StringUtils.isEmpty(appUsers)){
+			appParticipants = Arrays.asList(appUsers.split(TAG_SEPERATOR));
+			for(String participantId: appParticipants ){
+				Participant p = new Participant();
+				p.setStatus(RSVPSTATUS.NOT_REPLIED);
+				p.setUserType(TYPE.APP);
+				if(!StringUtils.isEmpty(participantId)){
+					p.setInviteeName(profileService.getByUserId(participantId).getName());
+				}
+				p.setUserId(participantId);
+				actParts.add(p);
+				userActivity.addInvitedId(p);
+			}
+		}
+
+		return userActivity;
+	}
+
+	
 	public static UserDraftEvent toCreateUserDraftEventObject(EventDto event, ProfileService profileService, String fromUserType, String author){
 		isvalidEvent(event);
 		UserDraftEvent userActivity= new UserDraftEvent();
 		
 		userActivity.setFromUserType(fromUserType);
 
-		if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
+		if (Message.VISIBILITY.PRIVATE.toString().equalsIgnoreCase(event.getAccess())) {
 			userActivity.setVisibility(Message.VISIBILITY.PRIVATE);
-		} else if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.PUBLIC.toString())) {
+		} else if (Message.VISIBILITY.PUBLIC.toString().equalsIgnoreCase(event.getAccess())) {
 			userActivity.setVisibility(Message.VISIBILITY.PUBLIC);
-		} else if (event.getAccess().equalsIgnoreCase(Message.VISIBILITY.FRIENDSONLY.toString())) {
+		} else if (Message.VISIBILITY.FRIENDSONLY.toString().equalsIgnoreCase(event.getAccess())) {
 			userActivity.setVisibility(Message.VISIBILITY.FRIENDSONLY);
 		}
 		else{
@@ -452,10 +495,6 @@ public class EventMapper {
 		return dto;
 	}
 	
-	
-	
-	
-	
 	private static boolean isvalidEvent(EventDto event) {
 		
 		logger.info(event.toString());
@@ -533,6 +572,26 @@ public class EventMapper {
 		//TODO: Remove the userid as he is a friend of himself we dont need to send it.
 		
 		return invitees;
+	}
+
+
+	public static UserDraftEvent addLookingViewable(UserDraftEvent draftEvent,
+			String lookingViewable) {
+		
+		if(!StringUtils.isEmpty(lookingViewable)){
+			if (lookingViewable.equalsIgnoreCase(Message.VISIBILITY.PRIVATE.toString())) {
+				draftEvent.setVisibility(Message.VISIBILITY.PRIVATE);
+			} else if (lookingViewable.equalsIgnoreCase(Message.VISIBILITY.PUBLIC.toString())) {
+				draftEvent.setVisibility(Message.VISIBILITY.PUBLIC);
+			} else if (lookingViewable.equalsIgnoreCase(Message.VISIBILITY.FRIENDSONLY.toString())) {
+				draftEvent.setVisibility(Message.VISIBILITY.FRIENDSONLY);
+			}
+			else{
+				draftEvent.setVisibility(Message.VISIBILITY.ME);
+			}			
+		}
+		
+		return draftEvent;
 	}
 	
 	
