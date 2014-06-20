@@ -2,7 +2,6 @@ package com.yatrix.activity.store.mongo.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 
 @Document(collection="ZipCodes")
 public class ZipCodes {

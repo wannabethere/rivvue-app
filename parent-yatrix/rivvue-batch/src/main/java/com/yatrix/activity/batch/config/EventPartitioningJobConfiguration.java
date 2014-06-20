@@ -23,14 +23,19 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.yatrix.activity.batch.scheduler.ProcessEventScheduler;
+import com.yatrix.activity.process.batch.AmpActiveProcessor;
+import com.yatrix.activity.process.batch.AmpActiveReader;
+import com.yatrix.activity.process.batch.AmpActiveWriter;
 import com.yatrix.activity.process.batch.FacebookSyncupProcessor;
 import com.yatrix.activity.process.batch.UserActivityProcessor;
 import com.yatrix.activity.batch.listener.LogProcessListener;
 import com.yatrix.activity.batch.listener.ProtocolListener;
 import com.yatrix.activity.ext.domain.facebook.FacebookSyncupSocialResult;
 import com.yatrix.activity.store.mongo.domain.ActivityAndUserToEvents;
+import com.yatrix.activity.store.mongo.domain.AmpActiveEventReviews;
 import com.yatrix.activity.store.mongo.domain.UserActivity;
 import com.yatrix.activity.store.mongo.domain.UserEvent;
+import com.yatrix.activity.store.mongo.domain.ZipCodes;
 import com.yatrix.activity.store.mongo.service.IUserActivityCatalogService;
 
 /**
@@ -76,6 +81,16 @@ public class EventPartitioningJobConfiguration {
 	@Autowired
 	@Qualifier("facebookSyncupWriter")
 	private ItemWriter<FacebookSyncupSocialResult> facebookSyncupWriter;
+	
+	@Autowired
+	private AmpActivePartitioner ampActivePartitioner;
+	
+	@Autowired
+	private AmpActiveReader ampActiveReader;
+	
+	@Autowired
+	private AmpActiveWriter ampActiveWriter;
+
 		
 	@Bean(name="pendingEventPartitioningJob")
 	public Job pendingEventPartitioningJob(){
@@ -132,6 +147,42 @@ public class EventPartitioningJobConfiguration {
 				.listener(logProcessListener())
 				.build();
 	}
+	
+	@Bean(name="ampDataPartitionJob")
+	public Job ampDataPartitionJob(){
+		return jobBuilders.get("ampDataPartitionJob")
+				.listener(protocolListener())
+				.start(ampDataPartitionStep())
+				.build();
+	}
+		
+	@Bean
+	public Step ampDataPartitionStep(){
+		return stepBuilders.get("ampPartitionStep")
+				.<ZipCodes, AmpActiveEventReviews>chunk(1)
+				.reader(ampActiveReader)
+				.processor(ampDataProcessor())
+				.writer(ampActiveWriter)
+				.listener(logProcessListener())
+				.build();
+	}
+	
+	@Bean
+	public Step ampPartitionStep(){
+		return stepBuilders.get("ampDataPartitionStep")
+				.partitioner(ampDataPartitionStep()).gridSize(10)
+				.partitioner("ampDataPartitionStep", ampActivePartitioner)
+				.taskExecutor(taskExecutor())
+				.build();
+	}
+	
+		
+	@Bean
+	public ItemProcessor<ZipCodes, AmpActiveEventReviews> ampDataProcessor(){
+		return new AmpActiveProcessor();
+	}
+	
+
 		
 	@Bean
 	public ItemProcessor<UserActivity, ActivityAndUserToEvents> eventProcessingProcessor(){
