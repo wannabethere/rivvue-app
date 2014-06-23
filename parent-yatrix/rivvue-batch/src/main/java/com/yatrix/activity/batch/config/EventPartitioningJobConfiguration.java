@@ -1,5 +1,7 @@
 package com.yatrix.activity.batch.config;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -159,7 +161,7 @@ public class EventPartitioningJobConfiguration {
 	@Bean
 	public Step ampDataPartitionStep(){
 		return stepBuilders.get("ampPartitionStep")
-				.<ZipCodes, AmpActiveEventReviews>chunk(1)
+				.<ZipCodes, List<AmpActiveEventReviews>>chunk(1)
 				.reader(ampActiveReader)
 				.processor(ampDataProcessor())
 				.writer(ampActiveWriter)
@@ -178,7 +180,7 @@ public class EventPartitioningJobConfiguration {
 	
 		
 	@Bean
-	public ItemProcessor<ZipCodes, AmpActiveEventReviews> ampDataProcessor(){
+	public ItemProcessor<ZipCodes, List<AmpActiveEventReviews>> ampDataProcessor(){
 		return new AmpActiveProcessor();
 	}
 	

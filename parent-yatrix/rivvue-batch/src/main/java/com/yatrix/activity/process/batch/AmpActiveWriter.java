@@ -1,5 +1,6 @@
 package com.yatrix.activity.process.batch;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -12,7 +13,7 @@ import com.yatrix.activity.store.mongo.domain.AmpActiveEventReviews;
 import com.yatrix.activity.store.mongo.repository.AmpActiveEventReviewsRepository;
 
 @Service
-public class AmpActiveWriter implements ItemWriter<AmpActiveEventReviews> {
+public class AmpActiveWriter implements ItemWriter<List<AmpActiveEventReviews>> {
 
 	@Autowired
 	private AmpActiveEventReviewsRepository ampActiveEventReviewRepository;
@@ -20,11 +21,18 @@ public class AmpActiveWriter implements ItemWriter<AmpActiveEventReviews> {
 	private static final Log log = LogFactory.getLog(AmpActiveWriter.class);
 
 	@Override
-	public void write(List<? extends AmpActiveEventReviews> items)
+	public void write(List<? extends List<AmpActiveEventReviews>> items)
 			throws Exception {
 
-		ampActiveEventReviewRepository.save(items);
+		List<AmpActiveEventReviews> allItems = new ArrayList<AmpActiveEventReviews>();
+		
+		for(List<AmpActiveEventReviews> item : items){
+			allItems.addAll(item);
+		}
 
+		ampActiveEventReviewRepository.save(allItems);
+		
 	}
+
 
 }
