@@ -32,8 +32,12 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 		
 		for(Categories category : Categories.getAllCategories()){
 			
+			int breakThreshold = 0;
+			
 			for(Activities activity : Activities.getAllActivities()){
-
+				
+				breakThreshold++;
+				
 				request = "http://api.amp.active.com/v2/search?query="
 						+ activity.getActivity().toLowerCase() +"&category=" + category.getCategory().toLowerCase() +"&start_date="
 						+ "2014-06-20" //TODO: Get today's date here.
@@ -50,6 +54,12 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 				
 				eventReviewList.add(eventReview);
 				
+				//TODO: Better refactor the reader to pass in only a url. 
+				//TODO: When refactored properly remove this.
+				if(breakThreshold > 2){
+					// For now we will read only 2 activities for testing
+					break;
+				}
 			}
 		}
 		
