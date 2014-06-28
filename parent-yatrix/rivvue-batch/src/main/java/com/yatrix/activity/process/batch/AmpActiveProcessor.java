@@ -9,9 +9,9 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
-import com.yatrix.activity.store.mongo.domain.ActivityAndUserToEvents;
-import com.yatrix.activity.store.mongo.domain.AmpActiveEventReviews;
 import com.yatrix.activity.store.mongo.domain.ZipCodes;
+import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventResponse;
+import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
 import com.yatrix.activity.store.utils.Activities;
 import com.yatrix.activity.store.utils.Categories;
 
@@ -31,6 +31,7 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 		String request;
 		
 		for(Categories category : Categories.getAllCategories()){
+			
 			for(Activities activity : Activities.getAllActivities()){
 
 				request = "http://api.amp.active.com/v2/search?query="
@@ -40,9 +41,15 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 						+  item.getPrimaryCity() +","+ item.getState() + "," + item.getCountry()//"San%20Diego,CA,US"
 						+ "&radius=50&api_key=sqq35zvx6a8rgmxhy9csm8qj";
 
-				//TODO: Make rest call to get the events and pass to the following constructor
 				eventReview = new AmpActiveEventReviews(request, null);
+				
+				Object ampActiveEventResponse = restTemplate.getForObject(request, Object.class); //AmpActiveEventResponse.class);
+				log.info("Returned: " + ampActiveEventResponse == null ? "Nothing returned" : ampActiveEventResponse.toString());
+				
+				eventReview.setAmpActiveEventResponse(ampActiveEventResponse.toString());
+				
 				eventReviewList.add(eventReview);
+				
 			}
 		}
 		

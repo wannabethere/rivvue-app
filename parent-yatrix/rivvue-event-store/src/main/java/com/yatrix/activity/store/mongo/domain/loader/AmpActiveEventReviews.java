@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.yatrix.activity.store.mongo.domain;
+package com.yatrix.activity.store.mongo.domain.loader;
 
 import java.io.Serializable;
 
@@ -19,7 +19,7 @@ public class AmpActiveEventReviews implements Serializable {
 	
 	String ampActiveEventRequest;
 	
-	AmpActiveEventResponse ampActiveEventResponse;
+	String ampActiveEventResponse;
 	
 	public AmpActiveEventReviews(String request, AmpActiveEventResponse response){
 		ampActiveEventRequest = request;
@@ -33,12 +33,12 @@ public class AmpActiveEventReviews implements Serializable {
 		this.ampActiveEventRequest = ampActiveEventRequest;
 	}
 
-	public AmpActiveEventResponse getAmpActiveEventResponse() {
+	public String getAmpActiveEventResponse() {
 		return ampActiveEventResponse;
 	}
 
 	public void setAmpActiveEventResponse(
-			AmpActiveEventResponse ampActiveEventResponse) {
+			String ampActiveEventResponse) {
 		this.ampActiveEventResponse = ampActiveEventResponse;
 	}
 	
