@@ -9,8 +9,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.yatrix.activity.mongo.repository.AmpActiveEventReviewsRepository;
 import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
-import com.yatrix.activity.store.mongo.repository.AmpActiveEventReviewsRepository;
+
 
 @Service
 public class AmpActiveWriter implements ItemWriter<List<AmpActiveEventReviews>> {

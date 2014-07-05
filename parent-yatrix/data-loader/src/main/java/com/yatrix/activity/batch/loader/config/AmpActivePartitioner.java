@@ -8,7 +8,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.yatrix.activity.store.mongo.repository.ZipCodeRepository;
+import com.yatrix.activity.mongo.repository.ZipCodeRepository;
+
 
 @Service
 public class AmpActivePartitioner implements Partitioner {

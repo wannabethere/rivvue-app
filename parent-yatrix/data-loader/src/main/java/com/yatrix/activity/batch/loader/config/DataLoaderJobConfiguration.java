@@ -12,13 +12,18 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.yatrix.activity.batch.loader.AmpActiveProcessor;
 import com.yatrix.activity.batch.loader.AmpActiveReader;
@@ -35,6 +40,8 @@ import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
 @Configuration
 @EnableScheduling
 @EnableBatchProcessing
+@ComponentScan(basePackages = {"com.yatrix.activity"})
+@Import({MongoConfig.class})
 public class DataLoaderJobConfiguration {
 	
 	@Autowired
@@ -124,6 +131,11 @@ public class DataLoaderJobConfiguration {
 		taskExecutor.setMaxPoolSize(4);
 		taskExecutor.afterPropertiesSet();
 		return taskExecutor;
+	}
+	
+	@Bean
+	public RestTemplate initializeRestTemplate(){
+		return new RestTemplate();
 	}
 
 }

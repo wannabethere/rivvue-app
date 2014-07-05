@@ -9,11 +9,10 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
+import com.yatrix.activity.batch.data.loader.util.Activities;
+import com.yatrix.activity.batch.data.loader.util.Categories;
 import com.yatrix.activity.store.mongo.domain.ZipCodes;
-import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventResponse;
 import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
-import com.yatrix.activity.store.utils.Activities;
-import com.yatrix.activity.store.utils.Categories;
 
 
 public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiveEventReviews>> {
@@ -61,6 +60,7 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 					break;
 				}
 			}
+			break;
 		}
 		
 		

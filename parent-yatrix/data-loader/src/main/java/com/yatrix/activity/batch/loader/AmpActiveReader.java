@@ -11,8 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.yatrix.activity.mongo.repository.ZipCodeRepository;
 import com.yatrix.activity.store.mongo.domain.ZipCodes;
-import com.yatrix.activity.store.mongo.repository.ZipCodeRepository;
 
 @Service
 public class AmpActiveReader extends AbstractPagingItemReader<ZipCodes> 
