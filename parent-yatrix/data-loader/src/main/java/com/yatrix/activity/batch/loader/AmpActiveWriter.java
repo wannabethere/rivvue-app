@@ -1,5 +1,12 @@
 package com.yatrix.activity.batch.loader;
 
+import static java.nio.file.StandardOpenOption.*;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +32,22 @@ public class AmpActiveWriter implements ItemWriter<List<AmpActiveEventReviews>> 
 	public void write(List<? extends List<AmpActiveEventReviews>> items)
 			throws Exception {
 
-		List<AmpActiveEventReviews> allItems = new ArrayList<AmpActiveEventReviews>();
-		
-		for(List<AmpActiveEventReviews> item : items){
-			allItems.addAll(item);
+		Path p = Paths.get("./AmpActiveEvents.txt");
+
+		try (OutputStream out = new BufferedOutputStream(
+				Files.newOutputStream(p, CREATE, APPEND))) {
+			for(List<AmpActiveEventReviews> item : items){
+				for(AmpActiveEventReviews activeEventReview : item){
+					out.write(activeEventReview.getAmpActiveEventResponse().getBytes(), 0, activeEventReview.getAmpActiveEventResponse().length());					
+				}
+			}
+			
+		} catch (IOException x) {
+			System.err.println(x);
 		}
 
-		ampActiveEventReviewRepository.save(allItems);
-		
+		//ampActiveEventReviewRepository.save(allItems);
+
 	}
 
 

@@ -42,7 +42,7 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 						+ "2014-06-20" //TODO: Get today's date here.
 						+ "..&near="
 						+  item.getPrimaryCity() +","+ item.getState() + "," + item.getCountry()//"San%20Diego,CA,US"
-						+ "&radius=50&api_key=sqq35zvx6a8rgmxhy9csm8qj";
+						+ "&radius=50&api_key=nannnszrab8pjhkey5j6vpc8";
 
 				eventReview = new AmpActiveEventReviews(request, null);
 				
