@@ -16,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -42,6 +43,7 @@ import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
 @EnableBatchProcessing
 @ComponentScan(basePackages = {"com.yatrix.activity"})
 @Import({MongoConfig.class})
+@PropertySource("classpath:data-loader.properties")
 public class DataLoaderJobConfiguration {
 	
 	@Autowired

@@ -5,6 +5,7 @@ import com.mongodb.WriteConcern;
 
 import javax.inject.Inject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
@@ -23,7 +24,7 @@ public class MongoConfig
   extends AbstractMongoConfiguration
 {
 
-  @Inject
+  @Autowired
   private Environment environment;
 
   @Override
@@ -31,12 +32,6 @@ public class MongoConfig
 	  //Bad Hack to figure out the env
     return StringUtils.isEmpty(environment.getProperty("mongo.db.name"))?"socialeventdb1":environment.getProperty("mongo.db.name");
   }
-
-  /*
-   * @Override protected UserCredentials getUserCredentials() { return new
-   * UserCredentials(environment.getProperty("mongodb.username"),
-   * environment.getProperty("mongodb.password")); }
-   */
 
   @Override
   public String getMappingBasePackage() {

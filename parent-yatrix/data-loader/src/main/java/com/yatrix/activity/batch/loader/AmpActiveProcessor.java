@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
 import com.yatrix.activity.batch.data.loader.util.Activities;
@@ -21,6 +22,9 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 	
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private Environment environment;
 	
 	public List<AmpActiveEventReviews> process(ZipCodes item) throws Exception {
 		
