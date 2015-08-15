@@ -1,6 +1,10 @@
 package com.yatrix.activity.batch.loader;
 
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -41,12 +45,15 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 				
 				breakThreshold++;
 				
-				request = "http://api.amp.active.com/v2/search?query="
-						+ activity.getActivity().toLowerCase() +"&category=" + category.getCategory().toLowerCase() +"&start_date="
-						+ "2014-06-20" //TODO: Get today's date here.
-						+ "..&near="
-						+  item.getPrimaryCity() +","+ item.getState() + "," + item.getCountry()//"San%20Diego,CA,US"
-						+ "&radius=50&api_key=nannnszrab8pjhkey5j6vpc8";
+				request = environment.getProperty("amp.active.event.search.url");
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				String date = dateFormat.format(new Date(System.currentTimeMillis()));
+				String apiKey = environment.getProperty("amp.active.event.search.api_key");
+				
+				request = MessageFormat.format(request, activity.getActivity().toLowerCase(), category.getCategory().toLowerCase(),
+						date, item.getPrimaryCity(), item.getState(), item.getCountry(), 50, apiKey);
+				
+				System.out.println("Request: " + request);
 
 				eventReview = new AmpActiveEventReviews(request, null);
 				
