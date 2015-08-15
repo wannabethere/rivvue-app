@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
 
 import com.yatrix.activity.mongo.repository.AmpActiveEventReviewsRepository;
 import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
+import com.yatrix.activity.store.mongo.domain.loader.DataLoaderResponse;
 
 
 @Service
-public class AmpActiveWriter implements ItemWriter<List<AmpActiveEventReviews>> {
+public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 
 	@Autowired
 	private AmpActiveEventReviewsRepository ampActiveEventReviewRepository;
@@ -34,26 +35,30 @@ public class AmpActiveWriter implements ItemWriter<List<AmpActiveEventReviews>> 
 	private static final Log log = LogFactory.getLog(AmpActiveWriter.class);
 
 	@Override
-	public void write(List<? extends List<AmpActiveEventReviews>> items)
+	public void write(List<? extends DataLoaderResponse> items)
 			throws Exception {
-
 		System.out.println("File Path: " + environment.getProperty("amp.active.file.path"));
-		
-		Path p = Paths.get(environment.getProperty("amp.active.file.path"));
 
-		try (OutputStream out = new BufferedOutputStream(
-				Files.newOutputStream(p, CREATE, APPEND))) {
-			for(List<AmpActiveEventReviews> item : items){
-				for(AmpActiveEventReviews activeEventReview : item){
-					out.write(activeEventReview.getAmpActiveEventResponse().getBytes(), 0, activeEventReview.getAmpActiveEventResponse().length());					
+		Path ampActiveFilepath = Paths.get(environment.getProperty("amp.active.file.path"));
+		Path yelpFilepath = Paths.get(environment.getProperty("yelp.file.path"));
+
+		try (OutputStream ampActiveFile = new BufferedOutputStream(
+				Files.newOutputStream(ampActiveFilepath, CREATE, APPEND));
+				OutputStream yelpReviewFile = new BufferedOutputStream(
+						Files.newOutputStream(yelpFilepath, CREATE, APPEND))) {
+			
+			for(DataLoaderResponse response : items){
+				for(String ampResponse : response.getAmpResponse()){
+					ampActiveFile.write((ampResponse + "\n" ).getBytes(), 0, (ampResponse + "\n" ).length());	
 				}
+				
+				yelpReviewFile.write((response.getYelpResponse() + "\n" ).getBytes(), 0, (response.getYelpResponse() + "\n" ).length());
+				
 			}
 
 		} catch (IOException ex) {
 			log.error("Error writing Amp Activity to file...", ex);
 		}
-
-		//ampActiveEventReviewRepository.save(allItems);
 
 	}
 

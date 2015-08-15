@@ -3,9 +3,7 @@ package com.yatrix.activity.batch.loader;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,11 +14,12 @@ import org.springframework.web.client.RestTemplate;
 
 import com.yatrix.activity.batch.data.loader.util.Activities;
 import com.yatrix.activity.batch.data.loader.util.Categories;
+import com.yatrix.activity.mongo.service.YelpPlacesService;
 import com.yatrix.activity.store.mongo.domain.ZipCodes;
-import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
+import com.yatrix.activity.store.mongo.domain.loader.DataLoaderResponse;
 
 
-public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiveEventReviews>> {
+public class AmpActiveProcessor implements ItemProcessor<ZipCodes, DataLoaderResponse> {
 
 	private static final Log log = LogFactory.getLog(AmpActiveProcessor.class);
 	
@@ -30,39 +29,23 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 	@Autowired
 	private Environment environment;
 	
-	public List<AmpActiveEventReviews> process(ZipCodes item) throws Exception {
+	@Autowired
+	private YelpPlacesService yelpService;
+	
+	public DataLoaderResponse process(ZipCodes item) throws Exception {
 		
 		log.info(" ---------------------------------------------------- Amp Active Processor --------------------------------------------"  + item.getPrimaryCity());
-		List<AmpActiveEventReviews> eventReviewList = new ArrayList<AmpActiveEventReviews>();
-		AmpActiveEventReviews eventReview;
-		String request;
+		DataLoaderResponse response = new DataLoaderResponse();
 		
-		for(Categories category : Categories.getAllCategories()){
+		for(Activities activity : Activities.getAllActivities()){
 			
 			int breakThreshold = 0;
 			
-			for(Activities activity : Activities.getAllActivities()){
+			for(Categories category : Categories.getAllCategories()){
 				
 				breakThreshold++;
 				
-				request = environment.getProperty("amp.active.event.search.url");
-				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				String date = dateFormat.format(new Date(System.currentTimeMillis()));
-				String apiKey = environment.getProperty("amp.active.event.search.api_key");
-				
-				request = MessageFormat.format(request, activity.getActivity().toLowerCase(), category.getCategory().toLowerCase(),
-						date, item.getPrimaryCity(), item.getState(), item.getCountry(), 50, apiKey);
-				
-				System.out.println("Request: " + request);
-
-				eventReview = new AmpActiveEventReviews(request, null);
-				
-				Object ampActiveEventResponse = restTemplate.getForObject(request, Object.class); //AmpActiveEventResponse.class);
-				log.info("Returned: " + ampActiveEventResponse == null ? "Nothing returned" : ampActiveEventResponse.toString());
-				
-				eventReview.setAmpActiveEventResponse(ampActiveEventResponse.toString());
-				
-				eventReviewList.add(eventReview);
+				response = setAmpActiveEvents(item, category, activity, response);
 				
 				//TODO: Better refactor the reader to pass in only a url. 
 				//TODO: When refactored properly remove this.
@@ -71,11 +54,35 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, List<AmpActiv
 					break;
 				}
 			}
-			break;
+			
+			response.setYelpResponse(yelpService.loadReviews(activity.getActivity().toLowerCase(), 
+					item.getLatitude(), item.getLongitude()));
+			//break;
 		}
 		
 		
-		return eventReviewList;
+		return response;
+	}
+
+	private DataLoaderResponse setAmpActiveEvents(ZipCodes item,
+			Categories category, Activities activity, DataLoaderResponse response) {
+		String request;
+		request = environment.getProperty("amp.active.event.search.url");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String date = dateFormat.format(new Date(System.currentTimeMillis()));
+		String apiKey = environment.getProperty("amp.active.event.search.api_key");
+		
+		request = MessageFormat.format(request, activity.getActivity().toLowerCase(), category.getCategory().toLowerCase(),
+				date, item.getLatitude(), item.getLongitude(), 50, apiKey);
+		
+		System.out.println("Request: " + request);
+
+		Object ampActiveEventResponse = restTemplate.getForObject(request, Object.class); //AmpActiveEventResponse.class);
+		log.info("Returned: " + ampActiveEventResponse == null ? "Nothing returned" : ampActiveEventResponse.toString());
+		
+		response.addAmpResponse(ampActiveEventResponse.toString());
+		
+		return response;
 	}
 
 }

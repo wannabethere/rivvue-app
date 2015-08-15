@@ -1,7 +1,5 @@
 package com.yatrix.activity.batch.loader.config;
 
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -23,7 +20,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.yatrix.activity.batch.loader.AmpActiveProcessor;
@@ -33,7 +29,7 @@ import com.yatrix.activity.batch.loader.listener.LogProcessListener;
 import com.yatrix.activity.batch.loader.listener.ProtocolListener;
 import com.yatrix.activity.batch.loader.scheduler.DataLoadScheduler;
 import com.yatrix.activity.store.mongo.domain.ZipCodes;
-import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
+import com.yatrix.activity.store.mongo.domain.loader.DataLoaderResponse;
 
 /**
  * @author Kishore Manthangod
@@ -64,8 +60,6 @@ public class DataLoaderJobConfiguration {
 	@Autowired
 	private AmpActiveWriter ampActiveWriter;
 
-		
-	
 	
 	@Bean(name="ampDataPartitionJob")
 	public Job ampDataPartitionJob(){
@@ -78,7 +72,7 @@ public class DataLoaderJobConfiguration {
 	@Bean
 	public Step ampDataPartitionStep(){
 		return stepBuilders.get("ampPartitionStep")
-				.<ZipCodes, List<AmpActiveEventReviews>>chunk(1)
+				.<ZipCodes, DataLoaderResponse>chunk(1)
 				.reader(ampActiveReader)
 				.processor(ampDataProcessor())
 				.writer(ampActiveWriter)
@@ -97,7 +91,7 @@ public class DataLoaderJobConfiguration {
 	
 		
 	@Bean
-	public ItemProcessor<ZipCodes, List<AmpActiveEventReviews>> ampDataProcessor(){
+	public ItemProcessor<ZipCodes, DataLoaderResponse> ampDataProcessor(){
 		return new AmpActiveProcessor();
 	}
 	
