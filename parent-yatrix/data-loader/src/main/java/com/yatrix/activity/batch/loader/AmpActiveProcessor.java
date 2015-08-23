@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.yatrix.activity.batch.data.loader.util.Activities;
 import com.yatrix.activity.batch.data.loader.util.Categories;
+import com.yatrix.activity.dataloader.store.mongo.domain.AmpActiveEventResponse;
 import com.yatrix.activity.mongo.service.YelpPlacesService;
 import com.yatrix.activity.store.mongo.domain.ZipCodes;
 import com.yatrix.activity.store.mongo.domain.loader.DataLoaderResponse;
@@ -57,7 +58,7 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, DataLoaderRes
 			
 			response.setYelpResponse(yelpService.loadReviews(activity.getActivity().toLowerCase(), 
 					item.getLatitude(), item.getLongitude()));
-			//break;
+			break;
 		}
 		
 		
@@ -77,10 +78,10 @@ public class AmpActiveProcessor implements ItemProcessor<ZipCodes, DataLoaderRes
 		
 		System.out.println("Request: " + request);
 
-		Object ampActiveEventResponse = restTemplate.getForObject(request, Object.class); //AmpActiveEventResponse.class);
-		log.info("Returned: " + ampActiveEventResponse == null ? "Nothing returned" : ampActiveEventResponse.toString());
+		String ampActiveEventResponse = restTemplate.getForObject(request, String.class); //AmpActiveEventResponse.class);
+		log.info("Returned: " + ampActiveEventResponse == null ? "Nothing returned" : ampActiveEventResponse);
 		
-		response.addAmpResponse(ampActiveEventResponse.toString());
+		response.addAmpResponse(ampActiveEventResponse);
 		
 		return response;
 	}

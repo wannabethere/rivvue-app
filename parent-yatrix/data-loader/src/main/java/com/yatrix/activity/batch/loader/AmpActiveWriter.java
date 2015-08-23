@@ -1,6 +1,7 @@
 package com.yatrix.activity.batch.loader;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -8,7 +9,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -18,8 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yatrix.activity.dataloader.store.mongo.domain.AmpActiveEventResponse;
+import com.yatrix.activity.ext.domain.yelp.PlaceDetailsResponse;
 import com.yatrix.activity.mongo.repository.AmpActiveEventReviewsRepository;
-import com.yatrix.activity.store.mongo.domain.loader.AmpActiveEventReviews;
+import com.yatrix.activity.mongo.repository.YelpPlacesRepository;
 import com.yatrix.activity.store.mongo.domain.loader.DataLoaderResponse;
 
 
@@ -28,6 +32,9 @@ public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 
 	@Autowired
 	private AmpActiveEventReviewsRepository ampActiveEventReviewRepository;
+	
+	@Autowired
+	private YelpPlacesRepository yelpPlacesRepository;
 
 	@Autowired
 	private Environment environment;
@@ -37,6 +44,47 @@ public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 	@Override
 	public void write(List<? extends DataLoaderResponse> items)
 			throws Exception {
+		
+		writeToFile(items);
+		persist(items);
+
+	}
+
+	private void persist(List<? extends DataLoaderResponse> items) {
+		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setSerializationInclusion(Include.NON_NULL);
+
+		PlaceDetailsResponse detailsResponse = null;
+		AmpActiveEventResponse ampActiveEventResponse = null;
+		
+		for(DataLoaderResponse response  : items){
+			try {
+				System.out.println("Saving yelp reviews...");
+				detailsResponse = mapper.readValue(response.getYelpResponse(), PlaceDetailsResponse.class);
+				
+				yelpPlacesRepository.save(detailsResponse.getResult());
+				
+				for(String eventResponse: response.getAmpResponse()){
+					ampActiveEventResponse = mapper.readValue(eventResponse, AmpActiveEventResponse.class);
+					
+					System.out.println(ampActiveEventResponse.getResults());
+					
+					ampActiveEventReviewRepository.save(ampActiveEventResponse.getResults());
+					System.out.println("Saved");
+				}
+				
+				
+				System.out.println("Saved yelp reviews...");
+			} catch (java.io.IOException ioe) {
+				System.out.println("error :" + ioe);
+			}
+			
+		}
+		
+	}
+
+	private void writeToFile(List<? extends DataLoaderResponse> items) {
 		System.out.println("File Path: " + environment.getProperty("amp.active.file.path"));
 
 		Path ampActiveFilepath = Paths.get(environment.getProperty("amp.active.file.path"));
@@ -59,7 +107,6 @@ public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 		} catch (IOException ex) {
 			log.error("Error writing Amp Activity to file...", ex);
 		}
-
 	}
 
 
