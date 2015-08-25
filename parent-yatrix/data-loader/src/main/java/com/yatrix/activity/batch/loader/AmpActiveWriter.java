@@ -4,7 +4,6 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,12 +13,14 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yatrix.activity.dataloader.store.mongo.domain.AmpActiveEvent;
 import com.yatrix.activity.dataloader.store.mongo.domain.AmpActiveEventResponse;
 import com.yatrix.activity.ext.domain.yelp.PlaceDetailsResponse;
 import com.yatrix.activity.mongo.repository.AmpActiveEventReviewsRepository;
@@ -64,13 +65,22 @@ public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 				detailsResponse = mapper.readValue(response.getYelpResponse(), PlaceDetailsResponse.class);
 				
 				yelpPlacesRepository.save(detailsResponse.getResult());
+				System.out.println("Yelp saved...");
 				
 				for(String eventResponse: response.getAmpResponse()){
+					System.out.println("Event Response..." );
 					ampActiveEventResponse = mapper.readValue(eventResponse, AmpActiveEventResponse.class);
+					System.out.println("Response: " + eventResponse);
 					
-					System.out.println(ampActiveEventResponse.getResults());
+					AmpActiveEvent ampActiveEvent = ampActiveEventResponse.getResults().get(0);
 					
-					ampActiveEventReviewRepository.save(ampActiveEventResponse.getResults());
+					com.yatrix.activity.dataloader.store.mongo.AmpActiveEvent persistencyEvent = new com.yatrix.activity.dataloader.store.mongo.AmpActiveEvent();
+					
+					BeanUtils.copyProperties(ampActiveEvent, persistencyEvent);
+					
+					System.out.println(persistencyEvent);
+					
+					ampActiveEventReviewRepository.save(persistencyEvent);
 					System.out.println("Saved");
 				}
 				
@@ -104,7 +114,7 @@ public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 				
 			}
 
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			log.error("Error writing Amp Activity to file...", ex);
 		}
 	}

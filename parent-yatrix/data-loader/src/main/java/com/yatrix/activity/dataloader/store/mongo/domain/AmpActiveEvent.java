@@ -9,8 +9,6 @@ import java.util.Map;
 
 import javax.annotation.Generated;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -102,7 +100,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "socialMedia",
     "assetReferences"
 })
-@Document(collection="AmpActiveEvents")
+//@Document(collection="AmpActiveEvents")
 public class AmpActiveEvent extends Item implements Serializable{
 
  
