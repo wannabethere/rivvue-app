@@ -47,7 +47,7 @@ public class AmpActiveWriter implements ItemWriter<DataLoaderResponse> {
 			throws Exception {
 		
 		writeToFile(items);
-		persist(items);
+		//persist(items);
 
 	}
 
